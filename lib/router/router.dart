@@ -1,3 +1,11 @@
+import 'package:taleemmate/ui/screens/create_account/create_account.dart';
+import 'package:taleemmate/ui/screens/login/login.dart';
+import 'package:taleemmate/ui/screens/splash/splash.dart';
+import 'package:taleemmate/ui/screens/progress/progress.dart';
+import 'package:taleemmate/ui/screens/plan/plan.dart';
+import 'package:taleemmate/ui/screens/tutor/tutor.dart';
+import 'package:taleemmate/ui/screens/library/library.dart';
+import 'package:taleemmate/ui/screens/home/home.dart';
 import 'package:flutter/material.dart';
 
 import 'routes.dart';
@@ -5,6 +13,7 @@ import 'routes.dart';
 final navigator = GlobalKey<NavigatorState>();
 
 final appRoutes = <String, WidgetBuilder>{
+  AppRoutes.createAccount: (_) => const CreateAccountScreen(),
   AppRoutes.login: (_) => const LoginScreen(),
   AppRoutes.splash: (_) => const SplashScreen(),
 };
@@ -13,12 +22,14 @@ Route<dynamic>? onGenerateRoutes(RouteSettings settings) {
   switch (settings.name) {
     case AppRoutes.home:
       return FadeRoute(child: const HomeScreen(), settings: settings);
-    case AppRoutes.jobs:
-      return FadeRoute(child: const JobsScreen(), settings: settings);
-    case AppRoutes.projects:
-      return FadeRoute(child: const ProjectsScreen(), settings: settings);
-    case AppRoutes.letters:
-      return FadeRoute(child: const LettersScreen(), settings: settings);
+    case AppRoutes.library:
+      return FadeRoute(child: const LibraryScreen(), settings: settings);
+    case AppRoutes.tutor:
+      return FadeRoute(child: const TutorScreen(), settings: settings);
+    case AppRoutes.plan:
+      return FadeRoute(child: const PlanScreen(), settings: settings);
+    case AppRoutes.progress:
+      return FadeRoute(child: const ProgressScreen(), settings: settings);
     default:
       return null;
   }
