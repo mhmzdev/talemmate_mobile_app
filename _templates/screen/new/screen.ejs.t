@@ -1,0 +1,56 @@
+---
+to: "lib/ui/screens/<%= h.changeCase.snake(name) %>/<%= h.changeCase.snake(name) %>.dart"
+---
+import 'package:flutter/material.dart';
+import 'package:taleemmate/configs/configs.dart';
+import 'package:provider/provider.dart';
+<% if (formData) { %>
+import 'package:flutter/foundation.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+<% } %>
+
+import 'package:taleemmate/ui/widgets/core/screen/screen.dart';
+
+<% if (formData) { %>part 'static/_form_data.dart';<% } %>
+<% if (formData) { %>part 'static/_form_keys.dart';<% } %>
+
+<% if (widgets.length) { widgets.forEach(function(key){ %>part 'widgets/_<%=h.changeCase.snake(key)%>.dart';<% }); } %>
+
+part '_state.dart';
+
+class <%=h.changeCase.pascal(name)%>Screen extends StatelessWidget {
+  const <%=h.changeCase.pascal(name)%>Screen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    App.init(context);
+
+    return ChangeNotifierProvider<_ScreenState>(
+      create: (_) => _ScreenState(),
+      child: const _Body(),
+    );
+  }
+}
+
+class _Body extends StatelessWidget {
+  const _Body();
+
+  @override
+  Widget build(BuildContext context) {
+    App.init(context);
+    <% if (formData) { %>final screenState = _ScreenState.s(context);<% } %>
+
+    return <% if (!formData) { %> const <% } %> Screen(
+      <% if (formData) { %>
+      formKey: screenState.formKey,
+      initialFormValue: _FormData.initialValues(),<% } %>
+      keyboardHandler: true,
+      child: <% if (formData) { %> const <% } %> SafeArea(
+        child: Column(
+          crossAxisAlignment: .stretch,
+          children: [],
+        ),
+      ),
+    );
+  }
+}
