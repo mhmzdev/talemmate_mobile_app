@@ -5,17 +5,25 @@ class AppIconPainters extends CustomPainter {
 
   final Color? fg;
   final Color? bg;
+  final double radius;
 
   const AppIconPainters({
     this.fg,
     this.bg,
+    this.radius = 8.0,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint0Fill = Paint()..style = PaintingStyle.fill;
     paint0Fill.color = bg ?? const Color(0xff0E2128).withValues(alpha: 1.0);
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), paint0Fill);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(0, 0, size.width, size.height),
+        Radius.circular(radius),
+      ),
+      paint0Fill,
+    );
 
     final path_1 = Path();
     path_1.moveTo(size.width * 0.2707656, size.height * 0.1444131);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:taleemmate/configs/configs.dart';
 import 'package:provider/provider.dart';
+import 'package:taleemmate/ui/painters/painters.dart';
 import 'package:taleemmate/ui/widgets/core/button/button.dart';
 
 import 'package:taleemmate/ui/widgets/core/screen/screen.dart';
@@ -35,6 +36,20 @@ class _Body extends StatelessWidget {
         child: Column(
           // crossAxisAlignment: .stretch,
           children: [
+            Space.y.t24,
+            CustomPaint(
+              painter: const AppIconPainters(),
+              size: AppIconPainters.s(128),
+            ),
+            Space.y.t24,
+            CustomPaint(
+              painter: AppIconPainters(
+                fg: AppTheme.c.primary,
+                bg: AppTheme.c.subBackground,
+              ),
+              size: AppIconPainters.s(128),
+            ),
+            Space.y.t24,
             AppButton(
               label: 'Primary',
               onTap: () {},
