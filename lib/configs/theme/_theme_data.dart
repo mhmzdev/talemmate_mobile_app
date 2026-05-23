@@ -6,9 +6,10 @@ const _lightTheme = _ThemeModel(
   text: AppColorsLight.text,
   subText: AppColorsLight.subText,
   background: AppColorsLight.background,
-  success: AppColorsLight.success,
-  warning: AppColorsLight.warning,
-  error: AppColorsLight.error,
+  subBackground: AppColorsLight.subBackground,
+  success: AppColors.success,
+  warning: AppColors.warning,
+  error: AppColors.error,
 );
 
 const _darkTheme = _ThemeModel(
@@ -17,7 +18,8 @@ const _darkTheme = _ThemeModel(
   text: AppColorsDark.text,
   subText: AppColorsDark.subText,
   background: AppColorsDark.background,
-  success: AppColorsDark.success,
-  warning: AppColorsDark.warning,
-  error: AppColorsDark.error,
+  subBackground: AppColorsDark.subBackground,
+  success: AppColors.success,
+  warning: AppColors.warning,
+  error: AppColors.error,
 );
