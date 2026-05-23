@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:taleemmate/configs/configs.dart';
 import 'package:taleemmate/services/logging/app_log.dart';
 

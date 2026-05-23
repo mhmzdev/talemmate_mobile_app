@@ -53,4 +53,12 @@ extension SuperAppText on TextStyle {
       fontWeight: fontWeight,
     );
   }
+
+  TextStyle gm() => copyWith(
+    fontFamily: FontFamily.geistMono,
+  );
+
+  TextStyle urdu() => copyWith(
+    fontFamily: FontFamily.notoNastaliqUrdu,
+  );
 }

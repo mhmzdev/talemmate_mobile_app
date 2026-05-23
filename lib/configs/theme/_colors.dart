@@ -16,6 +16,7 @@ sealed class AppColorsLight {
   static const text = Color(0xff1A2F38);
   static const subText = Color(0xff5A6770);
   static const background = Color(0xffFAF7F2);
+  static const specBackground = Color(0xffffffff);
   static const subBackground = Color(0xffF4EFE6);
 }
 
@@ -26,5 +27,6 @@ sealed class AppColorsDark {
   static const text = Color(0xffFAF7F2);
   static const subText = Color(0xff8AA4A9);
   static const background = Color(0xff0E2128);
+  static const specBackground = Color(0xff18303a);
   static const subBackground = Color(0xff132F3B);
 }

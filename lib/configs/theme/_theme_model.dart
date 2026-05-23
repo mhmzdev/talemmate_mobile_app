@@ -7,6 +7,7 @@ class _ThemeModel {
   final Color subText;
   final Color background;
   final Color subBackground;
+  final Color specBackground;
   final Color success;
   final Color warning;
   final Color error;
@@ -18,6 +19,7 @@ class _ThemeModel {
     required this.subText,
     required this.background,
     required this.subBackground,
+    required this.specBackground,
     required this.success,
     required this.warning,
     required this.error,
@@ -30,6 +32,7 @@ class _ThemeModel {
     Color? subText,
     Color? background,
     Color? subBackground,
+    Color? specBackground,
     Color? success,
     Color? warning,
     Color? error,
@@ -41,6 +44,7 @@ class _ThemeModel {
       subText: subText ?? this.subText,
       background: background ?? this.background,
       subBackground: subBackground ?? this.subBackground,
+      specBackground: specBackground ?? this.specBackground,
       success: success ?? this.success,
       warning: warning ?? this.warning,
       error: error ?? this.error,

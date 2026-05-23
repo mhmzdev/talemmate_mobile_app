@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:taleemmate/configs/configs.dart';
 import 'package:provider/provider.dart';
-import 'package:taleemmate/ui/painters/painters.dart';
 import 'package:taleemmate/ui/widgets/core/button/button.dart';
 
 import 'package:taleemmate/ui/widgets/core/screen/screen.dart';
+import 'package:taleemmate/ui/widgets/forms/forms.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 
 part '_state.dart';
 
@@ -37,83 +38,19 @@ class _Body extends StatelessWidget {
           // crossAxisAlignment: .stretch,
           children: [
             Space.y.t24,
-            CustomPaint(
-              painter: const AppIconPainters(),
-              size: AppIconPainters.s(128),
-            ),
-            Space.y.t24,
-            CustomPaint(
-              painter: AppIconPainters(
-                fg: AppTheme.c.primary,
-                bg: AppTheme.c.subBackground,
-              ),
-              size: AppIconPainters.s(128),
+            AppFormTextInput(
+              name: 'name',
+              heading: 'Email',
+              subHeading: 'This is email subheading',
+              placeholder: 'Enter your email....',
+              helper: 'Verification will be needed',
+              validators: FormBuilderValidators.email(),
             ),
             Space.y.t24,
             AppButton(
-              label: 'Primary',
+              label: 'Submit',
               onTap: () {},
               mainAxisSize: .max,
-              size: .large,
-            ),
-            Space.y.t12,
-            AppButton(
-              label: 'Primary Disabled',
-              onTap: () {},
-              state: .disabled,
-              mainAxisSize: .max,
-              size: .large,
-            ),
-            Space.y.t12,
-            AppButton(
-              label: 'Creamy',
-              onTap: () {},
-              style: .creamy,
-              mainAxisSize: .max,
-              size: .large,
-            ),
-            Space.y.t12,
-            AppButton(
-              label: 'Creamy Disabled',
-              onTap: () {},
-              style: .creamy,
-              state: .disabled,
-              mainAxisSize: .max,
-              size: .large,
-            ),
-            Space.y.t12,
-            AppButton(
-              label: 'Danger',
-              onTap: () {},
-              style: .error,
-              mainAxisSize: .max,
-              size: .large,
-            ),
-            Space.y.t12,
-            AppButton(
-              label: 'Danger Disabled',
-              onTap: () {},
-              style: .error,
-              state: .disabled,
-              mainAxisSize: .max,
-              size: .large,
-            ),
-            Space.y.t12,
-            AppButton(
-              label: 'Success',
-              onTap: () {},
-              style: .success,
-              mainAxisSize: .max,
-              size: .large,
-            ),
-            Space.y.t12,
-            AppButton(
-              label: 'Success Disabled',
-              onTap: () {},
-              style: .success,
-              state: .disabled,
-              mainAxisSize: .max,
-              size: .large,
             ),
             Space.y.t12,
           ],
