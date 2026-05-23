@@ -2,7 +2,7 @@
 to: "lib/ui/screens/<%= h.changeCase.snake(name) %>/listeners/_<%= h.changeCase.snake(arg.state) %>.dart"
 ---
 part of '../<%= h.changeCase.snake(name) %>.dart';
-<% bloc = h.changeCase.pascal(arg.bloc) %>
+<% bloc = h.changeCase.pascal(arg.cubit) %>
 <% module = h.changeCase.camel(arg.module) %>
 
 class _<%= h.changeCase.pascal(arg.state) %>Listener extends StatelessWidget {
