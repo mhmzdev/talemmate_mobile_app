@@ -6,13 +6,13 @@ import 'package:taleemmate/services/flavor/flavor.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
+  await Firebase.initializeApp();
 
   await AppFlavor.init();
 
   /// Services
   // AppAlice.ins.init();
-  // await EnhancedCrashlytics.ins.init();
+  await EnhancedCrashlytics.ins.init();
   // await AppPerformance.ins.init();
   // await FireRemoteConfig.ins.init();
 

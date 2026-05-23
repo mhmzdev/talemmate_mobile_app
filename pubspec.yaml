@@ -111,6 +111,10 @@ dev_dependencies:
   json_serializable: 6.11.2
   flutter_gen_runner: 5.12.0
 
+  # misc
+  # flutter_flavorizr: 2.4.2
+  # flutter_launcher_icons: 0.14.4
+
   # testing
   mockito: 5.6.3
 
@@ -123,6 +127,15 @@ flutter_gen:
 
   integrations:
     flutter_svg: true
+
+# flutter_launcher_icons:
+#   android: "ic_launcher"
+#   adaptive_icon_background: "assets/app/app_icon.png"
+#   adaptive_icon_foreground: "assets/app/app_icon.png"
+#   ios: true
+#   remove_alpha_ios: true
+#   image_path: "assets/app/app_icon.png"
+#   min_sdk_android: 21
 
 # The following section is specific to Flutter packages.
 flutter:
@@ -199,3 +212,46 @@ flutter:
           weight: 600
         - asset: fonts/Noto_Nastaliq_Urdu/NotoNastaliqUrdu-Bold.ttf
           weight: 700
+
+flavorizr:
+  app:
+    android:
+      flavorDimensions: 'flavor'
+    ios: {}
+
+  flavors:
+    stage:
+      app:
+        name: 'TL-Stage'
+      android:
+        applicationId: 'dev.mhmz.taleemmate.stage'
+        firebase:
+          config: '.firebase/stage/google-services.json'
+      ios:
+        bundleId: 'dev.mhmz.taleemmate.stage'
+        firebase:
+          config: '.firebase/stage/GoogleService-Info.plist'
+
+    qa:
+      app:
+        name: 'TL-QA'
+      android:
+        applicationId: 'dev.mhmz.taleemmate.qa'
+        firebase:
+          config: '.firebase/qa/google-services.json'
+      ios:
+        bundleId: 'dev.mhmz.taleemmate.qa'
+        firebase:
+          config: '.firebase/qa/GoogleService-Info.plist'
+
+    prod:
+      app:
+        name: 'TaleemMate'
+      android:
+        applicationId: 'dev.mhmz.taleemmate'
+        firebase:
+          config: '.firebase/prod/google-services.json'
+      ios:
+        bundleId: 'dev.mhmz.taleemmate'
+        firebase:
+          config: '.firebase/prod/GoogleService-Info.plist'
