@@ -10,8 +10,8 @@ Map<AppButtonStyle, _AppButtonModel> _mapPropsToData() {
         .disabled: AppTheme.c.primary.withValues(alpha: 0.5),
       },
       text: {
-        .def: AppTheme.c.background,
-        .disabled: AppTheme.c.primary,
+        .def: AppTheme.c.onPrimary,
+        .disabled: AppTheme.c.onPrimary.withValues(alpha: 0.5),
       },
     ),
     .creamy: _AppButtonModel(
@@ -21,8 +21,8 @@ Map<AppButtonStyle, _AppButtonModel> _mapPropsToData() {
         .disabled: AppTheme.c.subBackground.withValues(alpha: 0.5),
       },
       text: {
-        .def: AppTheme.c.primary,
-        .disabled: AppTheme.c.primary.withValues(alpha: 0.7),
+        .def: AppTheme.c.onAccent,
+        .disabled: AppTheme.c.onAccent.withValues(alpha: 0.5),
       },
     ),
     .error: _AppButtonModel(
@@ -32,8 +32,8 @@ Map<AppButtonStyle, _AppButtonModel> _mapPropsToData() {
         .disabled: AppTheme.c.error.withValues(alpha: 0.5),
       },
       text: {
-        .def: AppTheme.c.background,
-        .disabled: AppTheme.c.background,
+        .def: AppTheme.c.onPrimary,
+        .disabled: AppTheme.c.onPrimary.withValues(alpha: 0.7),
       },
     ),
     .success: _AppButtonModel(
@@ -43,8 +43,8 @@ Map<AppButtonStyle, _AppButtonModel> _mapPropsToData() {
         .disabled: AppTheme.c.success.withValues(alpha: 0.5),
       },
       text: {
-        .def: AppTheme.c.background,
-        .disabled: AppTheme.c.background,
+        .def: AppTheme.c.onPrimary,
+        .disabled: AppTheme.c.onPrimary.withValues(alpha: 0.7),
       },
     ),
   };

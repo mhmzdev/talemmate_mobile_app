@@ -101,9 +101,7 @@ class _AppButtonState extends State<AppButton> {
         data.text[AppButtonState.disabled] ?? AppTheme.c.subText;
     var surface = data.surface[state] ?? data.surface[AppButtonState.def]!;
 
-    var border = widget.style.isCreamy
-        ? AppTheme.c.subText.withValues(alpha: 0.5)
-        : surface;
+    var border = widget.style.isCreamy ? AppTheme.c.subBackground : surface;
 
     var text =
         widget.textColor ?? data.text[state] ?? data.text[AppButtonState.def]!;
