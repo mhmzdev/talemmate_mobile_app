@@ -11,9 +11,6 @@ class AppIconPainter extends CustomPainter {
     this.radius = 8.0,
   });
 
-  const AppIconPainter.light() : this(fg: Colors.white, bg: AppColors.primary);
-  const AppIconPainter.dark() : this(fg: Colors.white, bg: AppColors.primary);
-
   static Size size(double dimension) => Size(dimension, dimension);
 
   @override

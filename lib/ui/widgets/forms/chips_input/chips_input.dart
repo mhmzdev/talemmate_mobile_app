@@ -16,7 +16,7 @@ class AppChipsInput<T> extends StatefulWidget {
     required this.inputTransformer,
     required this.displayTransformer,
     this.placeholder,
-    this.state = AppFormState.def,
+    this.state = .def,
     this.error,
   });
 

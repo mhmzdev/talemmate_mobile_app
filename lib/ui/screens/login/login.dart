@@ -52,7 +52,7 @@ class _Body extends StatelessWidget {
       formKey: screenState.formKey,
       initialFormValue: _FormData.initialValues(),
       keyboardHandler: true,
-      padding: Space.a.t16,
+      padding: Space.a.t20,
       overlayBuilders: const [_LoginListener()],
       child: SafeArea(
         child: Column(
@@ -61,7 +61,7 @@ class _Body extends StatelessWidget {
             Row(
               children: [
                 CustomPaint(
-                  painter: const AppIconPainter.light(),
+                  painter: const AppIconPainter(radius: 4.0),
                   size: AppIconPainter.size(32),
                 ),
                 Space.x.t08,
@@ -76,8 +76,7 @@ class _Body extends StatelessWidget {
                   .copyWith(letterSpacing: 1.5),
             ),
             Space.y.t08,
-            Text('Welcome back.', style: AppText.h1),
-            Space.y.t08,
+            Text('Welcome back', style: AppText.h1),
             Text(
               'Pick up where you left off — your library, plan, and tutor are waiting.',
               style: AppText.b1.cl(AppTheme.c.subText),
@@ -116,7 +115,9 @@ class _Body extends StatelessWidget {
                 hasSplash: false,
                 child: Text(
                   'Forgot password?',
-                  style: AppText.b2.cl(AppTheme.c.accent),
+                  style: AppText.b2.copyWith(
+                    decoration: .underline,
+                  ),
                 ),
               ),
             ),
@@ -138,12 +139,15 @@ class _Body extends StatelessWidget {
                   style: AppText.b2.cl(AppTheme.c.subText),
                 ),
                 AppTouch(
-                  onTap: () =>
-                      Navigator.pushNamed(context, AppRoutes.createAccount),
+                  onTap: () => AppRoutes.createAccount.push(context),
                   hasSplash: false,
                   child: Text(
                     'Create account',
-                    style: AppText.b2.cl(AppTheme.c.accent),
+                    style: AppText.b2
+                        .copyWith(
+                          decoration: .underline,
+                        )
+                        .w(6),
                   ),
                 ),
               ],

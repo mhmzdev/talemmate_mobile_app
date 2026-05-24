@@ -10,7 +10,7 @@ class AppFormDateInput extends StatelessWidget {
     this.subHeading,
     this.placeholder,
     this.sideInput = false,
-    this.state = AppFormState.def,
+    this.state = .def,
     this.margin,
     this.firstDate,
     this.lastDate,

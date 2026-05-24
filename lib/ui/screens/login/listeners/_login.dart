@@ -12,7 +12,7 @@ class _LoginListener extends StatelessWidget {
           UIFlash.error(context, state.login.errorMessage);
         }
         if (state.login.isSuccess) {
-          Navigator.pushReplacementNamed(context, AppRoutes.home);
+          AppRoutes.home.pushReplace(context);
         }
       },
       builder: (context, state) {

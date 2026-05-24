@@ -50,20 +50,10 @@ class _BodyState extends State<_Body> {
       padding: Space.a.t16,
       child: SafeArea(
         child: Center(
-          child: Column(
-            mainAxisSize: .min,
-            children: [
-              CustomPaint(
-                painter: const AppIconPainter.light(),
-                size: AppIconPainter.size(96),
-              ).withBottomAnimation(),
-              Space.y.t24,
-              Text(
-                'TaleemMate - Parhai mai apka GPT',
-                style: AppText.h3,
-              ),
-            ],
-          ),
+          child: CustomPaint(
+            painter: const AppIconPainter(),
+            size: AppIconPainter.size(96),
+          ).withBottomAnimation(),
         ),
       ),
     );

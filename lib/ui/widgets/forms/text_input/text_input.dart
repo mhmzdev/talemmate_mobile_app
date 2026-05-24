@@ -16,7 +16,7 @@ class AppFormTextInput extends StatefulWidget {
     this.initialValue,
     this.focusNode,
     this.keyboardType,
-    this.textInputAction = TextInputAction.done,
+    this.textInputAction = .done,
     this.controller,
     this.onChanged,
     this.onFieldSubmitted,
@@ -30,10 +30,10 @@ class AppFormTextInput extends StatefulWidget {
     this.suffixIconConstraints,
     this.contentPadding,
     this.wrapperPadding,
-    this.state = AppFormState.def,
-    this.textCapitalization = TextCapitalization.none,
+    this.state = .def,
+    this.textCapitalization = .none,
     this.margin,
-    this.autovalidateMode = AutovalidateMode.onUserInteraction,
+    this.autovalidateMode = .onUnfocus,
     this.onTap,
   });
 
