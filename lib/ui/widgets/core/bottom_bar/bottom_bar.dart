@@ -21,14 +21,11 @@ class BottomBar extends StatelessWidget {
       child: Container(
         padding: Space.z.sb().t(12),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: .centerRight,
-            end: .centerLeft,
-            colors: [
-              AppTheme.c.primary.addOpacity(.1),
-              Colors.transparent,
-              AppTheme.c.primary.addOpacity(.1),
-            ],
+          color: AppTheme.c.subBackground,
+          border: Border(
+            top: BorderSide(
+              color: AppTheme.c.border,
+            ),
           ),
         ),
         child: Row(

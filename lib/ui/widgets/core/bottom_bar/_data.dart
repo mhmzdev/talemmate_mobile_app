@@ -9,12 +9,12 @@ final _tabs = [
   _BottomBar(
     label: 'Library',
     path: AppRoutes.library,
-    icon: LucideIcons.book,
+    icon: LucideIcons.library,
   ),
   _BottomBar(
     label: 'Tutor',
     path: AppRoutes.tutor,
-    icon: LucideIcons.message_circle,
+    icon: LucideIcons.message_square,
   ),
   _BottomBar(
     label: 'Plan',
@@ -24,6 +24,6 @@ final _tabs = [
   _BottomBar(
     label: 'Progress',
     path: AppRoutes.progress,
-    icon: LucideIcons.chart_bar,
+    icon: LucideIcons.chart_column,
   ),
 ];
