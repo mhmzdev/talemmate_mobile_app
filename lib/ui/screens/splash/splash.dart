@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:taleemmate/configs/configs.dart';
 import 'package:provider/provider.dart';
-import 'package:taleemmate/ui/widgets/core/button/button.dart';
+import 'package:taleemmate/router/routes.dart';
+import 'package:taleemmate/ui/animations/bottom_animation.dart';
+import 'package:taleemmate/ui/painters/painters.dart';
 
 import 'package:taleemmate/ui/widgets/core/screen/screen.dart';
-import 'package:taleemmate/ui/widgets/forms/forms.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
 
 part '_state.dart';
 
@@ -23,8 +23,23 @@ class SplashScreen extends StatelessWidget {
   }
 }
 
-class _Body extends StatelessWidget {
+class _Body extends StatefulWidget {
   const _Body();
+
+  @override
+  State<_Body> createState() => _BodyState();
+}
+
+class _BodyState extends State<_Body> {
+  @override
+  void initState() {
+    super.initState();
+
+    Future.delayed(1.5.seconds, () {
+      if (!mounted) return;
+      AppRoutes.login.pushReplace(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,49 +49,21 @@ class _Body extends StatelessWidget {
       keyboardHandler: true,
       padding: Space.a.t16,
       child: SafeArea(
-        child: Column(
-          // crossAxisAlignment: .stretch,
-          children: [
-            Space.y.t24,
-            AppFormTextInput(
-              name: 'name',
-              heading: 'Email',
-              subHeading: 'This is email subheading',
-              placeholder: 'Enter your email....',
-              helper: 'Verification will be needed',
-              validators: FormBuilderValidators.email(),
-            ),
-            Space.y.t24,
-            AppButton(
-              label: 'Primary',
-              onTap: () {},
-              mainAxisSize: .max,
-              // state: .disabled,
-            ),
-            Space.y.t12,
-            AppButton(
-              label: 'Creamy',
-              onTap: () {},
-              mainAxisSize: .max,
-              style: .creamy,
-              // state: .disabled,
-            ),
-            Space.y.t12,
-            AppButton(
-              label: 'Success',
-              onTap: () {},
-              mainAxisSize: .max,
-              style: .success,
-            ),
-            Space.y.t12,
-            AppButton(
-              label: 'Error',
-              onTap: () {},
-              mainAxisSize: .max,
-              style: .error,
-            ),
-            Space.y.t12,
-          ],
+        child: Center(
+          child: Column(
+            mainAxisSize: .min,
+            children: [
+              CustomPaint(
+                painter: const AppIconPainter.light(),
+                size: AppIconPainter.size(96),
+              ).withBottomAnimation(),
+              Space.y.t24,
+              Text(
+                'TaleemMate - Parhai mai apka GPT',
+                style: AppText.h3,
+              ),
+            ],
+          ),
         ),
       ),
     );

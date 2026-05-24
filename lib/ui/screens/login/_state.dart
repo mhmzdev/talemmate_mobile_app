@@ -6,4 +6,23 @@ class _ScreenState extends ChangeNotifier {
       Provider.of<_ScreenState>(context, listen: listen);
 
   final formKey = GlobalKey<FormBuilderState>();
+  final passwordFocus = FocusNode();
+
+  void submit(BuildContext context) {
+    try {
+      final form = formKey.currentState!;
+      final isValid = form.saveAndValidate();
+      if (!isValid) return;
+
+      UserCubit.c(context).login();
+    } catch (e) {
+      UIFlash.error(context, 'Something went wrong on submit!');
+    }
+  }
+
+  @override
+  void dispose() {
+    passwordFocus.dispose();
+    super.dispose();
+  }
 }

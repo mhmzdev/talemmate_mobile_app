@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:taleemmate/core/db/converters.dart';
 import 'package:taleemmate/core/db/tables/library_table.dart';
 import 'package:taleemmate/core/db/tables/onboarding_table.dart';
 import 'package:taleemmate/core/db/tables/progress_table.dart';
@@ -8,6 +9,16 @@ import 'package:taleemmate/core/db/tables/schedule_table.dart';
 import 'package:taleemmate/core/db/tables/settings_table.dart';
 import 'package:taleemmate/core/db/tables/subjects_table.dart';
 import 'package:taleemmate/core/db/tables/tutor_table.dart';
+import 'package:taleemmate/core/models/library/library_item.dart';
+import 'package:taleemmate/core/models/quiz/quiz_question.dart';
+import 'package:taleemmate/core/models/schedule/study_block.dart';
+import 'package:taleemmate/core/models/settings/appearance_preferences.dart';
+import 'package:taleemmate/core/models/settings/language_preferences.dart';
+import 'package:taleemmate/core/models/subject/topic.dart';
+import 'package:taleemmate/core/models/tutor/citation.dart';
+import 'package:taleemmate/core/models/tutor/follow_up_point.dart';
+import 'package:taleemmate/core/models/tutor/tutor_message.dart';
+import 'package:taleemmate/core/models/tutor/tutor_settings.dart';
 
 export 'tables/library_table.dart';
 export 'tables/onboarding_table.dart';
