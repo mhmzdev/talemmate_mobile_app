@@ -36,6 +36,17 @@ lib/ui/screens/login/
     _header.dart        — class _Header extends StatelessWidget
 ```
 
+### Widget Extraction Threshold
+
+The "always a private class" rule above governs HOW to extract, not WHEN. **Don't extract widgets that aren't worth extracting** — a single Row or a one-line Container should be inlined in its parent.
+
+Extract a private widget only when **at least one** of these is true:
+- The subtree has **≥5 child widgets** (counting every node — `Padding`, `SizedBox`, `Icon`, `Text` all count)
+- The subtree is **≥30 lines** of build code
+- The subtree is reused in ≥2 places (then move it to `lib/ui/widgets/` with an `App` prefix)
+
+If none apply: inline it. A screen with three children (header text, form, button) should NOT have three widget classes.
+
 ### Shared / Global Widgets
 
 Use the `App` prefix for any widget shared across screens:

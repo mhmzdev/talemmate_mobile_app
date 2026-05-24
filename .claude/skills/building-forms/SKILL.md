@@ -156,28 +156,43 @@ void _submit() {
 }
 ```
 
-## Focus Chain (multi-field forms)
+## Focus Chain — Default: DO NOT use FocusNodes
+
+**FocusNodes are opt-in, not default.** Flutter's keyboard `TextInputAction.next` already advances focus to the next form field for you — you do NOT need `FocusNode`s for the common case. Adding them creates lifecycle bugs (forgotten `dispose()`), bloats `_ScreenState`, and is pure ceremony for no behavior change.
 
 ```dart
-final _emailFocus    = FocusNode();
-final _passwordFocus = FocusNode();
-
+// CORRECT default — no FocusNodes, no onFieldSubmitted plumbing
 AppFormTextInput(
   name: _FormKeys.email,
-  focusNode: _emailFocus,
   textInputAction: TextInputAction.next,
-  onFieldSubmitted: (_) => _passwordFocus.requestFocus(),
 )
 
 AppFormTextInput(
   name: _FormKeys.password,
-  focusNode: _passwordFocus,
   textInputAction: TextInputAction.done,
-  onFieldSubmitted: (_) => _submit(),
 )
 ```
 
-Dispose `FocusNode`s in `_ScreenState.dispose()` if stored there, or in the `StatefulWidget` that owns them.
+**Only add a FocusNode when ALL of the following are true:**
+- You need to imperatively move focus from outside the field (e.g. after tapping a button, after a cubit response, on mount).
+- The next field in tab order is NOT a TextFormField (Flutter's auto-advance only works text→text).
+- You need to detect focus/blur for custom UI behavior (e.g. show/hide a hint).
+
+If you DO need one, store it on `_ScreenState`, dispose it in `_ScreenState.dispose()`, and document the reason in a one-line comment above the field.
+
+```dart
+// _state.dart
+class _ScreenState extends ChangeNotifier {
+  // OTP field needs imperative focus after the phone-verify cubit succeeds
+  final otpFocus = FocusNode();
+
+  @override
+  void dispose() {
+    otpFocus.dispose();
+    super.dispose();
+  }
+}
+```
 
 ## Resetting a Form
 

@@ -112,3 +112,22 @@ New decisions go here when made — not in chat. This is what the agent reads.
 **Why:** Typed faults give consistent `.message` access for UI display, structured logging, and exhaustive pattern matching. `FirebaseAuthFault` maps Firebase error codes to user-friendly Urdu/English strings at the boundary.
 **Rules out:** Raw exceptions, string throws, per-cubit error models.
 **Date:** 2026-05
+
+---
+
+## ADR-013: Repo layer is Map-only at its boundary
+
+**Decision:** Public functions on a `*Repo` class in `lib/repos/<name>/<name>_repo.dart` accept and return only `Map<String, dynamic>`, `List<Map<String, dynamic>>`, or primitives (`bool`, `int`, `String`, `double`, `void`). They MUST NOT return Dart model classes such as `UserData` or `OnboardingData`. The only exception is a single-purpose function whose entire input/output is 1–2 primitive parameters (e.g. `Future<bool> exists(String id)`, `Future<String> uploadAvatar(File file)`).
+**Why:** The repo is the boundary with the outside world (Firebase, HTTP, SQLite, mocks). Keeping the public signature Map-based means:
+- Backend changes don't ripple into the cubit layer.
+- The `_*Parser` part-file owns Map shape normalization (snake_case → camelCase, default values, dropping unknown keys).
+- The cubit owns the Map→Freezed-model conversion via `Model.fromJson(raw)`, which is also where state typing already lives.
+- Repos stay swappable: a `MockRepo` and `FirebaseRepo` have the same shape regardless of internal types.
+**Rules out:**
+- `Future<UserData> fetch()` in a repo public method.
+- Importing `lib/core/models/...` inside `<name>_repo.dart`.
+- Returning hand-rolled DTO classes from repo functions.
+- Hiding the Map under a typedef to dodge the rule.
+**How to apply:** Inside the repo: provider returns a `Map`, parser normalizes the `Map`, repo returns the `Map`. Inside the cubit: `final raw = await UserRepo.ins.fetch(); final data = UserData.fromJson(raw);`. Then `emit(state.copyWith(fetch: state.fetch.toSuccess(data: data)))`.
+**Enforcement:** A `Stop` hook in `.claude/settings.json` greps the diff for newly-added `core/models/` imports in `lib/repos/` and blocks completion with a pointer to this ADR.
+**Date:** 2026-05

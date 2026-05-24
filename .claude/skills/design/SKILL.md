@@ -46,7 +46,20 @@ Display headings use Fraunces. Body uses Geist. Code uses GeistMono. Urdu uses N
 
 ## Spacing
 
-Token scale: t04=4, t08=8, t12=12, t16=16, t24=24, t32=32, t48=48, t64=64
+**Tokens are 4-multiples only.** The full scale: `t04=4, t08=8, t12=12, t16=16, t24=24, t32=32, t48=48, t64=64`. There are no in-between tokens.
+
+**Snap any design value to the nearest token.** If the design says 10 → use `t08`. If it says 17 → `t16`. If it says 19 or 22 → `t20`/`t24` (rounding to the nearest 4-multiple). Never hardcode `SizedBox(height: 10)` or `EdgeInsets.all(17)` — pick the closest token.
+
+| Design value | Use |
+|---|---|
+| 1–6 | `t04` |
+| 7–10 | `t08` |
+| 11–14 | `t12` |
+| 15–20 | `t16` |
+| 21–28 | `t24` |
+| 29–40 | `t32` |
+| 41–56 | `t48` |
+| 57+ | `t64` |
 
 ```dart
 // Widgets (SizedBox shortcuts)
@@ -66,6 +79,23 @@ SpaceToken.t16   // = 16.0
 12.radius()    // BorderRadius.circular(12)
 8.radius()
 ```
+
+### Never use `Spacer()`
+
+Always use a fixed-token `Space.x.t*` / `Space.y.t*` for visual gaps so spacing stays consistent across screens. `Spacer()` and `SizedBox.shrink()` hide intent and cause uneven layouts across screen sizes.
+
+```dart
+// WRONG
+Row(children: [_LeftIcon(), Spacer(), _RightAction()])
+
+// CORRECT — fixed token, or use MainAxisAlignment.spaceBetween
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [_LeftIcon(), _RightAction()],
+)
+```
+
+If you genuinely need flex (rare — usually in a custom layout), use `Expanded(child: SizedBox.shrink())` with a `// flex: ...` comment explaining why a token won't work.
 
 ## Icons
 
@@ -129,3 +159,30 @@ LinearProgressWidget()                    // animated linear bar
 - Use `CrossAxisAlignment.stretch` on Column for full-width children.
 - Prefer `Flexible` / `Expanded` over hardcoded widths.
 - Tap targets: wrap with `AppTouch` (from `lib/ui/widgets/headless/app_touch.dart`) instead of `GestureDetector` for consistent hit area and ripple.
+
+## Widget Extraction Threshold
+
+**Don't extract a private widget for a one-row, one-Container, or one-Text wrapper.** Extraction is for *meaningful* subtrees, not visual noise.
+
+A child earns its own `class _Foo extends StatelessWidget` only when **at least one** of:
+- It contains **≥5 child widgets** (count the actual nodes in the tree, including `Padding`, `SizedBox`, `Icon`, `Text`)
+- It is **≥30 lines** of build code
+- It is reused in ≥2 places (then it may belong in `lib/ui/widgets/` with an `App` prefix instead)
+
+If none apply, inline the widget directly in the parent's `build()`. A screen body with three children — a header `Text`, a form, and a button — does NOT need three separate widget classes. Just write the three children inline.
+
+```dart
+// WRONG — one-line widget class
+class _SubmitButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) =>
+      AppButton(label: 'Submit', onTap: () {});
+}
+
+// CORRECT — just inline it
+Column(children: [
+  AppButton(label: 'Submit', onTap: () {}),
+])
+```
+
+When you DO extract, follow the file layout in `docs/conventions/DART.md` — private class in `widgets/_foo.dart`, declared as `part of '../<screen>.dart'`.

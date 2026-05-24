@@ -37,6 +37,18 @@
                     }
                 ]
             }
+        ],
+        "Stop": [
+            {
+                "matcher": "",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": ".claude/hooks/repo-purity-check.sh",
+                        "statusMessage": "Checking repo-layer purity (ADR-013)..."
+                    }
+                ]
+            }
         ]
     }
 }
