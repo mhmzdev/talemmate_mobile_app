@@ -14,7 +14,9 @@ class _ScreenState extends ChangeNotifier {
       final isValid = form.saveAndValidate();
       if (!isValid) return;
 
-      UserCubit.c(context).login();
+      final values = form.value;
+
+      UserCubit.c(context).login(values);
     } catch (e) {
       UIFlash.error(context, 'Something went wrong on submit!');
     }

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:taleemmate/configs/configs.dart';
 import 'package:taleemmate/core/models/user/user.dart';
 import 'package:taleemmate/services/fault/faults.dart';
 
@@ -16,7 +17,8 @@ class UserRepo {
 
   Future<UserData> init() => _UserProvider.init();
 
-  Future<UserData> login() => _UserProvider.login();
+  Future<UserData> login(Map<String, dynamic> values) =>
+      _UserProvider.login(values);
 
   Future<UserData> update() => _UserProvider.update();
 

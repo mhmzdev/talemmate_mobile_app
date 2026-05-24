@@ -19,7 +19,7 @@ class BottomBar extends StatelessWidget {
       color: AppTheme.c.background,
       elevation: 0,
       child: Container(
-        padding: Space.z.sb().t(8),
+        padding: Space.z.sb().t(12),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: .centerRight,
@@ -50,11 +50,15 @@ class BottomBar extends StatelessWidget {
                 child: Column(
                   children: [
                     Space.y.t04,
-                    Icon(tab.icon, color: color),
+                    Icon(
+                      tab.icon,
+                      color: color,
+                      size: SpaceToken.t24,
+                    ),
                     Space.y.t04,
                     Text(
                       tab.label,
-                      style: AppText.b2b + color,
+                      style: AppText.b2.gm() + color,
                     ),
                   ],
                 ),

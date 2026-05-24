@@ -13,14 +13,16 @@ class _UserProvider {
     }
   }
 
-  static Future<UserData> login() async {
+  static Future<UserData> login(Map<String, dynamic> values) async {
     try {
-      final raw = <String, dynamic>{};
+      final email = values['email'] as String;
+      final password = values['password'] as String;
+
+      final raw = await _UserMocks.login(email: email, password: password);
       return UserData.fromJson(raw);
     } catch (e, st) {
-      if (e is DioException) {
-        throw HttpFault.fromDioException(e, st);
-      }
+      if (e is Fault) rethrow;
+      if (e is DioException) throw HttpFault.fromDioException(e, st);
       throw UnknownFault('Something went wrong!', st);
     }
   }

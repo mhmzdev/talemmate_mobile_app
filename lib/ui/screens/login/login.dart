@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taleemmate/configs/configs.dart';
 import 'package:provider/provider.dart';
 
@@ -11,6 +12,7 @@ import 'package:taleemmate/blocs/user/cubit.dart';
 import 'package:taleemmate/ui/painters/painters.dart';
 import 'package:taleemmate/ui/widgets/core/screen/screen.dart';
 import 'package:taleemmate/ui/widgets/core/button/button.dart';
+import 'package:taleemmate/ui/widgets/design/full_screen_loader/full_screen_loader.dart';
 import 'package:taleemmate/ui/widgets/forms/forms.dart';
 import 'package:taleemmate/ui/widgets/headless/app_touch.dart';
 import 'package:taleemmate/utils/flash.dart';
@@ -19,6 +21,7 @@ part 'static/_form_data.dart';
 part 'static/_form_keys.dart';
 
 part '_state.dart';
+part 'listeners/_login.dart';
 
 part 'widgets/_divider.dart';
 part 'widgets/_tagline.dart';
@@ -50,7 +53,7 @@ class _Body extends StatelessWidget {
       initialFormValue: _FormData.initialValues(),
       keyboardHandler: true,
       padding: Space.a.t16,
-
+      overlayBuilders: const [_LoginListener()],
       child: SafeArea(
         child: Column(
           crossAxisAlignment: .stretch,
