@@ -31,7 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-    # firebase
+  # firebase
   firebase_auth: 6.1.2
   firebase_core: 4.2.1
   firebase_performance: 0.11.1+2
@@ -67,6 +67,10 @@ dependencies:
   path_provider: 2.1.5
   shared_preferences: 2.5.3
   cached_network_image: 3.4.1
+
+  # db + orm
+  drift: 2.33.0
+  drift_flutter: ^0.3.0
 
   # configs
   intl: 0.20.2
@@ -106,10 +110,11 @@ dev_dependencies:
   flutter_lints: 6.0.0
 
   # code gen
-  freezed: 3.2.3
-  build_runner: 2.10.4
-  json_serializable: 6.11.2
+  freezed: ^3.2.5
+  build_runner: ^2.4.0
+  json_serializable: ^6.11.3
   flutter_gen_runner: 5.12.0
+  drift_dev: ^2.33.0
 
   # misc
   # flutter_flavorizr: 2.4.2

@@ -1,6 +1,10 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'blocs/user/cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:taleemmate/configs/configs.dart';
+import 'package:taleemmate/core/db/database.dart';
 
 import 'providers/app.dart';
 import 'router/router.dart';
@@ -22,11 +26,16 @@ class _TaleemMateState extends State<TaleemMate> {
     return MultiProvider(
       providers: [
         // bloc-initiate-start
+        BlocProvider(create: (_) => UserCubit()),
 
         // bloc-initiate-end
 
         // provider-initiate-start
         ChangeNotifierProvider(create: (_) => AppProvider()),
+        Provider<AppDatabase>(
+          create: (_) => AppDatabase(),
+          dispose: (_, db) => db.close(),
+        ),
 
         // provider-initiate-end
       ],
