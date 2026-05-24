@@ -139,6 +139,8 @@ After structure is approved:
 - Example: `docs/exec-plans/backlog/quiz-result-screen.md`
 - Example: `docs/exec-plans/backlog/ai-chat-blocstate-refactor.md`
 
+New plans ALWAYS go to `backlog/`. They move through `active/ → completed/` (or `superseded/`) by `git mv` as the work progresses — see [Plan Lifecycle](#plan-lifecycle) at the end of this skill. Don't write directly into `active/` or `completed/`.
+
 **Frontmatter**:
 ```yaml
 ---
@@ -336,3 +338,34 @@ flutter test test/path/to/file.dart                                 # single fil
 flutter pub run build_runner build --delete-conflicting-outputs     # regen after model changes
 dart fix --dry-run                                                   # show fixable issues
 ```
+
+---
+
+## Plan Lifecycle
+
+Plans are persistent artifacts that move through four directories as work progresses. **The directory IS the status** — also reflected in the file's frontmatter `status:` field.
+
+| State | Directory | Banner | When |
+|---|---|---|---|
+| Backlog | `docs/exec-plans/backlog/` | `📋 BACKLOG — Not yet started` | Default home for a new plan |
+| Active | `docs/exec-plans/active/` | `🚧 ACTIVE — In progress` | Implementation has begun |
+| Completed | `docs/exec-plans/completed/` | `✅ COMPLETED — Merged YYYY-MM-DD` | All phases done + verified |
+| Superseded | `docs/exec-plans/superseded/` | `⛔ SUPERSEDED — see <other-slug>` | Replaced or no longer applies |
+
+### When to move a plan
+
+**You (the create-plan skill) only ever WRITE into `backlog/`.** Transitions happen later:
+
+- **backlog → active** — when the user signals "let's start" / "go implement this". One commit: `git mv backlog/<slug>.md active/<slug>.md`, update banner + frontmatter `status: active` + `started: YYYY-MM-DD`, move the INDEX.md row from `backlog/INDEX.md` to `active/INDEX.md`.
+- **active → completed** — when all phases pass automated + manual verification and the work is merged. One commit: `git mv active/<slug>.md completed/<slug>.md`, banner `✅ COMPLETED`, frontmatter `status: completed` + `completed: YYYY-MM-DD`, move the INDEX.md row.
+- **any → superseded** — when the user picks a different plan for the same problem, or scope shift makes this plan no longer apply. One commit: `git mv <src>/<slug>.md superseded/<slug>.md`, banner `⛔ SUPERSEDED`, frontmatter `superseded_by: <other-slug>` (or `superseded_reason: "<why>"` if no replacement), move the INDEX.md row.
+
+### INDEX.md handling per state
+
+Each state directory has its own `INDEX.md`. When moving a plan, the **same commit** must:
+1. `git mv` the plan file
+2. Remove the row from the source directory's `INDEX.md`
+3. Add the row to the destination directory's `INDEX.md`
+4. Update the file's banner + frontmatter
+
+Slug stays stable across moves — never rename the file.

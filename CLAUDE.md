@@ -70,3 +70,31 @@ Full detail lives in **[docs/INDEX.md](docs/INDEX.md)**.
 - `/building_forms` — form construction with flutter_form_builder
 - `/write_unit_test` — cubit unit tests
 - `/write_widget_test` — screen widget tests
+- `/research-codebase` — documents how a slice of the codebase works today (writes to `docs/research/`)
+- `/create-plan` — interactive multi-phase implementation plan (writes to `docs/exec-plans/backlog/`)
+
+## Research & Plan Lifecycle
+
+Research and plans are persistent artifacts — they live in `docs/` and outlive a single session. Keep them tidy.
+
+### Research (`docs/research/`)
+- Single flat folder. Filename: `YYYY-MM-DD-<kebab-slug>.md`.
+- Always overwrite an existing artifact for the same slug — never duplicate.
+- Add / update the row in `docs/research/INDEX.md` (ToC).
+
+### Plans (`docs/exec-plans/`)
+Plans move through four states by being **`git mv`**'d between subdirectories. The directory IS the status — also reflected in the file's frontmatter `status:` field.
+
+| State | Directory | When it lives here |
+|---|---|---|
+| Backlog | `docs/exec-plans/backlog/` | Default home for any newly written plan. Not yet started. |
+| Active | `docs/exec-plans/active/` | Implementation has begun. At most one plan per feature should be active at a time. |
+| Completed | `docs/exec-plans/completed/` | All phases done, merged, verified. |
+| Superseded | `docs/exec-plans/superseded/` | A different plan was chosen for the same problem, or scope changed enough that this plan no longer applies. Keep for context, don't delete. |
+
+**Transitions:**
+- `backlog → active` — when starting work. Update the banner from `📋 BACKLOG` to `🚧 ACTIVE` and the frontmatter `status: active`.
+- `active → completed` — after merge + manual verification. Banner `✅ COMPLETED`, `status: completed`, add `completed: YYYY-MM-DD` to frontmatter.
+- `* → superseded` — when abandoned. Banner `⛔ SUPERSEDED`, add `superseded_by: <slug>` pointing to the replacement plan (or `superseded_reason:` if none).
+
+Each state directory has its own `INDEX.md` table. When moving a plan, **remove its row from the source `INDEX.md` and add it to the destination `INDEX.md`** in the same commit as the `git mv`.

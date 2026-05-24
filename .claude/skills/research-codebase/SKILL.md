@@ -217,3 +217,20 @@ If the user follows up, **append** to the same research document rather than cre
 - **No placeholder frontmatter** — run the git commands before writing the document; never write `<hash>` literally
 - **Follow steps in order** — read files first, spawn agents, wait for all, then write
 - **You are a documentarian, not a critic** — document what IS, not what SHOULD BE
+
+---
+
+## Research Lifecycle
+
+Research lives in a **single flat folder**: `docs/research/`. There is no backlog / active / completed distinction — a research document either exists (current snapshot of how something works) or it doesn't.
+
+| Action | When | How |
+|---|---|---|
+| **Create** | First time researching a topic | Write `docs/research/YYYY-MM-DD-<slug>.md`, add row to `INDEX.md` |
+| **Overwrite** | Same topic researched again (any reason) | Same filename, fresh content from code, update frontmatter `date` + `git_commit` + `branch` + `last_updated`, update the date column in the existing `INDEX.md` row (do NOT add a new row) |
+| **Append** | Mode A follow-up question on the same research | Add `## Follow-up: YYYY-MM-DD` section at the end, bump `last_updated` |
+| **Archive** | Never | Research is a living snapshot. If a doc is obsolete it gets overwritten or deleted, not moved. |
+
+This is **deliberately simpler than the plan lifecycle** in `/create-plan`. Plans have explicit states because the same plan exists across multiple sessions and needs status tracking. Research is just "what does this code do right now" — there is only ever one current answer per topic.
+
+`INDEX.md` is the table-of-contents. One row per slug. Sort by date descending.
