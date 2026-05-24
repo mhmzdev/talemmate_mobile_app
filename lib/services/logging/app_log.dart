@@ -4,17 +4,16 @@ import 'dart:io';
 import '../firebase/crash/crashlytics.dart';
 
 enum AppLogLevel {
-  debug('💬', '\x1B[37m'), // White
-  info('ℹ️', '\x1B[36m'), // Cyan
-  warning('⚠️', '\x1B[33m'), // Yellow
-  error('❌', '\x1B[31m'), // Red
-  success('✅', '\x1B[32m'), // Green
+  debug('\x1B[37m'), // White
+  info('\x1B[36m'), // Cyan
+  warning('\x1B[33m'), // Yellow
+  error('\x1B[31m'), // Red
+  success('\x1B[32m'), // Green
   ;
 
-  final String emoji;
   final String colorCode;
 
-  const AppLogLevel(this.emoji, this.colorCode);
+  const AppLogLevel(this.colorCode);
 }
 
 extension LogExtension on Object {
@@ -34,7 +33,7 @@ extension LogExtension on Object {
     final callerInfo = showCallerInfo ? _getCallerInfo() : '';
     final callerSection = callerInfo.isNotEmpty ? ' $callerInfo' : '';
 
-    final message = '${level.emoji} [$tag:$callerSection] $now $this';
+    final message = '[$tag:$callerSection] $now $this';
     log('$color$message$reset');
 
     if (toCrashlytics && level != .error) {
