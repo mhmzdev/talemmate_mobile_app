@@ -48,7 +48,7 @@ Use the `App` prefix for any widget shared across screens:
 
 | File type | Max lines | Action if exceeded |
 |---|---|---|
-| UI / screen files | 200–300 | Split into `part` files or extract private widget classes |
+| UI / screen files | 200–250 | Split into `part` files or extract private widget classes |
 | Functions / methods | 30–50 | Refactor into smaller helpers or private methods |
 
 Use `part` / `part of` to split large files while keeping them in the same compile unit.
