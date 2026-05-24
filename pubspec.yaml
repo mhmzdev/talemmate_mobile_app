@@ -113,7 +113,7 @@ dev_dependencies:
 
   # misc
   # flutter_flavorizr: 2.4.2
-  # flutter_launcher_icons: 0.14.4
+  flutter_launcher_icons: 0.14.4
 
   # testing
   mockito: 5.6.3
@@ -128,14 +128,14 @@ flutter_gen:
   integrations:
     flutter_svg: true
 
-# flutter_launcher_icons:
-#   android: "ic_launcher"
-#   adaptive_icon_background: "assets/app/app_icon.png"
-#   adaptive_icon_foreground: "assets/app/app_icon.png"
-#   ios: true
-#   remove_alpha_ios: true
-#   image_path: "assets/app/app_icon.png"
-#   min_sdk_android: 21
+flutter_launcher_icons:
+  android: "ic_launcher"
+  adaptive_icon_background: "assets/app/app_icon.png"
+  adaptive_icon_foreground: "assets/app/app_icon.png"
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/app/app_icon.png"
+  min_sdk_android: 21
 
 # The following section is specific to Flutter packages.
 flutter:
