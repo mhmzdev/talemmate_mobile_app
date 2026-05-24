@@ -35,6 +35,8 @@ The five bottom-bar routes (`/home`, `/library`, `/tutor`, `/plan`, `/progress`)
 
 **The only button in the app.** Never use `ElevatedButton`, `TextButton`, or `InkWell` for primary actions.
 
+> **Extending AppButton** — the button follows the data-driven widget pattern (ADR-010). Files: `_enums.dart` (styles/sizes/states), `_model.dart` (surface + text color holders), `_data.dart` (theme-aware map functions). To add a new style, add the enum value and a new entry in `_mapPropsToData()` — the widget itself is not touched.
+
 ```dart
 AppButton(
   label: 'Continue',
@@ -144,6 +146,22 @@ AppFormChipsInput(
   // options configured internally or passed as needed
 )
 ```
+
+---
+
+### Creating a New Form Input
+
+Pick the right starting point based on what the input does:
+
+| The new input… | Starting point |
+|---|---|
+| Triggers a picker/modal to select a value (date, time, colour, location…) | Copy `date_input.dart` — it wraps `AppFormTextInputContent` with a read-only controller and a custom `_handleTap` |
+| Accepts free text but with a custom keyboard type, mask, or suffix | Add props to `AppFormTextInput` directly, or use `AppFormTextInputContent` standalone |
+| Has a fundamentally different interaction model (chips, toggle grid, slider, rating…) | Build a new widget wrapping `FormBuilderField<T>` directly, like `chips_input.dart` |
+
+**Rule:** always embed the new widget in a `FormBuilderField<T>` so it participates in `saveAndValidate()`, validation, and reset. Never manage form state manually.
+
+The forms system also follows the data-driven pattern (ADR-010). State colours (`def`, `pressed`, `disabled`) live in `_data.dart` — extend that map when adding new states, not the widget's `build()` method.
 
 ---
 

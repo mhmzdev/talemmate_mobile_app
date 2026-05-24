@@ -1,21 +1,24 @@
 # TaleemMate — System Overview
 
-TaleemMate is an AI-powered tutoring mobile app built with Flutter. It targets iOS and Android, supports English and Urdu, and is backed entirely by Firebase — no custom backend server.
+TaleemMate is an AI-powered tutoring mobile app built with Flutter. It targets iOS and Android and supports English and Urdu. The app is **offline-first** — all learning content and progress is stored locally using Drift (SQLite). Firebase is used only for Auth, Gemini AI, and user-account cloud data. No custom backend server exists.
 
 ## System Map
 
 ```
-┌────────────────────────────────────────────┐
-│  Flutter App (iOS + Android)               │
-│  lib/ — UI, Cubits, Services, Configs      │
-└────────────────┬───────────────────────────┘
-                 │ Firebase SDKs
-┌────────────────▼───────────────────────────┐
-│  Firebase Services                         │
-│  Auth · AI (Gemini) · Crashlytics          │
-│  Performance · Remote Config               │
-└────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────┐
+│  Flutter App (iOS + Android)                        │
+│  lib/ — UI, Cubits, Services, Configs               │
+└──────────┬──────────────────────────┬───────────────┘
+           │ Firebase SDKs            │ Drift (SQLite)
+┌──────────▼──────────┐   ┌──────────▼───────────────┐
+│  Firebase Services  │   │  Local Database           │
+│  Auth · AI (Gemini) │   │  Learning content         │
+│  Crashlytics        │   │  Progress & exercises     │
+│  Remote Config      │   │  (offline-first, v1)      │
+└─────────────────────┘   └──────────────────────────-┘
 ```
+
+> Cloud sync of local data to Firestore is deferred. Until that feature is built, Drift is the sole source of truth for all app content.
 
 ## Project Structure
 

@@ -48,6 +48,7 @@ Full detail lives in **[docs/INDEX.md](docs/INDEX.md)**.
 
 | I need to know… | Go to |
 |---|---|
+| What each feature does + v1 scope | [docs/features/CATALOGUE.md](docs/features/CATALOGUE.md) |
 | How the layers fit together | [docs/architecture/OVERVIEW.md](docs/architecture/OVERVIEW.md) |
 | Screen file anatomy + code examples | [docs/screens/STRUCTURE.md](docs/screens/STRUCTURE.md) |
 | BlocState + Provider patterns | [docs/conventions/STATE_MANAGEMENT.md](docs/conventions/STATE_MANAGEMENT.md) |

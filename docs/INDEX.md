@@ -26,6 +26,14 @@ For the one-page orientation, see [CLAUDE.md](../CLAUDE.md) or [ARCHITECTURE.md]
 
 ---
 
+## Features
+
+| Document | Read this when… |
+|---|---|
+| [features/CATALOGUE.md](features/CATALOGUE.md) | You need to know what a feature does, its v1 scope, key data, and how AI fits in — read before building any screen or cubit |
+
+---
+
 ## Screens
 
 | Document | Read this when… |

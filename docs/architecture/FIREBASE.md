@@ -1,6 +1,17 @@
 # Firebase — TaleemMate
 
-TaleemMate is a pure Flutter + Firebase app. There is no custom backend server or Cloud Functions. All business logic runs client-side against Firebase SDKs.
+TaleemMate uses Firebase for auth, AI, and observability only. All learning content and user progress is stored locally via Drift (SQLite) — **not** in Firestore. No custom backend server or Cloud Functions exist.
+
+### What Firebase is and is not used for (v1)
+
+| In scope | Out of scope |
+|---|---|
+| Firebase Auth — sign in / sign up / session | Storing lessons, exercises, or progress in Firestore |
+| Firebase AI (Gemini) — AI tutoring responses | Any Cloud Functions or custom backend logic |
+| Crashlytics — crash reporting | Real-time sync of learning data (deferred to a future release) |
+| Remote Config — feature flags | |
+
+If you are implementing a feature that reads or writes learning content, progress, or exercises — use Drift, not Firestore. See ADR-012.
 
 ---
 
