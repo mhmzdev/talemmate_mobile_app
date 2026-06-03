@@ -22,8 +22,10 @@ import 'package:taleemmate/core/models/onboarding/onboarding_data.dart';
 import 'package:taleemmate/core/models/subject/subject.dart';
 import 'package:taleemmate/core/models/subject/exam.dart';
 import 'package:taleemmate/core/models/schedule/schedule.dart';
+import 'package:taleemmate/services/logging/app_log.dart';
 import 'package:taleemmate/ui/widgets/core/screen/screen.dart';
 import 'package:taleemmate/ui/widgets/core/button/button.dart';
+import 'package:taleemmate/ui/widgets/design/alerts/app_alert_base.dart';
 import 'package:taleemmate/ui/widgets/design/full_screen_loader/full_screen_loader.dart';
 import 'package:taleemmate/ui/widgets/design/modals/app_modal_base.dart';
 import 'package:taleemmate/ui/widgets/headless/keep_alive_page_view.dart';
@@ -91,6 +93,14 @@ class _Body extends StatelessWidget {
     return Screen(
       keyboardHandler: true,
       padding: Space.v.t20,
+      canPop: false,
+      onBackPressed: () {
+        if (state.currentStep > 0) {
+          state.prevPage();
+        } else {
+          state.confirmSignOut(context);
+        }
+      },
       overlayBuilders: const [_CompleteListener()],
       child: SafeArea(
         child: Column(
@@ -140,7 +150,7 @@ class _StepHeader extends StatelessWidget {
       onLeft: AppBackButton(
         onTap: () {
           if (step == 0) {
-            AppRoutes.createAccount.pushReplace(context);
+            state.confirmSignOut(context);
           } else {
             state.prevPage();
           }
@@ -173,22 +183,24 @@ class _StepProgressBar extends StatelessWidget {
     final currentStep = screenState.currentStep;
 
     return Row(
-      children: [
-        for (int i = 0; i < 4; i++) ...[
-          Expanded(
-            child: Container(
-              height: 3,
-              decoration: BoxDecoration(
-                color: i <= currentStep
-                    ? AppTheme.c.primary
-                    : AppTheme.c.border,
-                borderRadius: 2.radius(),
+      children: List.generate(4, (i) => i)
+          .expand(
+            (i) => [
+              Expanded(
+                child: Container(
+                  height: 3,
+                  decoration: BoxDecoration(
+                    color: i <= currentStep
+                        ? AppTheme.c.primary
+                        : AppTheme.c.border,
+                    borderRadius: 2.radius(),
+                  ),
+                ),
               ),
-            ),
-          ),
-          if (i < 3) Space.x.t04,
-        ],
-      ],
+              if (i < 3) Space.x.t04,
+            ],
+          )
+          .toList(),
     );
   }
 }

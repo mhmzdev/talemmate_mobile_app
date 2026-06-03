@@ -159,8 +159,46 @@ class _ScreenState extends ChangeNotifier {
   );
 
   void finish(BuildContext context) {
-    final userId = UserCubit.c(context).state.init.data?.uid ?? '';
-    OnboardingCubit.c(context).complete(buildData(userId));
+    try {
+      final userCubit = UserCubit.c(context);
+      final userId =
+          userCubit.state.user?.uid ?? userCubit.state.userData?.uid ?? '';
+      final inst = institutionCtrl.text.trim();
+      userCubit.completeOnboarding({if (inst.isNotEmpty) 'institution': inst});
+      OnboardingCubit.c(context).complete(buildData(userId));
+    } catch (e, st) {
+      'onboarding.finish error: $e\n$st'.appLog(level: AppLogLevel.error);
+    }
+  }
+
+  /// Confirms before tearing down the session from inside onboarding.
+  void confirmSignOut(BuildContext context) {
+    showAppAlert(
+      context,
+      icon: const Icon(LucideIcons.log_out),
+      title: 'Sign out of TaleemMate?',
+      subtitle:
+          'Your study material and progress stay saved on this device. '
+          'You can sign back in anytime.',
+      actions: [
+        AppAlertAction(label: 'Cancel', onTap: () => Navigator.pop(context)),
+        AppAlertAction(
+          label: 'Sign out',
+          isDestructive: true,
+          onTap: () => _signOut(context),
+        ),
+      ],
+      routeName: 'confirm-sign-out',
+    );
+  }
+
+  Future<void> _signOut(BuildContext context) async {
+    final userCubit = UserCubit.c(context);
+    Navigator.pop(context); // dismiss the alert
+    await userCubit.logout();
+    userCubit.reset(); // clears user/userData
+    if (!context.mounted) return;
+    AppRoutes.login.pushAndClear(context); // wipe stack → single /login
   }
 
   @override

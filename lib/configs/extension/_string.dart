@@ -12,6 +12,17 @@ extension SuperString<T> on String {
   Future<void> pushReplace(BuildContext context, {Object? arguments}) =>
       Navigator.pushReplacementNamed(context, this, arguments: arguments);
 
+  /// Pushes this route and removes every route beneath it, leaving a clean
+  /// stack with this as the only entry. Use for session boundaries (sign-out,
+  /// sign-in) where back-navigation into the previous flow must be impossible.
+  Future<void> pushAndClear(BuildContext context, {Object? arguments}) =>
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        this,
+        (route) => false,
+        arguments: arguments,
+      );
+
   Future<void> slowHeroPushReplacement(
     BuildContext context, {
     required Widget screen,
