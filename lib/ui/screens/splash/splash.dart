@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taleemmate/blocs/user/cubit.dart';
 import 'package:taleemmate/configs/configs.dart';
 import 'package:provider/provider.dart';
 import 'package:taleemmate/router/routes.dart';
@@ -8,6 +10,7 @@ import 'package:taleemmate/ui/painters/painters.dart';
 import 'package:taleemmate/ui/widgets/core/screen/screen.dart';
 
 part '_state.dart';
+part 'listeners/_init.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -35,9 +38,9 @@ class _BodyState extends State<_Body> {
   void initState() {
     super.initState();
 
-    Future.delayed(1.5.seconds, () {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      AppRoutes.login.pushReplace(context);
+      UserCubit.c(context).init();
     });
   }
 
@@ -48,6 +51,7 @@ class _BodyState extends State<_Body> {
     return Screen(
       keyboardHandler: true,
       padding: Space.a.t16,
+      belowBuilders: const [_InitListener()],
       child: SafeArea(
         child: Center(
           child: CustomPaint(

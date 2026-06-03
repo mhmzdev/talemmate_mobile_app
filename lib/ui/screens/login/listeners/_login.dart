@@ -12,7 +12,8 @@ class _LoginListener extends StatelessWidget {
           UIFlash.error(context, state.login.errorMessage);
         }
         if (state.login.isSuccess) {
-          AppRoutes.home.pushReplace(context);
+          final done = state.userData?.isOnboardingComplete ?? false;
+          (done ? AppRoutes.home : AppRoutes.onboarding).pushReplace(context);
         }
       },
       builder: (context, state) {
