@@ -1,99 +1,131 @@
 part of 'user_repo.dart';
 
 class _UserProvider {
-  static Future<UserData> register(Map<String, dynamic> values) async {
+  static final FirebaseAuth _auth = FirebaseAuth.instance;
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  static Stream<User?> authChanges() => _auth.authStateChanges();
+
+  static User? get currentUser => _auth.currentUser;
+
+  static Future<User> register(Map<String, dynamic> values) async {
     try {
-      final raw = await _UserMocks.register(values);
-      return UserData.fromJson(raw);
+      final cred = await _auth.createUserWithEmailAndPassword(
+        email: values['email'] as String,
+        password: values['password'] as String,
+      );
+      final user = cred.user!;
+      await _firestore.collection(FireCollections.users).doc(user.uid).set({
+        'uid': user.uid,
+        'fullName': (values['fullName'] as String?)?.trim() ?? '',
+        'email': values['email'] as String,
+        'isOnboardingComplete': false,
+      });
+      return user;
+    } on FirebaseAuthException catch (e, s) {
+      throw FirebaseAuthFault.fromFirebaseAuthException(e, s);
+    } on FirebaseException catch (e, s) {
+      throw FirebaseFault.fromFirebase(e, s);
     } catch (e, st) {
       if (e is Fault) rethrow;
-      if (e is DioException) throw HttpFault.fromDioException(e, st);
       throw UnknownFault('Something went wrong!', st);
     }
   }
 
-  static Future<UserData> init() async {
+  static Future<User> login(Map<String, dynamic> values) async {
     try {
-      final raw = <String, dynamic>{};
-      return UserData.fromJson(raw);
-    } catch (e, st) {
-      if (e is DioException) {
-        throw HttpFault.fromDioException(e, st);
-      }
-      throw UnknownFault('Something went wrong!', st);
-    }
-  }
-
-  static Future<UserData> login(Map<String, dynamic> values) async {
-    try {
-      final email = values['email'] as String;
-      final password = values['password'] as String;
-
-      final raw = await _UserMocks.login(email: email, password: password);
-      return UserData.fromJson(raw);
+      final cred = await _auth.signInWithEmailAndPassword(
+        email: values['email'] as String,
+        password: values['password'] as String,
+      );
+      return cred.user!;
+    } on FirebaseAuthException catch (e, s) {
+      throw FirebaseAuthFault.fromFirebaseAuthException(e, s);
+    } on FirebaseException catch (e, s) {
+      throw FirebaseFault.fromFirebase(e, s);
     } catch (e, st) {
       if (e is Fault) rethrow;
-      if (e is DioException) throw HttpFault.fromDioException(e, st);
       throw UnknownFault('Something went wrong!', st);
     }
   }
 
-  static Future<UserData> update() async {
+  static Future<Map<String, dynamic>> fetchProfile(String uid) async {
     try {
-      final raw = <String, dynamic>{};
-      return UserData.fromJson(raw);
+      final doc = await _firestore
+          .collection(FireCollections.users)
+          .doc(uid)
+          .get();
+      return doc.data() ?? <String, dynamic>{};
+    } on FirebaseException catch (e, s) {
+      throw FirebaseFault.fromFirebase(e, s);
     } catch (e, st) {
-      if (e is DioException) {
-        throw HttpFault.fromDioException(e, st);
-      }
+      if (e is Fault) rethrow;
       throw UnknownFault('Something went wrong!', st);
     }
   }
 
-  static Future<UserData> fetch() async {
+  static Future<void> completeOnboarding(
+    String uid,
+    Map<String, dynamic>? extra,
+  ) async {
     try {
-      final raw = <String, dynamic>{};
-      return UserData.fromJson(raw);
+      await _firestore.collection(FireCollections.users).doc(uid).set({
+        'isOnboardingComplete': true,
+        ...?extra,
+      }, SetOptions(merge: true));
+    } on FirebaseException catch (e, s) {
+      throw FirebaseFault.fromFirebase(e, s);
     } catch (e, st) {
-      if (e is DioException) {
-        throw HttpFault.fromDioException(e, st);
-      }
+      if (e is Fault) rethrow;
       throw UnknownFault('Something went wrong!', st);
     }
   }
 
-  static Future<UserData> forgot() async {
+  static Future<void> logout() async {
     try {
-      final raw = <String, dynamic>{};
-      return UserData.fromJson(raw);
+      await _auth.signOut();
+    } on FirebaseAuthException catch (e, s) {
+      throw FirebaseAuthFault.fromFirebaseAuthException(e, s);
     } catch (e, st) {
-      if (e is DioException) {
-        throw HttpFault.fromDioException(e, st);
-      }
+      if (e is Fault) rethrow;
       throw UnknownFault('Something went wrong!', st);
     }
   }
 
-  static Future<UserData> logout() async {
+  // --- not wired to any UI yet; mocked until the real features land --- //
+
+  static Future<Map<String, dynamic>> fetch() async {
     try {
-      final raw = <String, dynamic>{};
-      return UserData.fromJson(raw);
+      return await _UserMocks.fetch();
     } catch (e, st) {
-      if (e is DioException) {
-        throw HttpFault.fromDioException(e, st);
-      }
+      if (e is Fault) rethrow;
       throw UnknownFault('Something went wrong!', st);
     }
   }
 
-  static Future<UserData> deleteAccount() async {
+  static Future<Map<String, dynamic>> update() async {
     try {
-      final raw = <String, dynamic>{};
-      return UserData.fromJson(raw);
+      return await _UserMocks.update();
     } catch (e, st) {
-      if (e is DioException) {
-        throw HttpFault.fromDioException(e, st);
-      }
+      if (e is Fault) rethrow;
+      throw UnknownFault('Something went wrong!', st);
+    }
+  }
+
+  static Future<Map<String, dynamic>> forgot() async {
+    try {
+      return await _UserMocks.forgot();
+    } catch (e, st) {
+      if (e is Fault) rethrow;
+      throw UnknownFault('Something went wrong!', st);
+    }
+  }
+
+  static Future<Map<String, dynamic>> deleteAccount() async {
+    try {
+      return await _UserMocks.deleteAccount();
+    } catch (e, st) {
+      if (e is Fault) rethrow;
       throw UnknownFault('Something went wrong!', st);
     }
   }

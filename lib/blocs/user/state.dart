@@ -13,10 +13,11 @@ class UserState extends Equatable {
   final BlocState<UserData> deleteAccount;
 
   // --- state data --- //
+  final UserData? userData;
+  final User? user;
 
   const UserState({
     required this.register,
-
     required this.init,
     required this.login,
     required this.update,
@@ -24,23 +25,25 @@ class UserState extends Equatable {
     required this.forgot,
     required this.logout,
     required this.deleteAccount,
+    this.userData,
+    this.user,
   });
 
   UserState.def()
     : // root-def-constructor
       register = BlocState(),
-
       init = BlocState(),
       login = BlocState(),
       update = BlocState(),
       fetch = BlocState(),
       forgot = BlocState(),
       logout = BlocState(),
-      deleteAccount = BlocState();
+      deleteAccount = BlocState(),
+      userData = null,
+      user = null;
 
   UserState copyWith({
     BlocState<UserData>? register,
-
     BlocState<UserData>? init,
     BlocState<UserData>? login,
     BlocState<UserData>? update,
@@ -48,10 +51,11 @@ class UserState extends Equatable {
     BlocState<UserData>? forgot,
     BlocState<UserData>? logout,
     BlocState<UserData>? deleteAccount,
+    UserData? userData,
+    User? user,
   }) {
     return UserState(
       register: register ?? this.register,
-
       init: init ?? this.init,
       login: login ?? this.login,
       update: update ?? this.update,
@@ -59,6 +63,8 @@ class UserState extends Equatable {
       forgot: forgot ?? this.forgot,
       logout: logout ?? this.logout,
       deleteAccount: deleteAccount ?? this.deleteAccount,
+      userData: userData ?? this.userData,
+      user: user ?? this.user,
     );
   }
 
@@ -73,5 +79,7 @@ class UserState extends Equatable {
     forgot,
     logout,
     deleteAccount,
+    userData,
+    user,
   ];
 }
