@@ -92,11 +92,11 @@ class _StepSchedule extends StatelessWidget {
                     child: Container(
                       padding: Space.sym(SpaceToken.t16, SpaceToken.t12),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: 10.radius(),
                         border: Border.all(color: AppTheme.c.border),
                       ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: .center,
                         children: [
                           Icon(Icons.add, size: 18, color: AppTheme.c.subText),
                           Space.x.t08,
@@ -117,7 +117,7 @@ class _StepSchedule extends StatelessWidget {
           AppButton(
             label: 'Continue',
             onTap: state.nextPage,
-            mainAxisSize: MainAxisSize.max,
+            mainAxisSize: .max,
             size: .large,
           ),
         ],
@@ -161,7 +161,7 @@ class _TimeWindowTile extends StatelessWidget {
         padding: Space.sym(SpaceToken.t12, SpaceToken.t16),
         decoration: BoxDecoration(
           color: enabled ? AppTheme.c.subBackground : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: 10.radius(),
           border: Border.all(
             color: enabled ? AppTheme.c.text : AppTheme.c.border,
           ),
@@ -173,7 +173,7 @@ class _TimeWindowTile extends StatelessWidget {
               height: 20,
               decoration: BoxDecoration(
                 color: enabled ? AppTheme.c.text : Colors.transparent,
-                borderRadius: BorderRadius.circular(5),
+                borderRadius: 5.radius(),
                 border: Border.all(
                   color: enabled ? AppTheme.c.text : AppTheme.c.border,
                   width: 1.5,
@@ -185,7 +185,7 @@ class _TimeWindowTile extends StatelessWidget {
             ),
             Space.x.t12,
             Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: .start,
               children: [
                 Text(label, style: AppText.b1b),
                 Text(time, style: AppText.b2.cl(AppTheme.c.subText)),
@@ -220,7 +220,7 @@ class _ExamRow extends StatelessWidget {
       padding: Space.sym(SpaceToken.t16, SpaceToken.t16),
       decoration: BoxDecoration(
         color: AppTheme.c.background,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: 10.radius(),
         border: Border.all(color: AppTheme.c.border),
       ),
       child: Row(
@@ -229,14 +229,14 @@ class _ExamRow extends StatelessWidget {
             width: 10,
             height: 10,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
+              shape: .circle,
               color: dotColor,
             ),
           ),
           Space.x.t12,
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: .start,
               children: [
                 Text(
                   draft.subjectName.isEmpty

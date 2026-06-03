@@ -25,15 +25,6 @@ class _StepAboutYou extends StatelessWidget {
     'Small consistent blocks',
   ];
 
-  static const _tutorPreviews = {
-    OnboardingGoal.passExams:
-        '"Salaam. We\'ll work backwards from your exam dates so nothing sneaks up on you. Once you add your subjects, I\'ll suggest where to start."',
-    OnboardingGoal.understand:
-        '"Let\'s build real intuition — not just answers. We\'ll slow down where it matters and make sure each concept clicks before moving on."',
-    OnboardingGoal.studyDaily:
-        '"Consistency is the goal. I\'ll plan small, manageable blocks every day so studying becomes a habit, not a sprint."',
-  };
-
   @override
   Widget build(BuildContext context) {
     App.init(context);
@@ -79,8 +70,8 @@ class _StepAboutYou extends StatelessWidget {
                       controller: state.nameCtrl,
                       disposeController: false,
                       placeholder: 'Your name',
-                      textCapitalization: TextCapitalization.words,
-                      textInputAction: TextInputAction.next,
+                      textCapitalization: .words,
+                      textInputAction: .next,
                     ),
                     Space.y.t24,
 
@@ -200,49 +191,7 @@ class _StepAboutYou extends StatelessWidget {
                     }),
 
                     Space.y.t16,
-
-                    // TUTOR PREVIEW
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppTheme.c.subBackground,
-                        borderRadius: BorderRadius.circular(12),
-                        border: const Border(
-                          left: BorderSide(color: Color(0xFFE09A2B), width: 3),
-                        ),
-                      ),
-                      padding: Space.sym(SpaceToken.t16, SpaceToken.t16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(
-                                0xFFE09A2B,
-                              ).withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              '● TUTOR PREVIEW',
-                              style: AppText.l1b
-                                  .cl(const Color(0xFFE09A2B))
-                                  .copyWith(letterSpacing: 1.0),
-                            ),
-                          ),
-                          Space.y.t12,
-                          Text(
-                            _tutorPreviews[state.goal] ??
-                                _tutorPreviews[OnboardingGoal.passExams]!,
-                            style: AppText.b1
-                                .cl(AppTheme.c.text)
-                                .copyWith(fontStyle: FontStyle.italic),
-                          ),
-                        ],
-                      ),
-                    ),
+                    const _TutorPreview(),
                     Space.y.t24,
                   ],
                 ),
@@ -252,7 +201,7 @@ class _StepAboutYou extends StatelessWidget {
             AppButton(
               label: 'Continue',
               onTap: state.nextPage,
-              mainAxisSize: MainAxisSize.max,
+              mainAxisSize: .max,
               size: .large,
             ),
           ],
@@ -282,7 +231,7 @@ class _InstitutionChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: selected ? AppTheme.c.text : AppTheme.c.subBackground,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: 20.radius(),
           border: Border.all(
             color: selected ? AppTheme.c.text : AppTheme.c.border,
           ),
@@ -356,10 +305,10 @@ class _YearChip extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: AppProps.medium,
-        padding: Space.sym(16, 4),
+        padding: Space.sym(SpaceToken.t16, SpaceToken.t04),
         decoration: BoxDecoration(
           color: selected ? AppTheme.c.accent : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: 20.radius(),
           border: Border.all(
             color: selected ? AppTheme.c.accent : AppTheme.c.border,
           ),
@@ -394,10 +343,10 @@ class _GoalCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: Space.sym(12, 16),
+        padding: Space.sym(SpaceToken.t12, SpaceToken.t16),
         decoration: BoxDecoration(
           color: selected ? AppTheme.c.subBackground : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: 10.radius(),
           border: Border.all(
             color: selected ? AppTheme.c.accent : AppTheme.c.border,
           ),
@@ -408,7 +357,7 @@ class _GoalCard extends StatelessWidget {
               width: 18,
               height: 18,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
+                shape: .circle,
                 border: Border.all(
                   color: selected ? AppTheme.c.accent : AppTheme.c.border,
                   width: 2,
@@ -420,7 +369,7 @@ class _GoalCard extends StatelessWidget {
                         width: 8,
                         height: 8,
                         decoration: BoxDecoration(
-                          shape: BoxShape.circle,
+                          shape: .circle,
                           color: AppTheme.c.accent,
                         ),
                       ),
@@ -430,7 +379,7 @@ class _GoalCard extends StatelessWidget {
             Space.x.t12,
             Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: .start,
                 children: [
                   Text(title, style: AppText.b1b),
                   Text(subtitle, style: AppText.b2.cl(AppTheme.c.subText)),
@@ -439,6 +388,57 @@ class _GoalCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _TutorPreview extends StatelessWidget {
+  const _TutorPreview();
+
+  static const _gold = Color(0xFFE09A2B);
+
+  static const _previews = {
+    OnboardingGoal.passExams:
+        '"Salaam. We\'ll work backwards from your exam dates so nothing sneaks up on you. Once you add your subjects, I\'ll suggest where to start."',
+    OnboardingGoal.understand:
+        '"Let\'s build real intuition — not just answers. We\'ll slow down where it matters and make sure each concept clicks before moving on."',
+    OnboardingGoal.studyDaily:
+        '"Consistency is the goal. I\'ll plan small, manageable blocks every day so studying becomes a habit, not a sprint."',
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    App.init(context);
+    final state = _ScreenState.s(context, true);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.c.subBackground,
+        borderRadius: 12.radius(),
+        border: const Border(left: BorderSide(color: _gold, width: 3)),
+      ),
+      padding: Space.sym(SpaceToken.t16, SpaceToken.t16),
+      child: Column(
+        crossAxisAlignment: .start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: _gold.withValues(alpha: 0.15),
+              borderRadius: 4.radius(),
+            ),
+            child: Text(
+              '● TUTOR PREVIEW',
+              style: AppText.l1b.cl(_gold).copyWith(letterSpacing: 1.0),
+            ),
+          ),
+          Space.y.t12,
+          Text(
+            _previews[state.goal] ?? _previews[OnboardingGoal.passExams]!,
+            style: AppText.b1.cl(AppTheme.c.text).copyWith(fontStyle: .italic),
+          ),
+        ],
       ),
     );
   }

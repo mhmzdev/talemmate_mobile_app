@@ -57,15 +57,15 @@ class _AddExamModalState extends State<_AddExamModal> {
       dragger: true,
       canPop: true,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: .stretch,
         children: [
           // Header
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: .start,
             children: [
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: .start,
                   children: [
                     Text(
                       'NEW EXAM',
@@ -84,7 +84,7 @@ class _AddExamModalState extends State<_AddExamModal> {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
+                    shape: .circle,
                     color: AppTheme.c.subBackground,
                   ),
                   child: Icon(
@@ -134,13 +134,13 @@ class _AddExamModalState extends State<_AddExamModal> {
                         ),
                       ),
                       child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisSize: .min,
                         children: [
                           Container(
                             width: 8,
                             height: 8,
                             decoration: BoxDecoration(
-                              shape: BoxShape.circle,
+                              shape: .circle,
                               color: Color(
                                 int.parse(
                                   s.colorHex.replaceFirst(
@@ -246,7 +246,7 @@ class _AddExamModalState extends State<_AddExamModal> {
                   previewText,
                   style: AppText.b2.cl(AppTheme.c.subText),
                   maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                  overflow: .ellipsis,
                 ),
               ),
               Space.x.t12,

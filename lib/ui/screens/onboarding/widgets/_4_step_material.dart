@@ -40,11 +40,11 @@ class _StepMaterial extends StatelessWidget {
                       height: 120,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: 12.radius(),
                         border: Border.all(color: AppTheme.c.border),
                       ),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: .center,
                         children: [
                           Icon(
                             Icons.upload_file_outlined,
@@ -119,7 +119,7 @@ class _StepMaterial extends StatelessWidget {
           AppButton(
             label: 'Finish setup',
             onTap: () => state.finish(context),
-            mainAxisSize: MainAxisSize.max,
+            mainAxisSize: .max,
             size: .large,
           ),
           Space.y.t08,
@@ -155,7 +155,7 @@ class _SourceChip extends StatelessWidget {
           padding: Space.sym(SpaceToken.t16, SpaceToken.t12),
           decoration: BoxDecoration(
             color: AppTheme.c.subBackground,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: 12.radius(),
             border: Border.all(color: AppTheme.c.border),
           ),
           child: Column(

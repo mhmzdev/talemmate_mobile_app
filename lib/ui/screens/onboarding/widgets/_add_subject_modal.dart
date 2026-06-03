@@ -36,8 +36,7 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
     final code = _draft.codeCtrl.text.trim();
     final name = _draft.nameCtrl.text.trim();
     if (code.isEmpty && name.isEmpty) return;
-    if (code.isNotEmpty &&
-        widget.existingCodes.contains(code.toLowerCase())) {
+    if (code.isNotEmpty && widget.existingCodes.contains(code.toLowerCase())) {
       UIFlash.error(context, 'You\'ve already added a subject with this code.');
       return;
     }
@@ -61,15 +60,15 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
       dragger: true,
       canPop: true,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: .stretch,
         children: [
           // Header
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: .start,
             children: [
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: .start,
                   children: [
                     Text(
                       'NEW SUBJECT',
@@ -88,7 +87,7 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
+                    shape: .circle,
                     color: AppTheme.c.subBackground,
                   ),
                   child: Icon(
@@ -104,12 +103,12 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
 
           // CODE + SUBJECT NAME side by side
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: .start,
             children: [
               Expanded(
                 flex: 2,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  crossAxisAlignment: .stretch,
                   children: [
                     Text(
                       'CODE',
@@ -130,7 +129,7 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
               Expanded(
                 flex: 3,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  crossAxisAlignment: .stretch,
                   children: [
                     Text(
                       'SUBJECT NAME',
@@ -169,7 +168,7 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
                     width: 28,
                     height: 28,
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
+                      shape: .circle,
                       color: Color(int.parse(hex.replaceFirst('#', '0xFF'))),
                       border: Border.all(
                         color: _colorHex == hex
@@ -186,6 +185,7 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
 
           // STARTING CONFIDENCE
           Row(
+            mainAxisAlignment: .spaceBetween,
             children: [
               Text(
                 'STARTING CONFIDENCE',
@@ -193,7 +193,6 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
                     .cl(AppTheme.c.subText)
                     .copyWith(letterSpacing: 1.2),
               ),
-              const Spacer(),
               Text(
                 _draft.confidence < 0.35
                     ? 'Shaky'
@@ -224,16 +223,16 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
                   ),
                   decoration: BoxDecoration(
                     border: Border.all(color: AppTheme.c.accent),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: 20.radius(),
                   ),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisSize: .min,
                     children: [
                       Container(
                         width: 6,
                         height: 6,
                         decoration: BoxDecoration(
-                          shape: BoxShape.circle,
+                          shape: .circle,
                           color: AppTheme.c.accent,
                         ),
                       ),
@@ -260,7 +259,7 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
                   padding: Space.sym(SpaceToken.t12, SpaceToken.t16),
                   decoration: BoxDecoration(
                     color: AppTheme.c.subBackground,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: 10.radius(),
                     border: Border.all(color: AppTheme.c.border),
                   ),
                   child: Row(
@@ -275,7 +274,7 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
                       Space.x.t12,
                       Expanded(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: .start,
                           children: [
                             Text(s['name'] ?? '', style: AppText.b1b),
                             Text(
@@ -306,7 +305,7 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
                   label: 'Cancel',
                   style: .creamy,
                   onTap: () => Navigator.pop(context),
-                  mainAxisSize: MainAxisSize.max,
+                  mainAxisSize: .max,
                   size: .large,
                 ),
               ),
@@ -316,7 +315,7 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
                 child: AppButton(
                   label: '+ Add subject',
                   onTap: _submit,
-                  mainAxisSize: MainAxisSize.max,
+                  mainAxisSize: .max,
                   size: .large,
                 ),
               ),
@@ -333,15 +332,15 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
     filled: true,
     fillColor: AppTheme.c.subBackground,
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: 10.radius(),
       borderSide: BorderSide(color: AppTheme.c.border),
     ),
     enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: 10.radius(),
       borderSide: BorderSide(color: AppTheme.c.border),
     ),
     focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: 10.radius(),
       borderSide: BorderSide(color: AppTheme.c.accent),
     ),
     contentPadding: Space.sym(SpaceToken.t12, SpaceToken.t16),

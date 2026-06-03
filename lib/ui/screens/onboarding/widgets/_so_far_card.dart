@@ -22,20 +22,25 @@ class _SoFarCard extends StatelessWidget {
       padding: Space.sym(SpaceToken.t16, SpaceToken.t16),
       decoration: BoxDecoration(
         color: AppTheme.c.subBackground,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: 12.radius(),
         border: Border.all(color: AppTheme.c.border),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: .start,
         children: [
           Text(
             'SO FAR',
-            style: AppText.l1b.cl(AppTheme.c.subText).copyWith(letterSpacing: 1.2),
+            style: AppText.l1b
+                .cl(AppTheme.c.subText)
+                .copyWith(letterSpacing: 1.2),
           ),
           Space.y.t12,
           _SoFarRow(label: 'Name', value: name.isEmpty ? '–' : name),
           Space.y.t08,
-          _SoFarRow(label: 'Institution', value: institution.isEmpty ? '–' : institution),
+          _SoFarRow(
+            label: 'Institution',
+            value: institution.isEmpty ? '–' : institution,
+          ),
           Space.y.t08,
           _SoFarRow(label: 'Midterms', value: examStr),
           Space.y.t08,
@@ -54,10 +59,11 @@ class _SoFarRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    App.init(context);
     return Row(
+      mainAxisAlignment: .spaceBetween,
       children: [
         Text(label, style: AppText.b2.cl(AppTheme.c.subText)),
-        const Spacer(),
         Text(value, style: AppText.b2),
       ],
     );

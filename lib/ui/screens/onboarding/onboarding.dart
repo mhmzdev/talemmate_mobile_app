@@ -76,7 +76,7 @@ class _Body extends StatelessWidget {
       overlayBuilders: const [_CompleteListener()],
       child: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: .stretch,
           children: [
             Padding(
               padding: Space.h.t20,
@@ -164,7 +164,7 @@ class _StepProgressBar extends StatelessWidget {
                 color: i <= currentStep
                     ? AppTheme.c.primary
                     : AppTheme.c.border,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: 2.radius(),
               ),
             ),
           ),

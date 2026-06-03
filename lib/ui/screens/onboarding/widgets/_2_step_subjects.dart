@@ -47,11 +47,11 @@ class _StepSubjects extends StatelessWidget {
                     child: Container(
                       padding: Space.sym(SpaceToken.t16, SpaceToken.t12),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: 10.radius(),
                         border: Border.all(color: AppTheme.c.border),
                       ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: .center,
                         children: [
                           Icon(Icons.add, size: 18, color: AppTheme.c.subText),
                           Space.x.t08,
@@ -77,7 +77,7 @@ class _StepSubjects extends StatelessWidget {
           AppButton(
             label: 'Continue',
             onTap: state.nextPage,
-            mainAxisSize: MainAxisSize.max,
+            mainAxisSize: .max,
             size: .large,
             state: state.subjects.isEmpty ? .disabled : .def,
           ),
@@ -104,7 +104,6 @@ class _StepSubjects extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class _SubjectEntry extends StatelessWidget {
@@ -138,14 +137,14 @@ class _SubjectEntry extends StatelessWidget {
       padding: Space.sym(SpaceToken.t12, SpaceToken.t16),
       decoration: BoxDecoration(
         color: AppTheme.c.subBackground,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: 10.radius(),
         border: Border.all(color: AppTheme.c.border),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: .start,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: .start,
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 3),
@@ -153,7 +152,7 @@ class _SubjectEntry extends StatelessWidget {
                   width: 10,
                   height: 10,
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
+                    shape: .circle,
                     color: dotColor,
                   ),
                 ),
@@ -161,7 +160,7 @@ class _SubjectEntry extends StatelessWidget {
               Space.x.t08,
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: .start,
                   children: [
                     Text(
                       draft.codeCtrl.text,

@@ -24,7 +24,7 @@ class _FileItem extends StatelessWidget {
       padding: Space.sym(SpaceToken.t12, SpaceToken.t12),
       decoration: BoxDecoration(
         color: AppTheme.c.subBackground,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: 10.radius(),
         border: Border.all(color: AppTheme.c.border),
       ),
       child: Row(
@@ -35,19 +35,21 @@ class _FileItem extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: _badgeColor(type).withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: 6.radius(),
             ),
             child: Text(
               type,
-              style: AppText.l1b.cl(_badgeColor(type)).copyWith(letterSpacing: 0.5),
+              style: AppText.l1b
+                  .cl(_badgeColor(type))
+                  .copyWith(letterSpacing: 0.5),
             ),
           ),
           Space.x.t12,
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: .start,
               children: [
-                Text(name, style: AppText.b2, maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(name, style: AppText.b2, maxLines: 1, overflow: .ellipsis),
                 Text(size, style: AppText.b2.cl(AppTheme.c.subText)),
               ],
             ),
