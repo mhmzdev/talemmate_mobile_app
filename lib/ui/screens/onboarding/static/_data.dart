@@ -1,8 +1,5 @@
 part of '../onboarding.dart';
 
-// Parses a "#RRGGBB" tag-colour string into a Color.
-Color _hexColor(String hex) => Color(int.parse(hex.replaceFirst('#', '0xFF')));
-
 // Study time windows for step 3 schedule picker.
 const _studyWindows = [
   ('afterFajr', 'After Fajr', '05:30-07:00'),

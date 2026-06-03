@@ -33,23 +33,3 @@ class _ModalTextField extends StatelessWidget {
     );
   }
 }
-
-InputDecoration _modalInputDec(String hint) => InputDecoration(
-  hintText: hint,
-  hintStyle: AppText.b1.cl(AppTheme.c.subText),
-  filled: true,
-  fillColor: AppTheme.c.subBackground,
-  border: OutlineInputBorder(
-    borderRadius: 10.radius(),
-    borderSide: BorderSide(color: AppTheme.c.border),
-  ),
-  enabledBorder: OutlineInputBorder(
-    borderRadius: 10.radius(),
-    borderSide: BorderSide(color: AppTheme.c.border),
-  ),
-  focusedBorder: OutlineInputBorder(
-    borderRadius: 10.radius(),
-    borderSide: BorderSide(color: AppTheme.c.accent),
-  ),
-  contentPadding: Space.sym(SpaceToken.t12, SpaceToken.t16),
-);

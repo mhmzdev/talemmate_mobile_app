@@ -36,6 +36,7 @@ part 'static/_form_data.dart';
 part 'static/_form_keys.dart';
 part 'static/_data.dart';
 
+part 'utils.dart';
 part '_state.dart';
 part 'listeners/_complete.dart';
 
@@ -57,7 +58,6 @@ part 'widgets/_exam_row.dart';
 part 'widgets/_source_chip.dart';
 part 'widgets/_so_far_card.dart';
 part 'widgets/_file_item.dart';
-part 'widgets/_confidence.dart';
 part 'widgets/_modal_header.dart';
 part 'widgets/_modal_text_field.dart';
 part 'widgets/_tag_color_picker.dart';
