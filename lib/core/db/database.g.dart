@@ -7634,7 +7634,7 @@ class $TutorMessagesTable extends TutorMessages
   }
 
   static TypeConverter<MessageSender, String> $convertersender =
-      EnumConverter<MessageSender>(MessageSender.values);
+      const EnumConverter<MessageSender>(MessageSender.values);
   static TypeConverter<List<FollowUpPoint>, String> $converterfollowUpPoints =
       const FollowUpPointsConverter();
   static TypeConverter<List<Citation>, String> $convertercitations =
@@ -8085,9 +8085,9 @@ class $TutorSettingsTableTable extends TutorSettingsTable
   }
 
   static TypeConverter<TutorScope, String> $converterscope =
-      EnumConverter<TutorScope>(TutorScope.values);
+      const EnumConverter<TutorScope>(TutorScope.values);
   static TypeConverter<ReasoningDepth, String> $converterreasoningDepth =
-      EnumConverter<ReasoningDepth>(ReasoningDepth.values);
+      const EnumConverter<ReasoningDepth>(ReasoningDepth.values);
 }
 
 class TutorSettingsRow extends DataClass

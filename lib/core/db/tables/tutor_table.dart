@@ -10,8 +10,7 @@ class TutorConversations extends Table {
   TextColumn get id => text()();
   TextColumn get userId => text()();
   TextColumn get subjectId => text().references(Subjects, #id)();
-  TextColumn get topicId =>
-      text().references(Topics, #id).nullable()();
+  TextColumn get topicId => text().references(Topics, #id).nullable()();
   TextColumn get title => text().nullable()();
   IntColumn get groundedSourceCount => integer()();
   DateTimeColumn get createdAt => dateTime()();
@@ -24,10 +23,9 @@ class TutorConversations extends Table {
 @DataClassName('TutorMessageRow')
 class TutorMessages extends Table {
   TextColumn get id => text()();
-  TextColumn get conversationId =>
-      text().references(TutorConversations, #id)();
+  TextColumn get conversationId => text().references(TutorConversations, #id)();
   TextColumn get sender =>
-      text().map(EnumConverter<MessageSender>(MessageSender.values))();
+      text().map(const EnumConverter<MessageSender>(MessageSender.values))();
   TextColumn get content => text()();
   DateTimeColumn get timestamp => dateTime()();
   TextColumn get followUpPoints =>
@@ -48,9 +46,9 @@ class TutorSettingsTable extends Table {
   BoolColumn get showCitationsOnEveryReply =>
       boolean().withDefault(const Constant(true))();
   TextColumn get scope =>
-      text().map(EnumConverter<TutorScope>(TutorScope.values))();
+      text().map(const EnumConverter<TutorScope>(TutorScope.values))();
   TextColumn get reasoningDepth =>
-      text().map(EnumConverter<ReasoningDepth>(ReasoningDepth.values))();
+      text().map(const EnumConverter<ReasoningDepth>(ReasoningDepth.values))();
 
   @override
   Set<Column> get primaryKey => {userId};
