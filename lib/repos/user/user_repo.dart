@@ -15,6 +15,9 @@ class UserRepo {
 
   /// --- repo functions --- ///
 
+  Future<UserData> register(Map<String, dynamic> values) =>
+      _UserProvider.register(values);
+
   Future<UserData> init() => _UserProvider.init();
 
   Future<UserData> login(Map<String, dynamic> values) =>

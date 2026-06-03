@@ -18,6 +18,28 @@ class UserCubit extends Cubit<UserState> {
 
   UserCubit() : super(UserState.def());
 
+  Future<void> register(Map<String, dynamic> values) async {
+    emit(
+      state.copyWith(
+        register: state.register.toLoading(),
+      ),
+    );
+    try {
+      final data = await UserRepo.ins.register(values);
+      emit(
+        state.copyWith(
+          register: state.register.toSuccess(data: data),
+        ),
+      );
+    } on Fault catch (e) {
+      emit(
+        state.copyWith(
+          register: state.register.toFailed(fault: e),
+        ),
+      );
+    }
+  }
+
   Future<void> init() async {
     emit(
       state.copyWith(

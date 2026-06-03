@@ -3,6 +3,18 @@
 part of 'user_repo.dart';
 
 class _UserMocks {
+  static Future<Map<String, dynamic>> register(
+    Map<String, dynamic> values,
+  ) async {
+    await 1.0.seconds.delay;
+    return {
+      'uid': 'mock-user-002',
+      'fullName': values['fullName'] as String? ?? 'New User',
+      'email': values['email'] as String? ?? '',
+      'isOnboardingComplete': false,
+    };
+  }
+
   static Future<Map<String, dynamic>> init() {
     return Future.value({'status': 200, 'message': 'mock', 'data': {}});
   }

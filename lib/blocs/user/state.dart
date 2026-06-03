@@ -3,6 +3,7 @@ part of 'cubit.dart';
 @immutable
 class UserState extends Equatable {
   // --- nested states --- //
+  final BlocState<UserData> register;
   final BlocState<UserData> init;
   final BlocState<UserData> login;
   final BlocState<UserData> update;
@@ -14,6 +15,8 @@ class UserState extends Equatable {
   // --- state data --- //
 
   const UserState({
+    required this.register,
+
     required this.init,
     required this.login,
     required this.update,
@@ -25,6 +28,8 @@ class UserState extends Equatable {
 
   UserState.def()
     : // root-def-constructor
+      register = BlocState(),
+
       init = BlocState(),
       login = BlocState(),
       update = BlocState(),
@@ -34,6 +39,8 @@ class UserState extends Equatable {
       deleteAccount = BlocState();
 
   UserState copyWith({
+    BlocState<UserData>? register,
+
     BlocState<UserData>? init,
     BlocState<UserData>? login,
     BlocState<UserData>? update,
@@ -43,6 +50,8 @@ class UserState extends Equatable {
     BlocState<UserData>? deleteAccount,
   }) {
     return UserState(
+      register: register ?? this.register,
+
       init: init ?? this.init,
       login: login ?? this.login,
       update: update ?? this.update,
@@ -56,6 +65,7 @@ class UserState extends Equatable {
   @override
   List<Object?> get props => [
     // root-state-props
+    register,
     init,
     login,
     update,

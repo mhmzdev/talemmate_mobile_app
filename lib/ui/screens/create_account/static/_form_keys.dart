@@ -5,4 +5,5 @@ class _FormKeys {
   static const email = 'email';
   static const password = 'password';
   static const confirm = 'confirm';
+  static const termsAccepted = 'termsAccepted';
 }

@@ -7,10 +7,11 @@ class _FormData {
     }
 
     return {
-      _FormKeys.fullName: 'FullName',
-      _FormKeys.email: 'Email',
-      _FormKeys.password: 'Password',
-      _FormKeys.confirm: 'Confirm',
+      _FormKeys.fullName: 'Muhammad Hamza',
+      _FormKeys.email: 'hamza@cui.edu.pk',
+      _FormKeys.password: 'Hamza@123',
+      _FormKeys.confirm: 'Hamza@123',
+      _FormKeys.termsAccepted: false,
     };
   }
 }

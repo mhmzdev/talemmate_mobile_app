@@ -1,6 +1,17 @@
 part of 'user_repo.dart';
 
 class _UserProvider {
+  static Future<UserData> register(Map<String, dynamic> values) async {
+    try {
+      final raw = await _UserMocks.register(values);
+      return UserData.fromJson(raw);
+    } catch (e, st) {
+      if (e is Fault) rethrow;
+      if (e is DioException) throw HttpFault.fromDioException(e, st);
+      throw UnknownFault('Something went wrong!', st);
+    }
+  }
+
   static Future<UserData> init() async {
     try {
       final raw = <String, dynamic>{};
