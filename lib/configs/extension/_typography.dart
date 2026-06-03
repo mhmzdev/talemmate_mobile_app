@@ -54,6 +54,10 @@ extension SuperAppText on TextStyle {
     );
   }
 
+  TextStyle fra() => copyWith(
+    fontFamily: FontFamily.fraunces,
+  );
+
   TextStyle gm() => copyWith(
     fontFamily: FontFamily.geistMono,
   );

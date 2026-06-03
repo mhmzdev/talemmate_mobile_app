@@ -15,6 +15,7 @@ class AppFormDateInput extends StatelessWidget {
     this.firstDate,
     this.lastDate,
     this.suffixIcon = LucideIcons.calendar,
+    this.dateFormat,
   });
 
   final String name;
@@ -29,6 +30,7 @@ class AppFormDateInput extends StatelessWidget {
   final DateTime? firstDate;
   final DateTime? lastDate;
   final IconData? suffixIcon;
+  final DateFormat? dateFormat;
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +52,7 @@ class AppFormDateInput extends StatelessWidget {
           initialValue: field.value,
           onChanged: field.didChange,
           fieldState: field,
+          dateFormat: dateFormat,
         );
       },
     );
@@ -71,6 +74,7 @@ class AppFormDateInputContent extends StatefulWidget {
     this.lastDate,
     this.suffixIcon = LucideIcons.calendar,
     this.fieldState,
+    this.dateFormat,
   });
 
   final DateTime? initialValue;
@@ -85,6 +89,7 @@ class AppFormDateInputContent extends StatefulWidget {
   final DateTime? lastDate;
   final IconData? suffixIcon;
   final FormFieldState<DateTime?>? fieldState;
+  final DateFormat? dateFormat;
 
   @override
   State<AppFormDateInputContent> createState() =>
@@ -111,7 +116,9 @@ class _AppFormDateInputContentState extends State<AppFormDateInputContent> {
 
   void _updateControllerValue(DateTime? date) {
     if (date != null) {
-      _controller.text = DateFormat('MMM yyyy').format(date);
+      _controller.text =
+          widget.dateFormat?.format(date) ??
+          DateFormat('MMM yyyy').format(date);
     } else {
       _controller.clear();
     }
@@ -127,6 +134,7 @@ class _AppFormDateInputContentState extends State<AppFormDateInputContent> {
       initialDate: widget.initialValue ?? now,
       firstDate: firstDate,
       lastDate: lastDate,
+      routeSettings: const RouteSettings(name: '/alerts/date-picker'),
       builder: _themeBuilder,
     );
 

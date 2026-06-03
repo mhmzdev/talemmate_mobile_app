@@ -79,8 +79,8 @@ class _TermsAndPrivacyWidgetState extends State<TermsAndPrivacyWidget> {
 
     final defaultTextStyle = AppText.b2;
     final defaultLinkStyle = AppText.b2.copyWith(
-      color: AppTheme.c.accent,
-      decoration: TextDecoration.underline,
+      color: AppTheme.c.primary,
+      decoration: .underline,
     );
 
     return Container(
