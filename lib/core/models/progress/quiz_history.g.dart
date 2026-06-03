@@ -27,6 +27,6 @@ Map<String, dynamic> _$QuizHistoryToJson(_QuizHistory instance) =>
       'userId': instance.userId,
       'totalQuizzesAttempted': instance.totalQuizzesAttempted,
       'totalQuestionsAnswered': instance.totalQuestionsAnswered,
-      'attempts': instance.attempts,
-      'scoreHistory': instance.scoreHistory,
+      'attempts': instance.attempts.map((e) => e.toJson()).toList(),
+      'scoreHistory': instance.scoreHistory.map((e) => e.toJson()).toList(),
     };

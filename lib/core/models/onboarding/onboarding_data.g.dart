@@ -50,11 +50,13 @@ Map<String, dynamic> _$OnboardingDataToJson(_OnboardingData instance) =>
       'educationLevel': _$EducationLevelEnumMap[instance.educationLevel]!,
       'year': instance.year,
       'goal': _$OnboardingGoalEnumMap[instance.goal]!,
-      'subjects': instance.subjects,
-      'exams': instance.exams,
+      'subjects': instance.subjects.map((e) => e.toJson()).toList(),
+      'exams': instance.exams.map((e) => e.toJson()).toList(),
       'institution': instance.institution,
-      'schedule': instance.schedule,
-      'uploadedMaterials': instance.uploadedMaterials,
+      'schedule': instance.schedule?.toJson(),
+      'uploadedMaterials': instance.uploadedMaterials
+          .map((e) => e.toJson())
+          .toList(),
     };
 
 const _$EducationLevelEnumMap = {

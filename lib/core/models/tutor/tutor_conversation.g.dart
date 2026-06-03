@@ -33,5 +33,5 @@ Map<String, dynamic> _$TutorConversationToJson(_TutorConversation instance) =>
       'lastMessageAt': instance.lastMessageAt.toIso8601String(),
       'topicId': instance.topicId,
       'title': instance.title,
-      'messages': instance.messages,
+      'messages': instance.messages.map((e) => e.toJson()).toList(),
     };

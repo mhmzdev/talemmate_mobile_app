@@ -33,8 +33,8 @@ Map<String, dynamic> _$TutorMessageToJson(_TutorMessage instance) =>
       'sender': _$MessageSenderEnumMap[instance.sender]!,
       'text': instance.text,
       'timestamp': instance.timestamp.toIso8601String(),
-      'followUpPoints': instance.followUpPoints,
-      'citations': instance.citations,
+      'followUpPoints': instance.followUpPoints.map((e) => e.toJson()).toList(),
+      'citations': instance.citations.map((e) => e.toJson()).toList(),
       'kickerQuestion': instance.kickerQuestion,
     };
 

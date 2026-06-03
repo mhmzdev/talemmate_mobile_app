@@ -21,7 +21,7 @@ _DayPlan _$DayPlanFromJson(Map<String, dynamic> json) => _DayPlan(
 
 Map<String, dynamic> _$DayPlanToJson(_DayPlan instance) => <String, dynamic>{
   'date': instance.date.toIso8601String(),
-  'blocks': instance.blocks,
-  'exam': instance.exam,
+  'blocks': instance.blocks.map((e) => e.toJson()).toList(),
+  'exam': instance.exam?.toJson(),
   'isDone': instance.isDone,
 };

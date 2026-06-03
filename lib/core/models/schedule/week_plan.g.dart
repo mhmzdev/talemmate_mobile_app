@@ -24,6 +24,6 @@ Map<String, dynamic> _$WeekPlanToJson(_WeekPlan instance) => <String, dynamic>{
   'scheduleId': instance.scheduleId,
   'startDate': instance.startDate.toIso8601String(),
   'endDate': instance.endDate.toIso8601String(),
-  'days': instance.days,
+  'days': instance.days.map((e) => e.toJson()).toList(),
   'aiReasoning': instance.aiReasoning,
 };

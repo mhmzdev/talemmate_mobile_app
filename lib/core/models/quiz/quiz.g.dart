@@ -24,7 +24,7 @@ Map<String, dynamic> _$QuizToJson(_Quiz instance) => <String, dynamic>{
   'id': instance.id,
   'subjectId': instance.subjectId,
   'currentQuestionIndex': instance.currentQuestionIndex,
-  'questions': instance.questions,
+  'questions': instance.questions.map((e) => e.toJson()).toList(),
   'topicId': instance.topicId,
   'sourceLabel': instance.sourceLabel,
   'isAIGenerated': instance.isAIGenerated,

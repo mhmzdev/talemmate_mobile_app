@@ -27,7 +27,7 @@ Map<String, dynamic> _$ProgressMetricToJson(_ProgressMetric instance) =>
       'subjectId': instance.subjectId,
       'readinessScore': instance.readinessScore,
       'lastUpdatedAt': instance.lastUpdatedAt.toIso8601String(),
-      'predictedScoreRange': instance.predictedScoreRange,
+      'predictedScoreRange': instance.predictedScoreRange?.toJson(),
       'weeklyGain': instance.weeklyGain,
       'aiInsight': instance.aiInsight,
     };
