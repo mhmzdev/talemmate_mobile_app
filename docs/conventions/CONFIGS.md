@@ -51,6 +51,7 @@ abstract class AppRoutes {
 |---|---|
 | `.push(context)` | `Navigator.pushNamed` |
 | `.pushReplace(context)` | `Navigator.pushReplacementNamed` |
+| `.pushAndClear(context)` | `Navigator.pushNamedAndRemoveUntil(…, (r) => false)` — wipes the whole stack; use at session boundaries (sign-in / sign-out) |
 | `.pop(context, [result])` | `Navigator.pop` |
 | `.popUntil(context)` | `Navigator.popUntil(ModalRoute.withName(this))` |
 | `.sameRoute()` | `NavigationHistoryObserver` — `true` if already on top |
@@ -192,6 +193,7 @@ AppProps.normal  // 500 ms
 |---|---|
 | `.push(context)` | Navigate via `pushNamed` |
 | `.pushReplace(context)` | Navigate via `pushReplacementNamed` |
+| `.pushAndClear(context)` | Navigate and remove all routes beneath (session boundaries) |
 | `.sameRoute()` | `true` if this route is currently on top |
 | `.available` (on `String?`) | `true` if non-null and non-empty |
 | `.splitError` | Returns last segment after `': '` — strips Firebase error prefixes |

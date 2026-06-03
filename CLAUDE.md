@@ -16,6 +16,10 @@ These apply to every task. Violating them breaks the architecture:
 8. **Spacing tokens are 4-multiples only** — `t04, t08, t12, t16, t24, t32, t48, t64`. Snap any design value to the nearest token (10→8, 17→16, 19→20, 22→24). Never use `Spacer()` — use `Space.x.t*` / `Space.y.t*` with the explicit token.
 9. **FocusNodes are opt-in** — Forms do NOT use `FocusNode` by default. The keyboard's "next" action moves focus on its own. Only add a FocusNode when there is a concrete need: jumping to a non-text field, programmatic focus on mount, or focusing after a non-tap event.
 10. **Read the conventions before generating code** — When touching UI, forms, state, or repos, the relevant `docs/conventions/*.md` file is authoritative. If you are unsure, read it first rather than inferring from siblings.
+11. **No `for` loops in the widget tree** — never iterate UI with `for (...) ...[]`. Always use `.map()` (and `.asMap().entries.expand(...)` when you need the index or separators). Applies to every widget-list build, including fixed-count ones.
+12. **Never delete `*_mocks.dart` / `*_parser.dart` from `lib/repos/`** — they are part of the repo scaffold and kept for future/test wiring even when a real provider is live. Keep them as `part of` with `// ignore_for_file: unused_element`. Same for the cubit/repo method surface (`forgot`, `update`, `fetch`, `deleteAccount`, …): don't prune methods just because nothing calls them yet.
+13. **Use the dedicated `Space` token for the shape you need** — `Space.a.t*` (all), `Space.h.t*` / `Space.v.t*` (one axis), `Space.t/b/l/r.t*` (one side). Reserve `Space.sym(h, v)` for genuinely asymmetric padding only — don't reach for it when a single-token form fits.
+14. **Always pass `routeName` to dialogs/sheets** — `showAppAlert`/`showDialog`/`showModalBottomSheet` must set `RouteSettings(name: ...)` so navigation logs are investigable (no `unknown` routes).
 
 ## Tech Stack
 

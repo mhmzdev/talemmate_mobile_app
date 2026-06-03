@@ -249,6 +249,39 @@ Widget _buildUrduText(String text) { ... }
 
 ---
 
+## Iteration in the Widget Tree — `.map()`, never `for`
+
+Never build a list of widgets with a `for` loop (`for (...) ...[]`). Always
+map over the collection. This is non-negotiable, including for fixed-count
+loops.
+
+```dart
+// WRONG
+Row(
+  children: [
+    for (int i = 0; i < actions.length; i++) ...[
+      if (i > 0) const _Divider(),
+      Expanded(child: _ActionButton(action: actions[i])),
+    ],
+  ],
+)
+
+// CORRECT — simple map
+Column(children: items.map((item) => _ItemTile(item: item)).toList())
+
+// CORRECT — need the index and/or separators between items
+Row(
+  children: actions
+      .asMap()
+      .entries
+      .expand((e) => [
+            if (e.key > 0) const _Divider(),
+            Expanded(child: _ActionButton(action: e.value)),
+          ])
+      .toList(),
+)
+```
+
 ## Lists
 
 Use `ListView.builder` for any list that could exceed ~5 items:

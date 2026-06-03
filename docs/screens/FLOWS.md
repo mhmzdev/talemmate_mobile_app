@@ -57,6 +57,35 @@ The splash screen drives session-restore routing. Priority order:
 
 ---
 
+## Listeners — never wrap `Screen`
+
+`BlocConsumer`/`BlocListener` widgets live in their own `listeners/_{action}.dart`
+`part` file and are passed **into** the `Screen` via:
+
+- `overlayBuilders:` — when the listener also renders something on top (e.g. a
+  `FullScreenLoader` during a loading state).
+- `belowBuilders:` — when the listener is pure side-effect (routing, flashes)
+  with no visible UI; pair it with `child: const SizedBox.shrink()`.
+
+Never wrap the `Screen` widget in a `BlocListener` — the screen body and its
+listeners are siblings inside `Screen`, not parent/child.
+
+```dart
+// WRONG
+return BlocListener<UserCubit, UserState>(
+  listener: ...,
+  child: Screen(child: ...),
+);
+
+// CORRECT
+return Screen(
+  belowBuilders: const [_InitListener()],   // routing-only listener
+  child: SafeArea(child: ...),
+);
+```
+
+---
+
 ## Screen File Requirements
 
 ### If the screen has a form
