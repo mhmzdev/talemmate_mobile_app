@@ -1,10 +1,7 @@
 part of '../onboarding.dart';
 
 class _AddExamModal extends StatefulWidget {
-  const _AddExamModal({
-    required this.subjects,
-    required this.onAdd,
-  });
+  const _AddExamModal({required this.subjects, required this.onAdd});
 
   final List<_SubjectDraft> subjects;
   final ValueChanged<_ExamDraft> onAdd;
@@ -49,9 +46,9 @@ class _AddExamModalState extends State<_AddExamModal> {
     final daysAway = _date.difference(DateTime.now()).inDays;
     final dateStr = '${_date.day} ${_monthAbbr[_date.month - 1]}';
     final subject = _selectedSubject;
-    final previewText = subject != null
-        ? '${subject.nameCtrl.text} · ${_type.name.titleCase} · $dateStr · in $daysAway days'
-        : '– · ${_type.name.titleCase} · $dateStr · in $daysAway days';
+    final name = subject?.nameCtrl.text ?? '–';
+    final previewText =
+        '$name · ${_type.name.titleCase} · $dateStr · in $daysAway days';
 
     return AppModalBase(
       dragger: true,
@@ -59,43 +56,7 @@ class _AddExamModalState extends State<_AddExamModal> {
       child: Column(
         crossAxisAlignment: .stretch,
         children: [
-          // Header
-          Row(
-            crossAxisAlignment: .start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: .start,
-                  children: [
-                    Text(
-                      'NEW EXAM',
-                      style: AppText.l1b
-                          .cl(AppTheme.c.subText)
-                          .copyWith(letterSpacing: 1.2),
-                    ),
-                    Space.y.t04,
-                    Text("When's the test?", style: AppText.h1),
-                  ],
-                ),
-              ),
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    shape: .circle,
-                    color: AppTheme.c.subBackground,
-                  ),
-                  child: Icon(
-                    Icons.close,
-                    size: 16,
-                    color: AppTheme.c.subText,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          const _ModalHeader(eyebrow: 'NEW EXAM', title: "When's the test?"),
           Space.y.t24,
 
           // SUBJECT
@@ -106,66 +67,11 @@ class _AddExamModalState extends State<_AddExamModal> {
                 .copyWith(letterSpacing: 1.2),
           ),
           Space.y.t08,
-          if (widget.subjects.isEmpty)
-            Text(
-              'No subjects added yet — go back to step 2.',
-              style: AppText.b2.cl(AppTheme.c.subText),
-            )
-          else
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final s in widget.subjects)
-                  GestureDetector(
-                    onTap: () => setState(() => _subjectId = s.id),
-                    child: Container(
-                      padding: Space.a.t08 + Space.h.t04,
-                      decoration: BoxDecoration(
-                        color: _subjectId == s.id
-                            ? AppTheme.c.primary
-                            : Colors.transparent,
-                        borderRadius: 30.radius(),
-                        border: Border.all(
-                          color: _subjectId == s.id
-                              ? AppTheme.c.primary
-                              : AppTheme.c.border,
-                          width: 1.5,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: .min,
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              shape: .circle,
-                              color: Color(
-                                int.parse(
-                                  s.colorHex.replaceFirst(
-                                    '#',
-                                    '0xFF',
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Space.x.t08,
-                          Text(
-                            s.nameCtrl.text,
-                            style: AppText.b1.cl(
-                              _subjectId == s.id
-                                  ? AppTheme.c.background
-                                  : AppTheme.c.text,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+          _ExamSubjectChips(
+            subjects: widget.subjects,
+            selectedId: _subjectId,
+            onSelect: (id) => setState(() => _subjectId = id),
+          ),
           Space.y.t16,
 
           // TYPE
@@ -176,42 +82,9 @@ class _AddExamModalState extends State<_AddExamModal> {
                 .copyWith(letterSpacing: 1.2),
           ),
           Space.y.t08,
-          Wrap(
-            children: [
-              for (int i = 0; i < ExamType.values.length; i++) ...[
-                if (i > 0) Space.x.t08,
-                GestureDetector(
-                  onTap: () => setState(
-                    () => _type = ExamType.values[i],
-                  ),
-                  child: Container(
-                    padding: Space.a.t08 + Space.h.t04,
-                    decoration: BoxDecoration(
-                      color: _type == ExamType.values[i]
-                          ? AppTheme.c.primary
-                          : Colors.transparent,
-                      borderRadius: 8.radius(),
-                      border: Border.all(
-                        color: _type == ExamType.values[i]
-                            ? AppTheme.c.primary
-                            : AppTheme.c.border,
-                      ),
-                    ),
-                    child: Text(
-                      ExamType.values[i].name.titleCase,
-                      textAlign: .center,
-                      style: AppText.b1
-                          .w(6)
-                          .cl(
-                            _type == ExamType.values[i]
-                                ? AppTheme.c.background
-                                : AppTheme.c.text,
-                          ),
-                    ),
-                  ),
-                ),
-              ],
-            ],
+          _ExamTypeChips(
+            selected: _type,
+            onSelect: (t) => setState(() => _type = t),
           ),
           Space.y.t16,
 
@@ -228,9 +101,7 @@ class _AddExamModalState extends State<_AddExamModal> {
             initialValue: _date,
             firstDate: DateTime.now(),
             dateFormat: DateFormat('dd MMM yyyy'),
-            lastDate: DateTime.now().add(
-              const Duration(days: 365),
-            ),
+            lastDate: DateTime.now().add(const Duration(days: 365)),
             placeholder: 'Select exam date',
             onChanged: (date) {
               if (date != null) setState(() => _date = date);

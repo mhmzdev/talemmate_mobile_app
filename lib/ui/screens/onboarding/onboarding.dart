@@ -39,14 +39,33 @@ part 'static/_data.dart';
 part '_state.dart';
 part 'listeners/_complete.dart';
 
-part 'widgets/_1_step_about_you.dart';
-part 'widgets/_2_step_subjects.dart';
-part 'widgets/_3_step_schedule.dart';
-part 'widgets/_4_step_material.dart';
+part 'pages/_1_about_you.dart';
+part 'pages/_2_subjects.dart';
+part 'pages/_3_schedule.dart';
+part 'pages/_4_material.dart';
+
+part 'widgets/_institution_chip.dart';
+part 'widgets/_level_tile.dart';
+part 'widgets/_year_chip.dart';
+part 'widgets/_goal_card.dart';
+part 'widgets/_goal_list.dart';
+part 'widgets/_tutor_preview.dart';
+part 'widgets/_subject_entry.dart';
+part 'widgets/_add_tile.dart';
+part 'widgets/_time_window_tile.dart';
+part 'widgets/_exam_row.dart';
+part 'widgets/_source_chip.dart';
 part 'widgets/_so_far_card.dart';
+part 'widgets/_file_item.dart';
+part 'widgets/_confidence.dart';
+part 'widgets/_modal_header.dart';
+part 'widgets/_modal_text_field.dart';
+part 'widgets/_tag_color_picker.dart';
+part 'widgets/_subject_suggestions.dart';
+part 'widgets/_exam_subject_chips.dart';
+part 'widgets/_exam_type_chips.dart';
 part 'widgets/_add_subject_modal.dart';
 part 'widgets/_add_exam_modal.dart';
-part 'widgets/_file_item.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});

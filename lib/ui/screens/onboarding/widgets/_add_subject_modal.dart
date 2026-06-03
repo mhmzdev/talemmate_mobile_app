@@ -49,12 +49,7 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
   @override
   Widget build(BuildContext context) {
     App.init(context);
-
-    final confidenceColor = _draft.confidence < 0.35
-        ? const Color(0xFFE05252)
-        : _draft.confidence < 0.7
-        ? const Color(0xFFE09A2B)
-        : const Color(0xFF4CAF50);
+    final confidenceColor = _confidenceColor(_draft.confidence);
 
     return AppModalBase(
       dragger: true,
@@ -62,43 +57,7 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
       child: Column(
         crossAxisAlignment: .stretch,
         children: [
-          // Header
-          Row(
-            crossAxisAlignment: .start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: .start,
-                  children: [
-                    Text(
-                      'NEW SUBJECT',
-                      style: AppText.l1b
-                          .cl(AppTheme.c.subText)
-                          .copyWith(letterSpacing: 1.2),
-                    ),
-                    Space.y.t04,
-                    Text('Add a course', style: AppText.h1),
-                  ],
-                ),
-              ),
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    shape: .circle,
-                    color: AppTheme.c.subBackground,
-                  ),
-                  child: Icon(
-                    Icons.close,
-                    size: 16,
-                    color: AppTheme.c.subText,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          const _ModalHeader(eyebrow: 'NEW SUBJECT', title: 'Add a course'),
           Space.y.t24,
 
           // CODE + SUBJECT NAME side by side
@@ -107,43 +66,19 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
             children: [
               Expanded(
                 flex: 2,
-                child: Column(
-                  crossAxisAlignment: .stretch,
-                  children: [
-                    Text(
-                      'CODE',
-                      style: AppText.l1b
-                          .cl(AppTheme.c.subText)
-                          .copyWith(letterSpacing: 1.2),
-                    ),
-                    Space.y.t08,
-                    TextField(
-                      controller: _draft.codeCtrl,
-                      style: AppText.b1,
-                      decoration: _inputDec('e.g. CS-200'),
-                    ),
-                  ],
+                child: _ModalTextField(
+                  label: 'CODE',
+                  controller: _draft.codeCtrl,
+                  hint: 'e.g. CS-200',
                 ),
               ),
               Space.x.t12,
               Expanded(
                 flex: 3,
-                child: Column(
-                  crossAxisAlignment: .stretch,
-                  children: [
-                    Text(
-                      'SUBJECT NAME',
-                      style: AppText.l1b
-                          .cl(AppTheme.c.subText)
-                          .copyWith(letterSpacing: 1.2),
-                    ),
-                    Space.y.t08,
-                    TextField(
-                      controller: _draft.nameCtrl,
-                      style: AppText.b1,
-                      decoration: _inputDec('e.g. Discrete Mathematics'),
-                    ),
-                  ],
+                child: _ModalTextField(
+                  label: 'SUBJECT NAME',
+                  controller: _draft.nameCtrl,
+                  hint: 'e.g. Discrete Mathematics',
                 ),
               ),
             ],
@@ -158,28 +93,9 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
                 .copyWith(letterSpacing: 1.2),
           ),
           Space.y.t08,
-          Wrap(
-            spacing: 10,
-            children: [
-              for (final hex in _subjectColors)
-                GestureDetector(
-                  onTap: () => setState(() => _colorHex = hex),
-                  child: Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      shape: .circle,
-                      color: Color(int.parse(hex.replaceFirst('#', '0xFF'))),
-                      border: Border.all(
-                        color: _colorHex == hex
-                            ? AppTheme.c.text
-                            : Colors.transparent,
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                ),
-            ],
+          _TagColorPicker(
+            selected: _colorHex,
+            onSelect: (hex) => setState(() => _colorHex = hex),
           ),
           Space.y.t16,
 
@@ -194,11 +110,7 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
                     .copyWith(letterSpacing: 1.2),
               ),
               Text(
-                _draft.confidence < 0.35
-                    ? 'Shaky'
-                    : _draft.confidence < 0.7
-                    ? 'Getting there'
-                    : 'Confident',
+                _confidenceLabel(_draft.confidence),
                 style: AppText.b2.cl(confidenceColor),
               ),
             ],
@@ -210,90 +122,11 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
             activeColor: confidenceColor,
           ),
 
-          // SUGGESTED section
-          if (widget.suggestedSubjects.isNotEmpty) ...[
-            const Divider(),
-            Space.y.t08,
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AppTheme.c.accent),
-                    borderRadius: 20.radius(),
-                  ),
-                  child: Row(
-                    mainAxisSize: .min,
-                    children: [
-                      Container(
-                        width: 6,
-                        height: 6,
-                        decoration: BoxDecoration(
-                          shape: .circle,
-                          color: AppTheme.c.accent,
-                        ),
-                      ),
-                      Space.x.t04,
-                      Text(
-                        'SUGGESTED',
-                        style: AppText.l1b
-                            .cl(AppTheme.c.accent)
-                            .copyWith(letterSpacing: 1.2),
-                      ),
-                    ],
-                  ),
-                ),
-                Space.x.t08,
-                Text('Tap to fill', style: AppText.b2.cl(AppTheme.c.subText)),
-              ],
+          if (widget.suggestedSubjects.isNotEmpty)
+            _SubjectSuggestions(
+              suggestions: widget.suggestedSubjects,
+              onFill: _fillFromSuggestion,
             ),
-            Space.y.t08,
-            for (final s in widget.suggestedSubjects)
-              GestureDetector(
-                onTap: () => _fillFromSuggestion(s),
-                child: Container(
-                  margin: Space.b.t08,
-                  padding: Space.sym(SpaceToken.t12, SpaceToken.t16),
-                  decoration: BoxDecoration(
-                    color: AppTheme.c.subBackground,
-                    borderRadius: 10.radius(),
-                    border: Border.all(color: AppTheme.c.border),
-                  ),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 52,
-                        child: Text(
-                          s['code'] ?? '',
-                          style: AppText.b2.cl(AppTheme.c.subText),
-                        ),
-                      ),
-                      Space.x.t12,
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: .start,
-                          children: [
-                            Text(s['name'] ?? '', style: AppText.b1b),
-                            Text(
-                              s['reason'] ?? '',
-                              style: AppText.b2.cl(AppTheme.c.subText),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Icon(
-                        Icons.add,
-                        size: 18,
-                        color: AppTheme.c.subText,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
 
           Space.y.t16,
           // Buttons
@@ -325,24 +158,4 @@ class _AddSubjectModalState extends State<_AddSubjectModal> {
       ),
     );
   }
-
-  InputDecoration _inputDec(String hint) => InputDecoration(
-    hintText: hint,
-    hintStyle: AppText.b1.cl(AppTheme.c.subText),
-    filled: true,
-    fillColor: AppTheme.c.subBackground,
-    border: OutlineInputBorder(
-      borderRadius: 10.radius(),
-      borderSide: BorderSide(color: AppTheme.c.border),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: 10.radius(),
-      borderSide: BorderSide(color: AppTheme.c.border),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: 10.radius(),
-      borderSide: BorderSide(color: AppTheme.c.accent),
-    ),
-    contentPadding: Space.sym(SpaceToken.t12, SpaceToken.t16),
-  );
 }
