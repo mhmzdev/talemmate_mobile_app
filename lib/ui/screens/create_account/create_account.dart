@@ -180,7 +180,7 @@ class _Body extends StatelessWidget {
                   style: AppText.b2.cl(AppTheme.c.subText),
                 ),
                 AppTouch(
-                  onTap: () => AppRoutes.login.pushReplace(context),
+                  onTap: () => ''.pop(context),
                   hasSplash: false,
                   child: Text(
                     'Login',
