@@ -125,6 +125,11 @@ dev_dependencies:
   # testing
   mockito: 5.6.3
 
+  # Enables the Flutter Driver extension for agent-driven debugging via the
+  # Dart MCP server (see test_driver/app.dart). Dev-only — never in release.
+  flutter_driver:
+    sdk: flutter
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

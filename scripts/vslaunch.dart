@@ -26,20 +26,40 @@ void main(List<String> args) async {
       .where((subList) => subList.length > 1)
       .where((subList) => !excludedPlatforms.contains(subList[1].trim()));
 
-  final devices = filteredDevices.map((array) {
-    final name = array[0].trim();
-    final deviceId = array[1].trim();
-    final obj = <String, dynamic>{
+  final deviceList = filteredDevices.toList();
+
+  Map<String, dynamic> configFor(
+    List<String> array, {
+    required String name,
+    required String program,
+  }) {
+    return <String, dynamic>{
       'name': name,
-      'deviceId': deviceId,
+      'deviceId': array[1].trim(),
       'type': 'dart',
       'request': 'launch',
-      'program': 'lib/main.dart',
+      'program': program,
       'args': ['--flavor', 'stage'],
     };
+  }
 
-    return obj;
-  });
+  // Normal launch — one per device.
+  final runConfigs = deviceList
+      .map((array) => configFor(array, name: array[0].trim(), program: 'lib/main.dart'))
+      .toList();
+
+  // Driver-enabled launch — `test_driver/app.dart` calls
+  // enableFlutterDriverExtension() so the Dart MCP server can drive the app
+  // (tap/type/navigate). Debug only; never used by release builds.
+  final driverConfigs = deviceList
+      .map(
+        (array) => configFor(
+          array,
+          name: 'Driver (MCP) — ${array[0].trim()}',
+          program: 'test_driver/app.dart',
+        ),
+      )
+      .toList();
 
   final newConfig = <String, dynamic>{
     'version': '1.0.0',
@@ -49,12 +69,13 @@ void main(List<String> args) async {
         'request': 'launch',
         'type': 'dart',
       },
-      ...devices,
+      ...runConfigs,
+      ...driverConfigs,
     ]),
     'compounds': [
       {
         'name': 'current',
-        'configurations': devices.map((obj) => obj['name']).toList(),
+        'configurations': runConfigs.map((obj) => obj['name']).toList(),
       },
     ],
   };
@@ -67,5 +88,5 @@ void main(List<String> args) async {
 
   vsConfig.writeAsStringSync(newJson);
 
-  print(devices.toString());
+  print('Generated ${runConfigs.length} run + ${driverConfigs.length} driver config(s).');
 }

@@ -47,6 +47,27 @@ hygen provider new <name>         # new app-level ChangeNotifier provider
 
 > Cubits live in `lib/blocs/<name>/`, repos in `lib/repos/<name>/`. Auto-registered in `lib/app.dart` under the `// bloc-initiate-start` marker.
 
+## Driving the App (Dart MCP)
+
+The `dart` MCP server (in `.mcp.json`) is a Playwright-equivalent: it can drive a **running debug build** — inspect the widget tree, screenshot, tap, type, scroll, navigate, hot reload, read runtime errors. Use it to **verify UI flows yourself** instead of asking the user to click through.
+
+**Before claiming you can't test the UI, check whether driving is available:**
+
+1. Call `mcp__dart__list_running_apps`. If it returns an app with a DTD URI, connect and drive.
+2. If empty, the app may still be running from VS Code — ask the user to paste the **DTD URI** (Cmd+Shift+P → *"Dart: Copy DTD URI to Clipboard"*). **Not** the VM-service URI from the debug console — that connects but then fails every call.
+3. If nothing is running, ask the user to launch the **`Driver (MCP) — <device>`** config (or `flutter run --flavor stage -t test_driver/app.dart`) and paste the DTD URI. You cannot launch it yourself — `launch_app` can't pass `--flavor stage`, which this app requires.
+
+**Tapping/typing requires the driver entrypoint** (`test_driver/app.dart`, which calls `enableFlutterDriverExtension()`). A plain `lib/main.dart` run is **view-only** (widget tree + screenshots work; `flutter_driver` taps do not).
+
+Then: `connect_dart_tooling_daemon` (DTD URI) → `get_widget_tree` to see real widgets → `flutter_driver` (`tap`, `enter_text`, `screenshot`, `scroll`).
+
+Gotchas:
+- **Don't pass `timeout`** to `flutter_driver` — the server mis-casts it and throws. Use the default.
+- Find widgets by **visible text/value** (`ByText`). Login/CreateAccount forms are pre-seeded by `_FormData.initialValues()`, so placeholder/hint text is absent — don't finder on the placeholder. `enter_text` types into the focused field, so `tap` the field first.
+- `PageBack` only matches a standard back button; custom back arrows won't match — tap an on-screen link instead.
+- A `tap`/`waitFor` on a non-existent widget **times out** (waits for it) rather than failing fast.
+- No disconnect tool — if a connection goes bad (e.g. wrong URI), run `/mcp` → reconnect `dart`, then connect again.
+
 ## Documentation
 
 Full detail lives in **[docs/INDEX.md](docs/INDEX.md)**.
