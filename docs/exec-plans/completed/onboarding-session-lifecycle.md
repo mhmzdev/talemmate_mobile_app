@@ -1,10 +1,11 @@
 ---
 title: "Onboarding Session Lifecycle (real auth + gate + sign-out)"
-status: active
+status: completed
 created: 2026-06-03
+completed: 2026-06-03
 ---
 
-🚧 ACTIVE — Implementation complete; awaiting manual emulator verification
+✅ COMPLETED — all 3 phases implemented, committed to `main`, and verified on the Firebase emulators via Dart MCP. See [docs/feat-checklist/onboarding-flow.md](../../feat-checklist/onboarding-flow.md).
 
 # Onboarding Session Lifecycle — Implementation Plan
 
