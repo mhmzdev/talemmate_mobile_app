@@ -17,7 +17,11 @@ class _CompleteListener extends StatelessWidget {
       },
       builder: (context, state) {
         final loading = state.complete.isLoading;
-        return FullScreenLoader(loading: loading);
+        return FullScreenLoader(
+          loading: loading,
+          title: 'Finishing up...',
+          subtitle: 'Just a moment while I set up your study plan.',
+        );
       },
     );
   }

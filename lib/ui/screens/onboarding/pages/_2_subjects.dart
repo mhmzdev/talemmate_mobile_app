@@ -46,11 +46,6 @@ class _StepSubjects extends StatelessWidget {
                     label: 'Add another subject',
                     onTap: () => _openAddSubjectModal(context, state),
                   ),
-
-                  if (state.subjects.isNotEmpty) ...[
-                    Space.y.t24,
-                    const _SoFarCard(),
-                  ],
                   Space.y.t24,
                 ],
               ),

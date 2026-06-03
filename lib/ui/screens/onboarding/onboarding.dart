@@ -56,7 +56,6 @@ part 'widgets/_add_tile.dart';
 part 'widgets/_time_window_tile.dart';
 part 'widgets/_exam_row.dart';
 part 'widgets/_source_chip.dart';
-part 'widgets/_so_far_card.dart';
 part 'widgets/_file_item.dart';
 part 'widgets/_modal_header.dart';
 part 'widgets/_modal_text_field.dart';
