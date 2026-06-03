@@ -38,6 +38,8 @@ dependencies:
   firebase_crashlytics: 5.0.5
   firebase_remote_config: 6.1.1
   firebase_ai: 3.6.0
+  cloud_firestore: 6.1.0
+  firebase_storage: 13.0.4
 
   # icons
   flutter_lucide: 1.7.0

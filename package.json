@@ -1,0 +1,12 @@
+{
+  "name": "taleemmate",
+  "version": "1.0.0",
+  "description": "TaleemMate - Firebase emulator & deploy scripts",
+  "scripts": {
+    "serve": "firebase emulators:start",
+    "serve:export": "firebase emulators:start --import=./.emulator-data --export-on-exit=./.emulator-data",
+    "deploy:stage": "firebase use stage && firebase deploy --only firestore:rules,firestore:indexes,storage:rules",
+    "deploy:prod": "firebase use prod && firebase deploy --only firestore:rules,firestore:indexes,storage:rules"
+  },
+  "private": true
+}

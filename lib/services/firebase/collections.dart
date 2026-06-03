@@ -1,3 +1,3 @@
 abstract class FireCollections {
-  static const String users = 'users_t';
+  static const String users = 'users';
 }

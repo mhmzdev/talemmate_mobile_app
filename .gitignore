@@ -54,6 +54,13 @@ prompts/
 **/google-services.json
 **/GoogleService-Info.plist
 
+# Firebase emulators
+node_modules/
+.emulator-data/
+*-debug.log
+firebase-debug.*.log
+.firebase/*/cache/
+
 # Android
 **/keyStage.properties
 **/keyProd.properties
