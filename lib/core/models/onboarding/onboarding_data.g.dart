@@ -10,6 +10,17 @@ _OnboardingData _$OnboardingDataFromJson(Map<String, dynamic> json) =>
     _OnboardingData(
       userId: json['userId'] as String,
       step: (json['step'] as num?)?.toInt() ?? 1,
+      name: json['name'] as String? ?? '',
+      educationLevel:
+          $enumDecodeNullable(
+            _$EducationLevelEnumMap,
+            json['educationLevel'],
+          ) ??
+          EducationLevel.undergraduate,
+      year: json['year'] as String?,
+      goal:
+          $enumDecodeNullable(_$OnboardingGoalEnumMap, json['goal']) ??
+          OnboardingGoal.passExams,
       subjects:
           (json['subjects'] as List<dynamic>?)
               ?.map((e) => Subject.fromJson(e as Map<String, dynamic>))
@@ -35,9 +46,26 @@ Map<String, dynamic> _$OnboardingDataToJson(_OnboardingData instance) =>
     <String, dynamic>{
       'userId': instance.userId,
       'step': instance.step,
+      'name': instance.name,
+      'educationLevel': _$EducationLevelEnumMap[instance.educationLevel]!,
+      'year': instance.year,
+      'goal': _$OnboardingGoalEnumMap[instance.goal]!,
       'subjects': instance.subjects,
       'exams': instance.exams,
       'institution': instance.institution,
       'schedule': instance.schedule,
       'uploadedMaterials': instance.uploadedMaterials,
     };
+
+const _$EducationLevelEnumMap = {
+  EducationLevel.oALevels: 'oALevels',
+  EducationLevel.matricFSc: 'matricFSc',
+  EducationLevel.undergraduate: 'undergraduate',
+  EducationLevel.masters: 'masters',
+};
+
+const _$OnboardingGoalEnumMap = {
+  OnboardingGoal.passExams: 'passExams',
+  OnboardingGoal.understand: 'understand',
+  OnboardingGoal.studyDaily: 'studyDaily',
+};

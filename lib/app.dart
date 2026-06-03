@@ -1,3 +1,4 @@
+import 'blocs/onboarding/cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'blocs/user/cubit.dart';
@@ -26,6 +27,7 @@ class _TaleemMateState extends State<TaleemMate> {
     return MultiProvider(
       providers: [
         // bloc-initiate-start
+        BlocProvider(create: (_) => OnboardingCubit()),
         BlocProvider(create: (_) => UserCubit()),
 
         // bloc-initiate-end

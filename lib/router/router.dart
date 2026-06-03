@@ -1,3 +1,5 @@
+import 'package:taleemmate/ui/screens/stepwise_loader/stepwise_loader.dart';
+import 'package:taleemmate/ui/screens/onboarding/onboarding.dart';
 import 'package:taleemmate/ui/screens/create_account/create_account.dart';
 import 'package:taleemmate/ui/screens/login/login.dart';
 import 'package:taleemmate/ui/screens/splash/splash.dart';
@@ -13,6 +15,8 @@ import 'routes.dart';
 final navigator = GlobalKey<NavigatorState>();
 
 final appRoutes = <String, WidgetBuilder>{
+  AppRoutes.stepwiseLoader: (_) => const StepwiseLoaderScreen(),
+  AppRoutes.onboarding: (_) => const OnboardingScreen(),
   AppRoutes.createAccount: (_) => const CreateAccountScreen(),
   AppRoutes.login: (_) => const LoginScreen(),
   AppRoutes.splash: (_) => const SplashScreen(),

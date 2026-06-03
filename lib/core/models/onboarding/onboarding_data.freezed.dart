@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$OnboardingData {
 
- String get userId; int get step; List<Subject> get subjects; List<Exam> get exams; String? get institution; Schedule? get schedule; List<LibraryItem> get uploadedMaterials;
+ String get userId; int get step; String get name; EducationLevel get educationLevel; String? get year; OnboardingGoal get goal; List<Subject> get subjects; List<Exam> get exams; String? get institution; Schedule? get schedule; List<LibraryItem> get uploadedMaterials;
 /// Create a copy of OnboardingData
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $OnboardingDataCopyWith<OnboardingData> get copyWith => _$OnboardingDataCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is OnboardingData&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.step, step) || other.step == step)&&const DeepCollectionEquality().equals(other.subjects, subjects)&&const DeepCollectionEquality().equals(other.exams, exams)&&(identical(other.institution, institution) || other.institution == institution)&&(identical(other.schedule, schedule) || other.schedule == schedule)&&const DeepCollectionEquality().equals(other.uploadedMaterials, uploadedMaterials));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is OnboardingData&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.step, step) || other.step == step)&&(identical(other.name, name) || other.name == name)&&(identical(other.educationLevel, educationLevel) || other.educationLevel == educationLevel)&&(identical(other.year, year) || other.year == year)&&(identical(other.goal, goal) || other.goal == goal)&&const DeepCollectionEquality().equals(other.subjects, subjects)&&const DeepCollectionEquality().equals(other.exams, exams)&&(identical(other.institution, institution) || other.institution == institution)&&(identical(other.schedule, schedule) || other.schedule == schedule)&&const DeepCollectionEquality().equals(other.uploadedMaterials, uploadedMaterials));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,userId,step,const DeepCollectionEquality().hash(subjects),const DeepCollectionEquality().hash(exams),institution,schedule,const DeepCollectionEquality().hash(uploadedMaterials));
+int get hashCode => Object.hash(runtimeType,userId,step,name,educationLevel,year,goal,const DeepCollectionEquality().hash(subjects),const DeepCollectionEquality().hash(exams),institution,schedule,const DeepCollectionEquality().hash(uploadedMaterials));
 
 @override
 String toString() {
-  return 'OnboardingData(userId: $userId, step: $step, subjects: $subjects, exams: $exams, institution: $institution, schedule: $schedule, uploadedMaterials: $uploadedMaterials)';
+  return 'OnboardingData(userId: $userId, step: $step, name: $name, educationLevel: $educationLevel, year: $year, goal: $goal, subjects: $subjects, exams: $exams, institution: $institution, schedule: $schedule, uploadedMaterials: $uploadedMaterials)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $OnboardingDataCopyWith<$Res>  {
   factory $OnboardingDataCopyWith(OnboardingData value, $Res Function(OnboardingData) _then) = _$OnboardingDataCopyWithImpl;
 @useResult
 $Res call({
- String userId, int step, List<Subject> subjects, List<Exam> exams, String? institution, Schedule? schedule, List<LibraryItem> uploadedMaterials
+ String userId, int step, String name, EducationLevel educationLevel, String? year, OnboardingGoal goal, List<Subject> subjects, List<Exam> exams, String? institution, Schedule? schedule, List<LibraryItem> uploadedMaterials
 });
 
 
@@ -65,11 +65,15 @@ class _$OnboardingDataCopyWithImpl<$Res>
 
 /// Create a copy of OnboardingData
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? step = null,Object? subjects = null,Object? exams = null,Object? institution = freezed,Object? schedule = freezed,Object? uploadedMaterials = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? step = null,Object? name = null,Object? educationLevel = null,Object? year = freezed,Object? goal = null,Object? subjects = null,Object? exams = null,Object? institution = freezed,Object? schedule = freezed,Object? uploadedMaterials = null,}) {
   return _then(_self.copyWith(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,step: null == step ? _self.step : step // ignore: cast_nullable_to_non_nullable
-as int,subjects: null == subjects ? _self.subjects : subjects // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,educationLevel: null == educationLevel ? _self.educationLevel : educationLevel // ignore: cast_nullable_to_non_nullable
+as EducationLevel,year: freezed == year ? _self.year : year // ignore: cast_nullable_to_non_nullable
+as String?,goal: null == goal ? _self.goal : goal // ignore: cast_nullable_to_non_nullable
+as OnboardingGoal,subjects: null == subjects ? _self.subjects : subjects // ignore: cast_nullable_to_non_nullable
 as List<Subject>,exams: null == exams ? _self.exams : exams // ignore: cast_nullable_to_non_nullable
 as List<Exam>,institution: freezed == institution ? _self.institution : institution // ignore: cast_nullable_to_non_nullable
 as String?,schedule: freezed == schedule ? _self.schedule : schedule // ignore: cast_nullable_to_non_nullable
@@ -168,10 +172,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  int step,  List<Subject> subjects,  List<Exam> exams,  String? institution,  Schedule? schedule,  List<LibraryItem> uploadedMaterials)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  int step,  String name,  EducationLevel educationLevel,  String? year,  OnboardingGoal goal,  List<Subject> subjects,  List<Exam> exams,  String? institution,  Schedule? schedule,  List<LibraryItem> uploadedMaterials)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _OnboardingData() when $default != null:
-return $default(_that.userId,_that.step,_that.subjects,_that.exams,_that.institution,_that.schedule,_that.uploadedMaterials);case _:
+return $default(_that.userId,_that.step,_that.name,_that.educationLevel,_that.year,_that.goal,_that.subjects,_that.exams,_that.institution,_that.schedule,_that.uploadedMaterials);case _:
   return orElse();
 
 }
@@ -189,10 +193,10 @@ return $default(_that.userId,_that.step,_that.subjects,_that.exams,_that.institu
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  int step,  List<Subject> subjects,  List<Exam> exams,  String? institution,  Schedule? schedule,  List<LibraryItem> uploadedMaterials)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  int step,  String name,  EducationLevel educationLevel,  String? year,  OnboardingGoal goal,  List<Subject> subjects,  List<Exam> exams,  String? institution,  Schedule? schedule,  List<LibraryItem> uploadedMaterials)  $default,) {final _that = this;
 switch (_that) {
 case _OnboardingData():
-return $default(_that.userId,_that.step,_that.subjects,_that.exams,_that.institution,_that.schedule,_that.uploadedMaterials);}
+return $default(_that.userId,_that.step,_that.name,_that.educationLevel,_that.year,_that.goal,_that.subjects,_that.exams,_that.institution,_that.schedule,_that.uploadedMaterials);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -206,10 +210,10 @@ return $default(_that.userId,_that.step,_that.subjects,_that.exams,_that.institu
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  int step,  List<Subject> subjects,  List<Exam> exams,  String? institution,  Schedule? schedule,  List<LibraryItem> uploadedMaterials)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  int step,  String name,  EducationLevel educationLevel,  String? year,  OnboardingGoal goal,  List<Subject> subjects,  List<Exam> exams,  String? institution,  Schedule? schedule,  List<LibraryItem> uploadedMaterials)?  $default,) {final _that = this;
 switch (_that) {
 case _OnboardingData() when $default != null:
-return $default(_that.userId,_that.step,_that.subjects,_that.exams,_that.institution,_that.schedule,_that.uploadedMaterials);case _:
+return $default(_that.userId,_that.step,_that.name,_that.educationLevel,_that.year,_that.goal,_that.subjects,_that.exams,_that.institution,_that.schedule,_that.uploadedMaterials);case _:
   return null;
 
 }
@@ -221,11 +225,15 @@ return $default(_that.userId,_that.step,_that.subjects,_that.exams,_that.institu
 @JsonSerializable()
 
 class _OnboardingData extends OnboardingData {
-  const _OnboardingData({required this.userId, this.step = 1, final  List<Subject> subjects = const [], final  List<Exam> exams = const [], this.institution, this.schedule, final  List<LibraryItem> uploadedMaterials = const []}): _subjects = subjects,_exams = exams,_uploadedMaterials = uploadedMaterials,super._();
+  const _OnboardingData({required this.userId, this.step = 1, this.name = '', this.educationLevel = EducationLevel.undergraduate, this.year, this.goal = OnboardingGoal.passExams, final  List<Subject> subjects = const [], final  List<Exam> exams = const [], this.institution, this.schedule, final  List<LibraryItem> uploadedMaterials = const []}): _subjects = subjects,_exams = exams,_uploadedMaterials = uploadedMaterials,super._();
   factory _OnboardingData.fromJson(Map<String, dynamic> json) => _$OnboardingDataFromJson(json);
 
 @override final  String userId;
 @override@JsonKey() final  int step;
+@override@JsonKey() final  String name;
+@override@JsonKey() final  EducationLevel educationLevel;
+@override final  String? year;
+@override@JsonKey() final  OnboardingGoal goal;
  final  List<Subject> _subjects;
 @override@JsonKey() List<Subject> get subjects {
   if (_subjects is EqualUnmodifiableListView) return _subjects;
@@ -263,16 +271,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OnboardingData&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.step, step) || other.step == step)&&const DeepCollectionEquality().equals(other._subjects, _subjects)&&const DeepCollectionEquality().equals(other._exams, _exams)&&(identical(other.institution, institution) || other.institution == institution)&&(identical(other.schedule, schedule) || other.schedule == schedule)&&const DeepCollectionEquality().equals(other._uploadedMaterials, _uploadedMaterials));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OnboardingData&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.step, step) || other.step == step)&&(identical(other.name, name) || other.name == name)&&(identical(other.educationLevel, educationLevel) || other.educationLevel == educationLevel)&&(identical(other.year, year) || other.year == year)&&(identical(other.goal, goal) || other.goal == goal)&&const DeepCollectionEquality().equals(other._subjects, _subjects)&&const DeepCollectionEquality().equals(other._exams, _exams)&&(identical(other.institution, institution) || other.institution == institution)&&(identical(other.schedule, schedule) || other.schedule == schedule)&&const DeepCollectionEquality().equals(other._uploadedMaterials, _uploadedMaterials));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,userId,step,const DeepCollectionEquality().hash(_subjects),const DeepCollectionEquality().hash(_exams),institution,schedule,const DeepCollectionEquality().hash(_uploadedMaterials));
+int get hashCode => Object.hash(runtimeType,userId,step,name,educationLevel,year,goal,const DeepCollectionEquality().hash(_subjects),const DeepCollectionEquality().hash(_exams),institution,schedule,const DeepCollectionEquality().hash(_uploadedMaterials));
 
 @override
 String toString() {
-  return 'OnboardingData(userId: $userId, step: $step, subjects: $subjects, exams: $exams, institution: $institution, schedule: $schedule, uploadedMaterials: $uploadedMaterials)';
+  return 'OnboardingData(userId: $userId, step: $step, name: $name, educationLevel: $educationLevel, year: $year, goal: $goal, subjects: $subjects, exams: $exams, institution: $institution, schedule: $schedule, uploadedMaterials: $uploadedMaterials)';
 }
 
 
@@ -283,7 +291,7 @@ abstract mixin class _$OnboardingDataCopyWith<$Res> implements $OnboardingDataCo
   factory _$OnboardingDataCopyWith(_OnboardingData value, $Res Function(_OnboardingData) _then) = __$OnboardingDataCopyWithImpl;
 @override @useResult
 $Res call({
- String userId, int step, List<Subject> subjects, List<Exam> exams, String? institution, Schedule? schedule, List<LibraryItem> uploadedMaterials
+ String userId, int step, String name, EducationLevel educationLevel, String? year, OnboardingGoal goal, List<Subject> subjects, List<Exam> exams, String? institution, Schedule? schedule, List<LibraryItem> uploadedMaterials
 });
 
 
@@ -300,11 +308,15 @@ class __$OnboardingDataCopyWithImpl<$Res>
 
 /// Create a copy of OnboardingData
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? step = null,Object? subjects = null,Object? exams = null,Object? institution = freezed,Object? schedule = freezed,Object? uploadedMaterials = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? step = null,Object? name = null,Object? educationLevel = null,Object? year = freezed,Object? goal = null,Object? subjects = null,Object? exams = null,Object? institution = freezed,Object? schedule = freezed,Object? uploadedMaterials = null,}) {
   return _then(_OnboardingData(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,step: null == step ? _self.step : step // ignore: cast_nullable_to_non_nullable
-as int,subjects: null == subjects ? _self._subjects : subjects // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,educationLevel: null == educationLevel ? _self.educationLevel : educationLevel // ignore: cast_nullable_to_non_nullable
+as EducationLevel,year: freezed == year ? _self.year : year // ignore: cast_nullable_to_non_nullable
+as String?,goal: null == goal ? _self.goal : goal // ignore: cast_nullable_to_non_nullable
+as OnboardingGoal,subjects: null == subjects ? _self._subjects : subjects // ignore: cast_nullable_to_non_nullable
 as List<Subject>,exams: null == exams ? _self._exams : exams // ignore: cast_nullable_to_non_nullable
 as List<Exam>,institution: freezed == institution ? _self.institution : institution // ignore: cast_nullable_to_non_nullable
 as String?,schedule: freezed == schedule ? _self.schedule : schedule // ignore: cast_nullable_to_non_nullable
