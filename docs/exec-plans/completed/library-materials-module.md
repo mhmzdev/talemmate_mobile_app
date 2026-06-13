@@ -1,10 +1,11 @@
 ---
 title: "Library — App-wide Materials Module (cubit/repo + screen)"
-status: backlog
+status: completed
 created: 2026-06-13
+completed: 2026-06-13
 ---
 
-📋 BACKLOG — Not yet started
+✅ COMPLETED — Phases 1–4 implemented, `flutter analyze` clean, flows verified end-to-end on emulator (Dart MCP). See [feat-checklist](../../feat-checklist/library-materials-module.md).
 
 # Library — App-wide Materials Module — Implementation Plan
 

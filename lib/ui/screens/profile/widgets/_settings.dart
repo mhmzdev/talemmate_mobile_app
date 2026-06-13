@@ -309,24 +309,3 @@ class _ThemeSegment extends StatelessWidget {
     );
   }
 }
-
-/// Small gold "AI" pill used as a section aside.
-class _AiPill extends StatelessWidget {
-  const _AiPill();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: Space.sym(SpaceToken.t08, SpaceToken.t04),
-      decoration: BoxDecoration(
-        color: AppTheme.c.accent.withValues(alpha: 0.12),
-        borderRadius: 999.radius(),
-        border: Border.all(color: AppTheme.c.accent.withValues(alpha: 0.4)),
-      ),
-      child: Text(
-        'AI',
-        style: AppText.l1b.cl(AppTheme.c.accent).copyWith(letterSpacing: 1.2),
-      ),
-    );
-  }
-}

@@ -13,6 +13,10 @@ class SubjectDao extends DatabaseAccessor<AppDatabase> with _$SubjectDaoMixin {
   Stream<List<ExamRow>> watchExams() =>
       (select(exams)..orderBy([(e) => OrderingTerm.asc(e.date)])).watch();
 
+  /// One-shot read of all subjects, ordered. Used for Library grouping headers.
+  Future<List<SubjectRow>> getAll() =>
+      (select(subjects)..orderBy([(s) => OrderingTerm.asc(s.order)])).get();
+
   Future<void> upsertSubject(SubjectsCompanion companion) =>
       into(subjects).insertOnConflictUpdate(companion);
 

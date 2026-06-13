@@ -9,7 +9,7 @@ class _ExamRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     App.init(context);
-    final dotColor = _hexColor(draft.subjectColorHex);
+    final dotColor = draft.subjectColorHex.toColor();
     final daysAway = draft.date.difference(DateTime.now()).inDays;
     final daysText = daysAway <= 0
         ? 'today'

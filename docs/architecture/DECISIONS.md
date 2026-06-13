@@ -131,3 +131,11 @@ New decisions go here when made — not in chat. This is what the agent reads.
 **How to apply:** Inside the repo: provider returns a `Map`, parser normalizes the `Map`, repo returns the `Map`. Inside the cubit: `final raw = await UserRepo.ins.fetch(); final data = UserData.fromJson(raw);`. Then `emit(state.copyWith(fetch: state.fetch.toSuccess(data: data)))`.
 **Enforcement:** A `Stop` hook in `.claude/settings.json` greps the diff for newly-added `core/models/` imports in `lib/repos/` and blocks completion with a pointer to this ADR.
 **Date:** 2026-05
+
+## ADR-014: Session userId via `initUid` / `resetUid` on cubits
+
+**Decision:** A cubit that needs the signed-in user's uid holds it in its own state (`final String? userId`) and exposes `initUid(String uid)` / `resetUid()`. The auth-transition listeners set it on login / session-resume success and clear it on logout. A cubit MUST NOT read another cubit (e.g. `UserCubit`) to obtain the uid.
+**Why:** App-wide modules like Library load per-user data but live below the same root `MultiProvider` as `UserCubit`, with no parent/child guarantee about emit ordering. Reading `UserCubit` from inside `LibraryCubit` would couple the two and make the data layer depend on widget-tree wiring. A self-owned `userId`, pushed in by the listeners that already own the auth transitions, keeps the cubit self-contained and unit-testable without a fake `UserCubit`.
+**How to apply:** Add `final String? userId` to the state; `initUid(uid) => emit(state.copyWith(userId: uid))`; `resetUid() => emit(State.def())` (clears uid + loaded data). Wire the existing listeners: login success (`_login.dart`) and session-resume success (splash `_init.dart`) call `XCubit.c(context).initUid(state.user!.uid)`; logout success (profile + onboarding `_logout.dart`) calls `XCubit.c(context).resetUid()`. Per-action loads (`load()`) no-op when `userId == null`.
+**Rules out:** `UserCubit.c(context)` (or any cross-cubit read) inside a data cubit purely to fetch the uid.
+**Date:** 2026-06

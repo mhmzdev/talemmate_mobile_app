@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
 import 'package:taleemmate/blocs/user/cubit.dart';
+import 'package:taleemmate/blocs/library/cubit.dart';
 import 'package:taleemmate/configs/configs.dart';
 import 'package:taleemmate/router/routes.dart';
 import 'package:taleemmate/ui/widgets/core/buttons/app_back_button.dart';
 import 'package:taleemmate/ui/widgets/core/button/button.dart';
 import 'package:taleemmate/ui/widgets/core/screen/screen.dart';
 import 'package:taleemmate/ui/widgets/design/alerts/app_alert_base.dart';
+import 'package:taleemmate/ui/widgets/design/misc/app_ai_pill.dart';
 import 'package:taleemmate/ui/widgets/design/misc/app_avatar.dart';
 import 'package:taleemmate/ui/widgets/design/misc/app_circle_icon_button.dart';
 import 'package:taleemmate/ui/widgets/headless/app_touch.dart';
@@ -90,7 +92,7 @@ class _Body extends StatelessWidget {
               // AI tutor
               _Section(
                 title: 'AI tutor',
-                aside: const _AiPill(),
+                aside: const AppAiPill(),
                 children: [
                   _SettingToggle(
                     icon: LucideIcons.sparkles,

@@ -14,7 +14,7 @@ class _SubjectEntry extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     App.init(context);
-    final dotColor = _hexColor(draft.colorHex);
+    final dotColor = draft.colorHex.toColor();
     return Container(
       padding: Space.sym(SpaceToken.t12, SpaceToken.t16),
       decoration: BoxDecoration(

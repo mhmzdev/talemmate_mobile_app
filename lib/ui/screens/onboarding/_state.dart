@@ -174,22 +174,27 @@ class _ScreenState extends ChangeNotifier {
     return false;
   }
 
+  /// Turns picks into materials attached to the selected subject. `userId` is
+  /// left empty here and filled with the real uid in [buildData].
+  void _addPicks(List<PickedMaterial> picks) {
+    final subject = _materialSubject;
+    materials.addAll(
+      picks.map(
+        (p) => libraryItemForPick(
+          pick: p,
+          userId: '',
+          subjectId: subject?.id, // FK to subjects (groups in the Library)
+          colorHex: subject?.colorHex, // so the file row shows the subject color
+        ),
+      ),
+    );
+    notifyListeners();
+  }
+
   Future<void> addFiles(BuildContext context) async {
     if (!_requireSubject(context)) return;
     try {
-      final result = await FilePicker.platform.pickFiles(allowMultiple: true);
-      if (result == null) return; // user cancelled
-      materials.addAll(
-        result.files.map(
-          (f) => _materialFrom(
-            name: f.name,
-            sizeBytes: f.size,
-            path: f.path,
-            ext: f.extension,
-          ),
-        ),
-      );
-      notifyListeners();
+      _addPicks(await MaterialPicker.pickFiles());
     } catch (e, st) {
       'onboarding.addFiles error: $e\n$st'.appLog(level: AppLogLevel.error);
       if (context.mounted) UIFlash.error(context, 'Could not add those files.');
@@ -199,20 +204,7 @@ class _ScreenState extends ChangeNotifier {
   Future<void> addImages(BuildContext context) async {
     if (!_requireSubject(context)) return;
     try {
-      final images = await ImagePicker().pickMultiImage();
-      if (images.isEmpty) return;
-      final items = await Future.wait(
-        images.map(
-          (x) async => _materialFrom(
-            name: x.name,
-            sizeBytes: await x.length(),
-            path: x.path,
-            ext: 'img',
-          ),
-        ),
-      );
-      materials.addAll(items);
-      notifyListeners();
+      _addPicks(await MaterialPicker.pickImages());
     } catch (e, st) {
       'onboarding.addImages error: $e\n$st'.appLog(level: AppLogLevel.error);
       if (context.mounted) UIFlash.error(context, 'Could not add those photos.');
@@ -222,17 +214,8 @@ class _ScreenState extends ChangeNotifier {
   Future<void> captureImage(BuildContext context) async {
     if (!_requireSubject(context)) return;
     try {
-      final shot = await ImagePicker().pickImage(source: ImageSource.camera);
-      if (shot == null) return;
-      materials.add(
-        _materialFrom(
-          name: shot.name,
-          sizeBytes: await shot.length(),
-          path: shot.path,
-          ext: 'img',
-        ),
-      );
-      notifyListeners();
+      final shot = await MaterialPicker.captureImage();
+      if (shot != null) _addPicks([shot]);
     } catch (e, st) {
       'onboarding.captureImage error: $e\n$st'.appLog(level: AppLogLevel.error);
       if (context.mounted) UIFlash.error(context, 'Could not capture a photo.');
@@ -242,27 +225,6 @@ class _ScreenState extends ChangeNotifier {
   void removeMaterial(String id) {
     materials.removeWhere((m) => m.id == id);
     notifyListeners();
-  }
-
-  LibraryItem _materialFrom({
-    required String name,
-    required int sizeBytes,
-    String? path,
-    String? ext,
-  }) {
-    final subject = _materialSubject;
-    return LibraryItem(
-      id: const Uuid().v4(),
-      userId: '', // filled with the real uid in buildData()
-      name: name,
-      kind: _kindForExtension(ext),
-      fileSize: sizeBytes,
-      uploadedAt: DateTime.now(),
-      processingStatus: ProcessingStatus.indexed, // mocked until real indexing
-      metadata: path,
-      subjectId: subject?.id, // attach to the selected subject (FK to subjects)
-      colorHex: subject?.colorHex, // so the file row shows the subject color
-    );
   }
 
   OnboardingData buildData(String userId) => OnboardingData(

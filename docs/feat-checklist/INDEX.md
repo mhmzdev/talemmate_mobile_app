@@ -8,3 +8,4 @@ keep · 🚧 by-design gap.
 | Checklist | Covers |
 |---|---|
 | [onboarding-flow](onboarding-flow.md) | Register → onboarding → home; launch gate; login routing; sign-out back-out; completion |
+| [library-materials-module](library-materials-module.md) | Library screen (grouped-by-subject + Unsorted, in-state search + filter chips, pull-to-refresh); "…" actions sheet + delete; post-onboarding add-material; session userId (ADR-014); shared widgets + picker service |

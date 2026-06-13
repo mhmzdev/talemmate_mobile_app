@@ -9,6 +9,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 
 import 'package:taleemmate/router/routes.dart';
 import 'package:taleemmate/blocs/user/cubit.dart';
+import 'package:taleemmate/blocs/library/cubit.dart';
 import 'package:taleemmate/ui/painters/painters.dart';
 import 'package:taleemmate/ui/widgets/core/screen/screen.dart';
 import 'package:taleemmate/ui/widgets/core/button/button.dart';

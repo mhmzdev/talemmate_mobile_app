@@ -16,8 +16,10 @@ class _LogoutListener extends StatelessWidget {
           // Capture the cubit before navigating so reset() doesn't run on a
           // stale context.
           final userCubit = UserCubit.c(context);
+          final libraryCubit = LibraryCubit.c(context);
           AppRoutes.login.pushAndClear(context);
           userCubit.reset(); // clears user/userData
+          libraryCubit.resetUid(); // clears session uid + materials (ADR-014)
         }
       },
       child: const SizedBox.shrink(),

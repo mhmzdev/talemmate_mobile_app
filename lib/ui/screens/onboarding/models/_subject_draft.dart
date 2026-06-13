@@ -24,4 +24,7 @@ class _SubjectDraft {
     confidenceLevel: confidence,
     order: 0,
   );
+
+  SubjectChipData toChipData() =>
+      SubjectChipData(id: id, label: nameCtrl.text.trim(), colorHex: colorHex);
 }

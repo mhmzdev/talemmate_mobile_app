@@ -15,6 +15,14 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
             ..where((l) => l.subjectId.equals(subjectId)))
           .watch();
 
+  /// One-shot read of a user's materials, newest first. Used by [LibraryDao]'s
+  /// repo for the load-once + pull-to-refresh flow (no live stream).
+  Future<List<LibraryItemRow>> getByUser(String userId) =>
+      (select(libraryItems)
+            ..where((l) => l.userId.equals(userId))
+            ..orderBy([(l) => OrderingTerm.desc(l.uploadedAt)]))
+          .get();
+
   Future<void> upsert(LibraryItemsCompanion companion) =>
       into(libraryItems).insertOnConflictUpdate(companion);
 

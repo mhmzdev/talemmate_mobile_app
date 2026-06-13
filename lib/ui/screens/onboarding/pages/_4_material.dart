@@ -52,10 +52,14 @@ class _StepMaterial extends StatelessWidget {
                     ],
                   ),
                   Space.y.t08,
-                  _SubjectChips(
-                    subjects: state.subjects,
+                  SubjectChips(
+                    subjects: state.subjects
+                        .map((s) => s.toChipData())
+                        .toList(),
                     selectedId: state.materialSubjectId,
                     onSelect: state.selectMaterialSubject,
+                    emptyMessage:
+                        'No subjects added yet — go back to step 2.',
                   ),
                   Space.y.t16,
 
@@ -131,10 +135,18 @@ class _StepMaterial extends StatelessWidget {
                     ),
                   ...state.materials.expand(
                     (item) => [
-                      _FileItem(
+                      LibraryItemTile(
                         item: item,
                         subjectName: state.subjectNameFor(item.subjectId),
-                        onRemove: () => state.removeMaterial(item.id),
+                        trailing: AppTouch(
+                          onTap: () => state.removeMaterial(item.id),
+                          hasSplash: false,
+                          child: Icon(
+                            LucideIcons.x,
+                            size: 18,
+                            color: AppTheme.c.subText,
+                          ),
+                        ),
                       ),
                       Space.y.t08,
                     ],

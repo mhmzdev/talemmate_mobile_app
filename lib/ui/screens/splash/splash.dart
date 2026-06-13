@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taleemmate/blocs/user/cubit.dart';
+import 'package:taleemmate/blocs/library/cubit.dart';
 import 'package:taleemmate/configs/configs.dart';
 import 'package:provider/provider.dart';
 import 'package:taleemmate/router/routes.dart';

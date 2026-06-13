@@ -67,10 +67,11 @@ class _AddExamModalState extends State<_AddExamModal> {
                 .copyWith(letterSpacing: 1.2),
           ),
           Space.y.t08,
-          _SubjectChips(
-            subjects: widget.subjects,
+          SubjectChips(
+            subjects: widget.subjects.map((s) => s.toChipData()).toList(),
             selectedId: _subjectId,
             onSelect: (id) => setState(() => _subjectId = id),
+            emptyMessage: 'No subjects added yet — go back to step 2.',
           ),
           Space.y.t16,
 

@@ -20,7 +20,7 @@ class _TagColorPicker extends StatelessWidget {
               height: 28,
               decoration: BoxDecoration(
                 shape: .circle,
-                color: _hexColor(hex),
+                color: hex.toColor(),
                 border: Border.all(
                   color: selected == hex ? AppTheme.c.text : Colors.transparent,
                   width: 2,

@@ -172,5 +172,27 @@ class AppDatabase extends _$AppDatabase {
     });
   }
 
+  /// Persists a single library material (a `LibraryItem.toJson()` map) added
+  /// outside onboarding (the Library "Add" path). Lives here — not in the repo
+  /// — so the repo stays model-free per ADR-013; it just hands over the Map.
+  Future<void> saveLibraryItem(Map<String, dynamic> json) async {
+    final m = LibraryItem.fromJson(json);
+    await libraryDao.upsert(
+      LibraryItemsCompanion(
+        id: Value(m.id),
+        userId: Value(m.userId),
+        name: Value(m.name),
+        kind: Value(m.kind),
+        fileSize: Value(m.fileSize),
+        uploadedAt: Value(m.uploadedAt),
+        processingStatus: Value(m.processingStatus),
+        subjectId: Value(m.subjectId),
+        metadata: Value(m.metadata),
+        colorHex: Value(m.colorHex),
+        indexedPageCount: Value(m.indexedPageCount),
+      ),
+    );
+  }
+
   static QueryExecutor _openConnection() => driftDatabase(name: 'taleemmate');
 }
