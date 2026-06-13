@@ -1,10 +1,17 @@
 part of '../onboarding.dart';
 
 class _FileItem extends StatelessWidget {
-  const _FileItem({required this.item, required this.onRemove});
+  const _FileItem({
+    required this.item,
+    required this.onRemove,
+    this.subjectName,
+  });
 
   final LibraryItem item;
   final VoidCallback onRemove;
+
+  /// Resolved name of the subject this material is attached to (if any).
+  final String? subjectName;
 
   static Color _badgeColor(ItemKind kind) => switch (kind) {
     ItemKind.pdf => const Color(0xFFE05252),
@@ -59,7 +66,37 @@ class _FileItem extends StatelessWidget {
                   maxLines: 1,
                   overflow: .ellipsis,
                 ),
-                Text(_readableSize, style: AppText.b2.cl(AppTheme.c.subText)),
+                Space.y.t04,
+                Row(
+                  children: [
+                    if (subjectName != null) ...[
+                      Container(
+                        width: 7,
+                        height: 7,
+                        decoration: BoxDecoration(
+                          shape: .circle,
+                          color: item.colorHex != null
+                              ? _hexColor(item.colorHex!)
+                              : AppTheme.c.subText,
+                        ),
+                      ),
+                      Space.x.t04,
+                      Flexible(
+                        child: Text(
+                          subjectName!,
+                          style: AppText.b2.cl(AppTheme.c.subText),
+                          maxLines: 1,
+                          overflow: .ellipsis,
+                        ),
+                      ),
+                      Text(' · ', style: AppText.b2.cl(AppTheme.c.subText)),
+                    ],
+                    Text(
+                      _readableSize,
+                      style: AppText.b2.cl(AppTheme.c.subText),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),

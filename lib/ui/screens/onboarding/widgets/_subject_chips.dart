@@ -1,7 +1,11 @@
 part of '../onboarding.dart';
 
-class _ExamSubjectChips extends StatelessWidget {
-  const _ExamSubjectChips({
+/// A selectable row of subject pills (colored dot + name). Shared across the
+/// onboarding step flow — the add-exam modal and Step 4 material attachment.
+/// (When the post-onboarding Library lands, promote this to a shared widget
+/// keyed on the public `Subject` model rather than the private `_SubjectDraft`.)
+class _SubjectChips extends StatelessWidget {
+  const _SubjectChips({
     required this.subjects,
     required this.selectedId,
     required this.onSelect,

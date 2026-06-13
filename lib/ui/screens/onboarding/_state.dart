@@ -38,6 +38,37 @@ class _ScreenState extends ChangeNotifier {
   // Step 4 — Material (local references; no remote upload yet)
   final List<LibraryItem> materials = [];
 
+  /// Subject that newly-picked materials attach to. Defaults to the first
+  /// subject so the "ADD TO SUBJECT" selector is satisfied out of the box.
+  String? selectedMaterialSubjectId;
+
+  /// The effective attach-to subject id (explicit selection, else first).
+  String? get materialSubjectId =>
+      selectedMaterialSubjectId ?? (subjects.isEmpty ? null : subjects.first.id);
+
+  _SubjectDraft? get _materialSubject {
+    final id = materialSubjectId;
+    if (id == null) return null;
+    for (final s in subjects) {
+      if (s.id == id) return s;
+    }
+    return null;
+  }
+
+  void selectMaterialSubject(String id) {
+    selectedMaterialSubjectId = id;
+    notifyListeners();
+  }
+
+  /// Display name for a material's subject (for the file row's pill).
+  String? subjectNameFor(String? subjectId) {
+    if (subjectId == null) return null;
+    for (final s in subjects) {
+      if (s.id == subjectId) return s.nameCtrl.text.trim();
+    }
+    return null;
+  }
+
   void updateCurrentStep(int page) {
     currentStep = page;
     notifyListeners();
@@ -135,7 +166,16 @@ class _ScreenState extends ChangeNotifier {
   bool get isStep3Valid => enabledWindowIds.isNotEmpty;
 
   // Step 4 helpers — local file references only (no Firebase Storage yet).
+  // Each picked item attaches to [materialSubjectId] so the Library can group
+  // material by subject.
+  bool _requireSubject(BuildContext context) {
+    if (materialSubjectId != null) return true;
+    UIFlash.error(context, 'Add a subject in Step 2 first, then attach material.');
+    return false;
+  }
+
   Future<void> addFiles(BuildContext context) async {
+    if (!_requireSubject(context)) return;
     try {
       final result = await FilePicker.platform.pickFiles(allowMultiple: true);
       if (result == null) return; // user cancelled
@@ -157,6 +197,7 @@ class _ScreenState extends ChangeNotifier {
   }
 
   Future<void> addImages(BuildContext context) async {
+    if (!_requireSubject(context)) return;
     try {
       final images = await ImagePicker().pickMultiImage();
       if (images.isEmpty) return;
@@ -179,6 +220,7 @@ class _ScreenState extends ChangeNotifier {
   }
 
   Future<void> captureImage(BuildContext context) async {
+    if (!_requireSubject(context)) return;
     try {
       final shot = await ImagePicker().pickImage(source: ImageSource.camera);
       if (shot == null) return;
@@ -207,16 +249,21 @@ class _ScreenState extends ChangeNotifier {
     required int sizeBytes,
     String? path,
     String? ext,
-  }) => LibraryItem(
-    id: const Uuid().v4(),
-    userId: '', // filled with the real uid in buildData()
-    name: name,
-    kind: _kindForExtension(ext),
-    fileSize: sizeBytes,
-    uploadedAt: DateTime.now(),
-    processingStatus: ProcessingStatus.indexed, // mocked until real indexing
-    metadata: path,
-  );
+  }) {
+    final subject = _materialSubject;
+    return LibraryItem(
+      id: const Uuid().v4(),
+      userId: '', // filled with the real uid in buildData()
+      name: name,
+      kind: _kindForExtension(ext),
+      fileSize: sizeBytes,
+      uploadedAt: DateTime.now(),
+      processingStatus: ProcessingStatus.indexed, // mocked until real indexing
+      metadata: path,
+      subjectId: subject?.id, // attach to the selected subject (FK to subjects)
+      colorHex: subject?.colorHex, // so the file row shows the subject color
+    );
+  }
 
   OnboardingData buildData(String userId) => OnboardingData(
     userId: userId,

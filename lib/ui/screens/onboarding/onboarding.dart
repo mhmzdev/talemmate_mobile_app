@@ -70,7 +70,7 @@ part 'widgets/_modal_header.dart';
 part 'widgets/_modal_text_field.dart';
 part 'widgets/_tag_color_picker.dart';
 part 'widgets/_subject_suggestions.dart';
-part 'widgets/_exam_subject_chips.dart';
+part 'widgets/_subject_chips.dart';
 part 'widgets/_exam_type_chips.dart';
 part 'widgets/_add_subject_modal.dart';
 part 'widgets/_add_exam_modal.dart';

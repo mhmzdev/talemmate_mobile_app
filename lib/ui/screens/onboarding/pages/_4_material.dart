@@ -7,6 +7,7 @@ class _StepMaterial extends StatelessWidget {
   Widget build(BuildContext context) {
     App.init(context);
     final state = _ScreenState.s(context, true);
+    final attachSubject = state.subjectNameFor(state.materialSubjectId);
 
     return Padding(
       padding: Space.h.t20,
@@ -33,6 +34,31 @@ class _StepMaterial extends StatelessWidget {
                   ),
                   Space.y.t24,
 
+                  // Attach picked material to a subject (so the Library can
+                  // group it). Defaults to the first subject.
+                  Row(
+                    mainAxisAlignment: .spaceBetween,
+                    children: [
+                      Text(
+                        'ADD TO SUBJECT',
+                        style: AppText.l1b
+                            .cl(AppTheme.c.subText)
+                            .copyWith(letterSpacing: 1.2),
+                      ),
+                      Text(
+                        'Required',
+                        style: AppText.b2.cl(AppTheme.c.subText),
+                      ),
+                    ],
+                  ),
+                  Space.y.t08,
+                  _SubjectChips(
+                    subjects: state.subjects,
+                    selectedId: state.materialSubjectId,
+                    onSelect: state.selectMaterialSubject,
+                  ),
+                  Space.y.t16,
+
                   GestureDetector(
                     onTap: () => state.addFiles(context),
                     child: Container(
@@ -52,7 +78,9 @@ class _StepMaterial extends StatelessWidget {
                           ),
                           Space.y.t08,
                           Text(
-                            'Tap to add files',
+                            attachSubject != null
+                                ? 'Add files to $attachSubject'
+                                : 'Tap to add files',
                             style: AppText.b1.cl(AppTheme.c.subText),
                           ),
                           Text(
@@ -105,6 +133,7 @@ class _StepMaterial extends StatelessWidget {
                     (item) => [
                       _FileItem(
                         item: item,
+                        subjectName: state.subjectNameFor(item.subjectId),
                         onRemove: () => state.removeMaterial(item.id),
                       ),
                       Space.y.t08,
