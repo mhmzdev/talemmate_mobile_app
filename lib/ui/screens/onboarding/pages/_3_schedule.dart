@@ -33,15 +33,17 @@ class _StepSchedule extends StatelessWidget {
                   ),
                   Space.y.t24,
 
-                  for (final (id, label, time) in _studyWindows) ...[
-                    _TimeWindowTile(
-                      label: label,
-                      time: time,
-                      enabled: state.enabledWindowIds.contains(id),
-                      onToggle: () => state.toggleWindow(id),
-                    ),
-                    Space.y.t08,
-                  ],
+                  ..._studyWindows.expand(
+                    (w) => [
+                      _TimeWindowTile(
+                        label: w.$2,
+                        time: w.$3,
+                        enabled: state.enabledWindowIds.contains(w.$1),
+                        onToggle: () => state.toggleWindow(w.$1),
+                      ),
+                      Space.y.t08,
+                    ],
+                  ),
 
                   Space.y.t08,
 
@@ -83,10 +85,12 @@ class _StepSchedule extends StatelessWidget {
                         .copyWith(letterSpacing: 1.2),
                   ),
                   Space.y.t08,
-                  for (int i = 0; i < state.exams.length; i++) ...[
-                    _ExamRow(index: i, draft: state.exams[i]),
-                    Space.y.t08,
-                  ],
+                  ...state.exams.asMap().entries.expand(
+                    (e) => [
+                      _ExamRow(index: e.key, draft: e.value),
+                      Space.y.t08,
+                    ],
+                  ),
                   _AddTile(
                     label: 'Add exam',
                     onTap: () => _openAddExamModal(context, state),
@@ -99,7 +103,10 @@ class _StepSchedule extends StatelessWidget {
           Space.y.t12,
           AppButton(
             label: 'Continue',
-            onTap: state.nextPage,
+            onTap: () {
+              if (state.isStep3Valid) state.nextPage();
+            },
+            state: state.isStep3Valid ? .def : .disabled,
             mainAxisSize: .max,
             size: .large,
           ),

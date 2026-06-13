@@ -45,5 +45,9 @@
     <true/>
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>TaleemMate needs access to your photos so you can add study material like slides and notes.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>TaleemMate needs camera access so you can snap notes and board photos as study material.</string>
   </dict>
 </plist>

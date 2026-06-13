@@ -1,11 +1,15 @@
 // ignore: unused_import
+import 'package:taleemmate/services/fault/faults.dart';
+
 import 'dart:async'; // used by _state.dart part (Timer)
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:taleemmate/ui/widgets/core/buttons/app_back_button.dart';
@@ -19,6 +23,7 @@ import 'package:taleemmate/router/routes.dart';
 import 'package:taleemmate/blocs/user/cubit.dart';
 import 'package:taleemmate/blocs/onboarding/cubit.dart';
 import 'package:taleemmate/core/models/onboarding/onboarding_data.dart';
+import 'package:taleemmate/core/models/library/library_item.dart';
 import 'package:taleemmate/core/models/subject/subject.dart';
 import 'package:taleemmate/core/models/subject/exam.dart';
 import 'package:taleemmate/core/models/schedule/schedule.dart';
@@ -30,6 +35,8 @@ import 'package:taleemmate/ui/widgets/design/full_screen_loader/full_screen_load
 import 'package:taleemmate/ui/widgets/design/modals/app_modal_base.dart';
 import 'package:taleemmate/ui/widgets/headless/keep_alive_page_view.dart';
 import 'package:taleemmate/utils/flash.dart';
+part 'listeners/_logout.dart';
+
 
 part 'models/_subject_draft.dart';
 part 'models/_exam_draft.dart';
@@ -101,6 +108,7 @@ class _Body extends StatelessWidget {
           state.confirmSignOut(context);
         }
       },
+      belowBuilders: const [_LogoutListener()],
       overlayBuilders: const [_CompleteListener()],
       child: SafeArea(
         child: Column(

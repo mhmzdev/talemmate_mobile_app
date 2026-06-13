@@ -35,7 +35,7 @@ class _TaleemMateState extends State<TaleemMate> {
         // provider-initiate-start
         ChangeNotifierProvider(create: (_) => AppProvider()),
         Provider<AppDatabase>(
-          create: (_) => AppDatabase(),
+          create: (_) => AppDatabase.ins,
           dispose: (_, db) => db.close(),
         ),
 

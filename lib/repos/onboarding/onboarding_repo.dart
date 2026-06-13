@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:taleemmate/configs/configs.dart';
+import 'package:taleemmate/core/db/database.dart';
 import 'package:taleemmate/services/fault/faults.dart';
 
 part 'onboarding_mocks.dart';

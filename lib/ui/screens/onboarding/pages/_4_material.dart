@@ -34,8 +34,7 @@ class _StepMaterial extends StatelessWidget {
                   Space.y.t24,
 
                   GestureDetector(
-                    onTap: () =>
-                        UIFlash.info(context, 'File upload coming soon'),
+                    onTap: () => state.addFiles(context),
                     child: Container(
                       height: 120,
                       alignment: Alignment.center,
@@ -71,22 +70,19 @@ class _StepMaterial extends StatelessWidget {
                       _SourceChip(
                         label: 'Files',
                         icon: LucideIcons.file,
-                        onTap: () =>
-                            UIFlash.info(context, 'File upload coming soon'),
+                        onTap: () => state.addFiles(context),
                       ),
                       Space.x.t08,
                       _SourceChip(
                         label: 'Photos',
                         icon: LucideIcons.image,
-                        onTap: () =>
-                            UIFlash.info(context, 'File upload coming soon'),
+                        onTap: () => state.addImages(context),
                       ),
                       Space.x.t08,
                       _SourceChip(
                         label: 'Camera',
                         icon: LucideIcons.camera,
-                        onTap: () =>
-                            UIFlash.info(context, 'File upload coming soon'),
+                        onTap: () => state.captureImage(context),
                       ),
                     ],
                   ),
@@ -100,10 +96,20 @@ class _StepMaterial extends StatelessWidget {
                         .copyWith(letterSpacing: 1.2),
                   ),
                   Space.y.t12,
-                  for (final file in state.files) ...[
-                    _FileItem(file: file),
-                    Space.y.t08,
-                  ],
+                  if (state.materials.isEmpty)
+                    Text(
+                      'Nothing yet — add slides, past papers, or notes above.',
+                      style: AppText.b2.cl(AppTheme.c.subText),
+                    ),
+                  ...state.materials.expand(
+                    (item) => [
+                      _FileItem(
+                        item: item,
+                        onRemove: () => state.removeMaterial(item.id),
+                      ),
+                      Space.y.t08,
+                    ],
+                  ),
 
                   Space.y.t08,
                   Text(

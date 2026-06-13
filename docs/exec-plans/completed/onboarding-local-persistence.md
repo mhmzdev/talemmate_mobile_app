@@ -1,10 +1,11 @@
 ---
 title: "Onboarding Local Persistence (Drift DB + file picker + validation + loader)"
-status: backlog
+status: completed
 created: 2026-06-03
+completed: 2026-06-13
 ---
 
-📋 BACKLOG — Not yet started
+✅ COMPLETED — 2026-06-13 (verified e2e on emulators: new-account run persists the onboarding payload + materials to Drift, profile to Firestore)
 
 # Onboarding Local Persistence — Implementation Plan
 

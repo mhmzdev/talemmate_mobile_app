@@ -61,6 +61,7 @@ class _StepAboutYou extends StatelessWidget {
                       placeholder: 'Your name',
                       textCapitalization: .words,
                       textInputAction: .next,
+                      onChanged: (_) => state.refresh(),
                     ),
                     Space.y.t24,
 
@@ -85,12 +86,13 @@ class _StepAboutYou extends StatelessWidget {
                       runSpacing: 8,
                       crossAxisAlignment: .center,
                       children: [
-                        for (final chip in _institutions)
-                          _InstitutionChip(
+                        ..._institutions.map(
+                          (chip) => _InstitutionChip(
                             label: chip,
                             selected: state.selectedInstitutionChip == chip,
                             onTap: () => state.selectInstitutionChip(chip),
                           ),
+                        ),
                         Text(
                           'or type your own',
                           style: AppText.b2.cl(AppTheme.c.subText),
@@ -137,14 +139,15 @@ class _StepAboutYou extends StatelessWidget {
                       Space.y.t08,
                       Wrap(
                         spacing: 8,
-                        children: [
-                          for (final y in _years)
-                            _YearChip(
-                              label: y,
-                              selected: state.year == y,
-                              onTap: () => state.setYear(y),
-                            ),
-                        ],
+                        children: _years
+                            .map(
+                              (y) => _YearChip(
+                                label: y,
+                                selected: state.year == y,
+                                onTap: () => state.setYear(y),
+                              ),
+                            )
+                            .toList(),
                       ),
                     ],
 
@@ -160,7 +163,10 @@ class _StepAboutYou extends StatelessWidget {
             Space.y.t12,
             AppButton(
               label: 'Continue',
-              onTap: state.nextPage,
+              onTap: () {
+                if (state.isStep1Valid) state.nextPage();
+              },
+              state: state.isStep1Valid ? .def : .disabled,
               mainAxisSize: .max,
               size: .large,
             ),

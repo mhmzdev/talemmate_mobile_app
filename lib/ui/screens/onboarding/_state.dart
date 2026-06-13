@@ -5,6 +5,17 @@ class _ScreenState extends ChangeNotifier {
   static _ScreenState s(BuildContext context, [listen = false]) =>
       Provider.of<_ScreenState>(context, listen: listen);
 
+  _ScreenState() {
+    // Seed the controllers (debug prefill / empty in prod) before the first
+    // build so the Step-1 validity gate is correct from frame one.
+    final seed = _FormData.initialValues();
+    nameCtrl.text = seed[_FormKeys.name] as String? ?? '';
+    institutionCtrl.text = seed[_FormKeys.institution] as String? ?? '';
+    if (institutionCtrl.text.isNotEmpty) {
+      selectedInstitutionChip = institutionCtrl.text;
+    }
+  }
+
   final pageController = PageController();
   int currentStep = 0;
 
@@ -24,33 +35,8 @@ class _ScreenState extends ChangeNotifier {
   double dailyTargetHours = 3.5;
   final List<_ExamDraft> exams = [];
 
-  // Step 4 — Material (mocked)
-  final List<Map<String, dynamic>> files = [
-    {
-      'type': 'PDF',
-      'name': 'CLRS — Chapter 7.pdf',
-      'size': '412 KB',
-      'status': 'indexed',
-    },
-    {
-      'type': 'PDF',
-      'name': 'Forouzan slides L12.pdf',
-      'size': '8.1 MB',
-      'status': 'indexed',
-    },
-    {
-      'type': 'IMG',
-      'name': 'OS lecture board (3)',
-      'size': '2.4 MB',
-      'status': 'processing',
-    },
-    {
-      'type': 'NOTE',
-      'name': 'My recurrence notes.md',
-      'size': '3 KB',
-      'status': 'indexed',
-    },
-  ];
+  // Step 4 — Material (local references; no remote upload yet)
+  final List<LibraryItem> materials = [];
 
   void updateCurrentStep(int page) {
     currentStep = page;
@@ -139,6 +125,99 @@ class _ScreenState extends ChangeNotifier {
 
   void refresh() => notifyListeners();
 
+  // --- step validation gates (G8) --- //
+
+  /// Step 1 requires a name and an institution before advancing.
+  bool get isStep1Valid =>
+      nameCtrl.text.trim().isNotEmpty && institutionCtrl.text.trim().isNotEmpty;
+
+  /// Step 3 requires at least one study window selected.
+  bool get isStep3Valid => enabledWindowIds.isNotEmpty;
+
+  // Step 4 helpers — local file references only (no Firebase Storage yet).
+  Future<void> addFiles(BuildContext context) async {
+    try {
+      final result = await FilePicker.platform.pickFiles(allowMultiple: true);
+      if (result == null) return; // user cancelled
+      materials.addAll(
+        result.files.map(
+          (f) => _materialFrom(
+            name: f.name,
+            sizeBytes: f.size,
+            path: f.path,
+            ext: f.extension,
+          ),
+        ),
+      );
+      notifyListeners();
+    } catch (e, st) {
+      'onboarding.addFiles error: $e\n$st'.appLog(level: AppLogLevel.error);
+      if (context.mounted) UIFlash.error(context, 'Could not add those files.');
+    }
+  }
+
+  Future<void> addImages(BuildContext context) async {
+    try {
+      final images = await ImagePicker().pickMultiImage();
+      if (images.isEmpty) return;
+      final items = await Future.wait(
+        images.map(
+          (x) async => _materialFrom(
+            name: x.name,
+            sizeBytes: await x.length(),
+            path: x.path,
+            ext: 'img',
+          ),
+        ),
+      );
+      materials.addAll(items);
+      notifyListeners();
+    } catch (e, st) {
+      'onboarding.addImages error: $e\n$st'.appLog(level: AppLogLevel.error);
+      if (context.mounted) UIFlash.error(context, 'Could not add those photos.');
+    }
+  }
+
+  Future<void> captureImage(BuildContext context) async {
+    try {
+      final shot = await ImagePicker().pickImage(source: ImageSource.camera);
+      if (shot == null) return;
+      materials.add(
+        _materialFrom(
+          name: shot.name,
+          sizeBytes: await shot.length(),
+          path: shot.path,
+          ext: 'img',
+        ),
+      );
+      notifyListeners();
+    } catch (e, st) {
+      'onboarding.captureImage error: $e\n$st'.appLog(level: AppLogLevel.error);
+      if (context.mounted) UIFlash.error(context, 'Could not capture a photo.');
+    }
+  }
+
+  void removeMaterial(String id) {
+    materials.removeWhere((m) => m.id == id);
+    notifyListeners();
+  }
+
+  LibraryItem _materialFrom({
+    required String name,
+    required int sizeBytes,
+    String? path,
+    String? ext,
+  }) => LibraryItem(
+    id: const Uuid().v4(),
+    userId: '', // filled with the real uid in buildData()
+    name: name,
+    kind: _kindForExtension(ext),
+    fileSize: sizeBytes,
+    uploadedAt: DateTime.now(),
+    processingStatus: ProcessingStatus.indexed, // mocked until real indexing
+    metadata: path,
+  );
+
   OnboardingData buildData(String userId) => OnboardingData(
     userId: userId,
     step: 4,
@@ -155,7 +234,7 @@ class _ScreenState extends ChangeNotifier {
       dailyTargetHours: dailyTargetHours,
       enabledWindowIds: enabledWindowIds.toList(),
     ),
-    uploadedMaterials: const [],
+    uploadedMaterials: materials.map((m) => m.copyWith(userId: userId)).toList(),
   );
 
   void finish(BuildContext context) {
@@ -192,13 +271,12 @@ class _ScreenState extends ChangeNotifier {
     );
   }
 
-  Future<void> _signOut(BuildContext context) async {
-    final userCubit = UserCubit.c(context);
+  /// Dispatches the logout action only. Navigation away from onboarding is a
+  /// side effect of the `UserState.logout` transition and is handled by
+  /// [_LogoutListener] — this layer never navigates as a result of state.
+  void _signOut(BuildContext context) {
     Navigator.pop(context); // dismiss the alert
-    await userCubit.logout();
-    userCubit.reset(); // clears user/userData
-    if (!context.mounted) return;
-    AppRoutes.login.pushAndClear(context); // wipe stack → single /login
+    UserCubit.c(context).logout();
   }
 
   @override

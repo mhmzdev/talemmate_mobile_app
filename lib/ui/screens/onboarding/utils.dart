@@ -2,6 +2,16 @@ part of 'onboarding.dart';
 
 // Non-widget helpers shared across the onboarding feature.
 
+/// Maps a file extension to a [ItemKind] for picked Step-4 materials.
+ItemKind _kindForExtension(String? ext) => switch ((ext ?? '').toLowerCase()) {
+  'pdf' => .pdf,
+  'jpg' || 'jpeg' || 'png' || 'heic' || 'webp' || 'gif' || 'img' => .img,
+  'ppt' || 'pptx' || 'key' => .slide,
+  'mp4' || 'mov' => .video,
+  'mp3' || 'm4a' || 'wav' => .voice,
+  _ => .note,
+};
+
 /// Parses a "#RRGGBB" tag-colour string into a [Color].
 Color _hexColor(String hex) => Color(int.parse(hex.replaceFirst('#', '0xFF')));
 

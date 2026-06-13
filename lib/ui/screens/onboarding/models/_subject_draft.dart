@@ -12,8 +12,12 @@ class _SubjectDraft {
     nameCtrl.dispose();
   }
 
+  // Use the draft's stable [id] — exams reference a subject by this id
+  // (`_ExamDraft.subjectId = subject.id`), and `Exams.subjectId` is a FK to
+  // `Subjects.id`. Minting a fresh id here would break that reference and abort
+  // the save transaction whenever an exam is present.
   Subject toSubject() => Subject(
-    id: const Uuid().v4(),
+    id: id,
     code: codeCtrl.text.trim(),
     name: nameCtrl.text.trim(),
     colorHex: colorHex,
