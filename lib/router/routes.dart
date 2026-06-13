@@ -1,4 +1,5 @@
 abstract class AppRoutes {
+static const profile = '/profile';
   static const createAccount = '/create-account';
   static const onboarding = '/onboarding';
   static const stepwiseLoader = '/stepwise-loader';
