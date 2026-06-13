@@ -1,10 +1,11 @@
 ---
 title: "Onboarding implementation — create account + 4-step flow + stepwise loader"
-status: active
+status: completed
 created: 2026-05-24
+completed: 2026-06-13
 ---
 
-🚧 ACTIVE — Implementation complete, pending manual verification
+✅ COMPLETED — 2026-06-13 (verified via `docs/feat-checklist/onboarding-flow.md`: registration, 4-step flow, completion, and local persistence all green on emulators)
 
 # Onboarding Implementation Plan
 
