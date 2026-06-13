@@ -7,8 +7,8 @@ class _FormData {
     }
 
     return {
-      _FormKeys.email: 'test@taleemmate.com',
-      _FormKeys.password: 'test1234',
+      _FormKeys.email: 'hamza.verify6@cui.edu.pk',
+      _FormKeys.password: 'Hamza@123',
     };
   }
 }
