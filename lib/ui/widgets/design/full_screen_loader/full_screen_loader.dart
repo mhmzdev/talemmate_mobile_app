@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:taleemmate/configs/configs.dart';
 
 import '../misc/pluse_dot.dart';
+import '../misc/progress_dots.dart';
 
 class FullScreenLoader extends StatelessWidget {
   const FullScreenLoader({
@@ -65,7 +66,7 @@ class FullScreenLoader extends StatelessWidget {
               ),
             ],
             Space.y.t24,
-            const _ProgressDots(),
+            const AppProgressDots(),
           ],
         ),
       ),
@@ -98,91 +99,3 @@ class _RingSpinner extends StatelessWidget {
   }
 }
 
-// Three dots with staggered pulse — subtle progress hint at the bottom.
-class _ProgressDots extends StatefulWidget {
-  const _ProgressDots();
-
-  @override
-  State<_ProgressDots> createState() => _ProgressDotsState();
-}
-
-class _ProgressDotsState extends State<_ProgressDots>
-    with TickerProviderStateMixin {
-  late List<AnimationController> _ctrls;
-  late List<Animation<double>> _opacities;
-  late List<Animation<double>> _dys;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrls = List.generate(
-      3,
-      (_) => AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 1200),
-      ),
-    );
-
-    _opacities = _ctrls
-        .map(
-          (c) => TweenSequence([
-            TweenSequenceItem(tween: Tween(begin: 0.25, end: 1.0), weight: 40),
-            TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.25), weight: 60),
-          ]).animate(CurvedAnimation(parent: c, curve: Curves.easeInOut)),
-        )
-        .toList();
-
-    _dys = _ctrls
-        .map(
-          (c) => TweenSequence([
-            TweenSequenceItem(tween: Tween(begin: 0.0, end: -2.0), weight: 40),
-            TweenSequenceItem(tween: Tween(begin: -2.0, end: 0.0), weight: 60),
-          ]).animate(CurvedAnimation(parent: c, curve: Curves.easeInOut)),
-        )
-        .toList();
-
-    for (var i = 0; i < 3; i++) {
-      Future.delayed(Duration(milliseconds: i * 180), () {
-        if (mounted) _ctrls[i].repeat();
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    for (final c in _ctrls) {
-      c.dispose();
-    }
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(
-        3,
-        (i) => AnimatedBuilder(
-          animation: _ctrls[i],
-          builder: (context, _) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 2.5),
-            child: Transform.translate(
-              offset: Offset(0, _dys[i].value),
-              child: Opacity(
-                opacity: _opacities[i].value,
-                child: Container(
-                  width: 5,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppTheme.c.text,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
