@@ -3,9 +3,12 @@ import 'package:dio/dio.dart';
 import 'package:taleemmate/configs/configs.dart';
 import 'package:taleemmate/services/flavor/flavor.dart';
 import 'package:taleemmate/services/http/alice.dart';
+import 'package:taleemmate/services/logging/app_log.dart';
 
 part 'urls.dart';
 part 'endpoints.dart';
+
+part 'interceptors/retry_interceptor.dart';
 
 abstract class BaseApi {
   final String baseUrl;
@@ -23,6 +26,7 @@ abstract class BaseApi {
         },
       ),
     );
+    ins.interceptors.add(_RetryInterceptor(ins));
     if (!AppFlavor.isProdRelease) {
       ins.interceptors.add(AppAlice.ins.getDioInterceptor());
     }
