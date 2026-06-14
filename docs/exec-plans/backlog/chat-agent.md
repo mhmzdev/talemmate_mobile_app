@@ -24,6 +24,7 @@ Key files:
 - `lib/core/models/tutor/` — `TutorMessage{sender, text, followUpPoints[], citations[], kickerQuestion?}`, `TutorConversation{subjectId, topicId?, title?, groundedSourceCount, messages[]}`, `TutorSettings{scope, reasoningDepth, showCitationsOnEveryReply}`, `Citation{source, pageReference?, colorHex?, libraryItemId?}`, `FollowUpPoint{label, body}`.
 - `lib/core/db/tables/tutor_table.dart` + `lib/core/db/daos/tutor_dao.dart` — `TutorConversations` / `TutorMessages` / `TutorSettingsTable` with converters; `TutorDao` already has `watchByUser`, `watchMessages`, `settingsForUser`, `upsertConversation`, `insertMessage`, `upsertSettings`.
 - `assets/chat_sys_prompt.md` — **wrong-app ("Dreamstale") content; must be rewritten.** Registered as `Assets.chatSysPrompt` (`lib/gen/assets/assets.gen.dart:39`). No loader exists.
+- `lib/services/firebase/ai/agent_tools.dart` — `AgentTools.chatSchema`, the structured-output `Schema` home for agents (lives next to `AiService`). **The schema body is placeholder copy from an older project** (dream/image refinement — fields `responseMessage`/`error`, doc text about "generate an image based on the refined prompt"). **Location + pattern are correct; only the schema shape needs rewriting** to the `Tutor*` output (`text`, `citations[]`, `followUpPoints[]`, `kickerQuestion?`). Everything else here is fine as a scaffold.
 - Pattern templates: `lib/blocs/quotes/cubit.dart`, `lib/repos/quotes/quotes_repo.dart`; `BlocState<T>` at `lib/configs/bloc/_state.dart`.
 
 **firebase_ai 3.6.0 structured-output API verified:**
@@ -76,6 +77,7 @@ class SystemPrompts {
 
 #### 3. Chat model + response schema on AiService
 **File**: `lib/services/firebase/ai/ai_service.dart` (extends the Plan-A service)
+Source the `responseSchema` from `AgentTools.ins.chatSchema` (the schema home — see Current State) rather than inlining it here. **First rewrite that schema** from the older-project placeholder (`responseMessage`/`error`) to the `Tutor*` shape shown below.
 ```dart
 GenerativeModel chatModel(String systemPrompt) =>
     FirebaseAI.googleAI().generativeModel(
@@ -83,21 +85,25 @@ GenerativeModel chatModel(String systemPrompt) =>
       systemInstruction: Content.system(systemPrompt),
       generationConfig: GenerationConfig(
         responseMimeType: 'application/json',
-        responseSchema: Schema.object(properties: {
-          'text': Schema.string(),
-          'kickerQuestion': Schema.string(nullable: true),
-          'citations': Schema.array(items: Schema.object(properties: {
-            'libraryItemId': Schema.string(nullable: true),
-            'source': Schema.string(),
-            'pageReference': Schema.string(nullable: true),
-          })),
-          'followUpPoints': Schema.array(items: Schema.object(properties: {
-            'label': Schema.string(),
-            'body': Schema.string(),
-          })),
-        }),
+        responseSchema: AgentTools.ins.chatSchema, // updated to the shape below
       ),
     );
+```
+`AgentTools.chatSchema` (rewritten to match `TutorMessage`):
+```dart
+Schema get chatSchema => Schema.object(properties: {
+      'text': Schema.string(),
+      'kickerQuestion': Schema.string(nullable: true),
+      'citations': Schema.array(items: Schema.object(properties: {
+        'libraryItemId': Schema.string(nullable: true),
+        'source': Schema.string(),
+        'pageReference': Schema.string(nullable: true),
+      })),
+      'followUpPoints': Schema.array(items: Schema.object(properties: {
+        'label': Schema.string(),
+        'body': Schema.string(),
+      })),
+    });
 ```
 
 ### Hygen Commands
@@ -107,6 +113,7 @@ _None._
 #### Automated Verification
 - [ ] `flutter analyze` clean.
 #### Manual Verification
+- [ ] `AgentTools.chatSchema` rewritten from the older-project placeholder (`responseMessage`/`error`, image-refinement doc text) to the `Tutor*` shape (`text`, `citations[]`, `followUpPoints[]`, `kickerQuestion?`); doc comment updated to describe tutor output.
 - [ ] `SystemPrompts.chat()` returns the rewritten prompt.
 - [ ] A throwaway `chatModel(...).generateContent([Content.text('hi')])` returns parseable JSON matching the schema.
 
