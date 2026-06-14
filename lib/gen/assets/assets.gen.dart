@@ -37,12 +37,14 @@ class Assets {
 
   static const $AssetsAppGen app = $AssetsAppGen();
   static const String chatSysPrompt = 'assets/chat_sys_prompt.md';
+  static const String libraryExtractionSysPrompt =
+      'assets/library_extraction_sys_prompt.md';
   static const String planSysPrompt = 'assets/plan_sys_prompt.md';
   static const String quizSysPrompt = 'assets/quiz_sys_prompt.md';
 
   /// List of all assets
   static List<String> get values =>
-      [chatSysPrompt, planSysPrompt, quizSysPrompt];
+      [chatSysPrompt, libraryExtractionSysPrompt, planSysPrompt, quizSysPrompt];
 }
 
 class AssetGenImage {
