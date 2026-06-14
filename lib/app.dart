@@ -1,5 +1,6 @@
 import 'blocs/quotes/cubit.dart';
 import 'package:taleemmate/services/flavor/flavor.dart';
+import 'package:taleemmate/services/notifications/local.dart';
 
 import 'blocs/library/cubit.dart';
 import 'blocs/onboarding/cubit.dart';
@@ -32,6 +33,10 @@ class _TaleemMateState extends State<TaleemMate> {
     if (!AppFlavor.isProdRelease) {
       AppAlice.ins.setNavigatorKey(navigator);
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      LocalNotificationHandler.ins.init();
+    });
   }
 
   @override
