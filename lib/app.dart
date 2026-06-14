@@ -1,3 +1,4 @@
+import 'blocs/chat/cubit.dart';
 import 'blocs/material/cubit.dart';
 import 'blocs/quotes/cubit.dart';
 import 'package:taleemmate/services/flavor/flavor.dart';
@@ -47,6 +48,7 @@ class _TaleemMateState extends State<TaleemMate> {
     return MultiProvider(
       providers: [
         // bloc-initiate-start
+        BlocProvider(create: (_) => ChatCubit()),
         BlocProvider(create: (_) => MaterialCubit()),
         BlocProvider(create: (_) => QuotesCubit()),
         BlocProvider(create: (_) => LibraryCubit()),
