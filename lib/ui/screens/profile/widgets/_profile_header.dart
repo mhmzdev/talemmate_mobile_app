@@ -42,8 +42,6 @@ class _ProfileHeader extends StatelessWidget {
               ],
             ),
           ),
-          Space.x.t08,
-          AppCircleIconButton(icon: LucideIcons.ellipsis, onTap: () {}),
         ],
       ),
     );

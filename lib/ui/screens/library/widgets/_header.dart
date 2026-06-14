@@ -15,25 +15,17 @@ class _Header extends StatelessWidget {
 
     return Padding(
       padding: Space.sym(SpaceToken.t24, SpaceToken.t12),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: .start,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: .start,
-              children: [
-                Text('Library', style: AppText.h1),
-                Space.y.t04,
-                Text(
-                  '$count $noun · ${totalSize.readableSize}',
-                  style: AppText.b2
-                      .cl(AppTheme.c.subText)
-                      .copyWith(letterSpacing: 0.4),
-                ),
-              ],
-            ),
+          Text('Library', style: AppText.h1),
+          Space.y.t04,
+          Text(
+            '$count $noun · ${totalSize.readableSize}',
+            style: AppText.b2
+                .cl(AppTheme.c.subText)
+                .copyWith(letterSpacing: 0.4),
           ),
-          Space.x.t12,
-          AppCircleIconButton(icon: LucideIcons.search, onTap: () {}),
         ],
       ),
     );

@@ -43,8 +43,6 @@ class _Header extends StatelessWidget {
               ],
             ),
           ),
-          Space.x.t12,
-          AppCircleIconButton(icon: LucideIcons.bell, onTap: () {}),
           Space.x.t08,
           AppAvatar(
             initials: initials,

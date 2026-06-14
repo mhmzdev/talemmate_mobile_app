@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 import 'package:taleemmate/blocs/library/cubit.dart';
 import 'package:taleemmate/configs/configs.dart';
@@ -15,7 +16,6 @@ import 'package:taleemmate/ui/widgets/design/alerts/app_alert_base.dart';
 import 'package:taleemmate/ui/widgets/design/library/library_item_tile.dart';
 import 'package:taleemmate/ui/widgets/design/library/subject_chips.dart';
 import 'package:taleemmate/ui/widgets/design/misc/app_choice_chip.dart';
-import 'package:taleemmate/ui/widgets/design/misc/app_circle_icon_button.dart';
 import 'package:taleemmate/ui/widgets/design/modals/app_modal_base.dart';
 import 'package:taleemmate/ui/widgets/forms/forms.dart';
 import 'package:taleemmate/ui/widgets/headless/app_touch.dart';
@@ -33,6 +33,7 @@ part 'widgets/_subject_section.dart';
 part 'widgets/_add_material_tile.dart';
 part 'widgets/_add_material_sheet.dart';
 part 'widgets/_material_actions_sheet.dart';
+part 'widgets/_library_skeleton.dart';
 
 class LibraryScreen extends StatelessWidget {
   const LibraryScreen({super.key});
@@ -74,6 +75,13 @@ class _BodyState extends State<_Body> {
       formKey: screenState.formKey,
       initialFormValue: _FormData.initialValues(),
       keyboardHandler: true,
+      floatingActionButton: AppButton(
+        icon: LucideIcons.plus,
+        size: .large,
+        padding: Space.a.t20,
+        margin: Space.b.t60 + Space.b.t12,
+        onTap: () => _AddMaterialSheet.show(context),
+      ),
       child: SafeArea(
         child: BlocConsumer<LibraryCubit, LibraryState>(
           listenWhen: (a, b) =>
@@ -93,6 +101,15 @@ class _BodyState extends State<_Body> {
           },
           builder: (context, state) {
             final items = state.load.data ?? const <LibraryItem>[];
+
+            // First load (nothing cached yet) → full-screen skeleton.
+            if (state.load.isLoading && items.isEmpty) {
+              return const SingleChildScrollView(
+                physics: NeverScrollableScrollPhysics(),
+                child: _LibrarySkeleton(),
+              );
+            }
+
             final totalSize = items.fold<int>(0, (sum, i) => sum + i.fileSize);
             final sections = groupMaterials(
               items: items,
@@ -134,6 +151,7 @@ class _BodyState extends State<_Body> {
                         ],
                       ),
                     ),
+                    Space.y.t100,
                   ],
                 ),
               ),
@@ -157,15 +175,6 @@ class _Content extends StatelessWidget {
   Widget build(BuildContext context) {
     App.init(context);
     final items = state.load.data ?? const <LibraryItem>[];
-
-    if (state.load.isLoading && items.isEmpty) {
-      return Padding(
-        padding: Space.v.t32,
-        child: Center(
-          child: CircularProgressIndicator(color: AppTheme.c.primary),
-        ),
-      );
-    }
 
     if (state.load.isFailed && items.isEmpty) {
       return Padding(

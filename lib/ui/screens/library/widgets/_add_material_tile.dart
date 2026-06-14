@@ -10,7 +10,7 @@ class _AddMaterialTile extends StatelessWidget {
     App.init(context);
 
     return AppTouch(
-      onTap: () => _showAddMaterial(context),
+      onTap: () => _AddMaterialSheet.show(context),
       hasSplash: false,
       child: Container(
         padding: Space.a.t16,

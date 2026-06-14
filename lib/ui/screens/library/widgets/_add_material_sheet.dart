@@ -1,21 +1,21 @@
 part of '../library.dart';
 
-/// Opens the post-onboarding "Add new material" sheet.
-Future<void> _showAddMaterial(BuildContext context) {
-  return showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    routeSettings: const RouteSettings(name: '/modal/add-material'),
-    builder: (_) => const _AddMaterialSheet(),
-  );
-}
-
 class _AddMaterialSheet extends StatefulWidget {
   const _AddMaterialSheet();
 
   @override
   State<_AddMaterialSheet> createState() => _AddMaterialSheetState();
+
+  /// Opens the post-onboarding "Add new material" sheet.
+  static Future<void> show(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      routeSettings: const RouteSettings(name: '/modal/add-material'),
+      builder: (_) => const _AddMaterialSheet(),
+    );
+  }
 }
 
 class _AddMaterialSheetState extends State<_AddMaterialSheet> {
@@ -104,7 +104,9 @@ class _AddMaterialSheetState extends State<_AddMaterialSheet> {
         children: [
           Text(
             'ADD TO SUBJECT',
-            style: AppText.l1b.cl(AppTheme.c.subText).copyWith(letterSpacing: 1.2),
+            style: AppText.l1b
+                .cl(AppTheme.c.subText)
+                .copyWith(letterSpacing: 1.2),
           ),
           Space.y.t08,
           SubjectChips(
@@ -166,8 +168,7 @@ class _AddMaterialSheetState extends State<_AddMaterialSheet> {
                         item: item,
                         subjectName: _selectedSubject?.name,
                         trailing: AppTouch(
-                          onTap: () =>
-                              setState(() => _picked.remove(item)),
+                          onTap: () => setState(() => _picked.remove(item)),
                           hasSplash: false,
                           child: Icon(
                             LucideIcons.x,
