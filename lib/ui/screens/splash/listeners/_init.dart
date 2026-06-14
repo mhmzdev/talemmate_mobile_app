@@ -19,7 +19,13 @@ class _InitListener extends StatelessWidget {
           final uid = state.user?.uid;
           if (uid != null) LibraryCubit.c(context).initUid(uid);
           final data = state.userData;
-          final next = data == null
+          final isLoggedIn = data != null;
+
+          if (isLoggedIn && data.isOnboardingComplete) {
+            QuotesCubit.c(context).today();
+          }
+
+          final next = !isLoggedIn
               ? AppRoutes.login
               : data.isOnboardingComplete
               ? AppRoutes.home
