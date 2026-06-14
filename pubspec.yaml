@@ -162,6 +162,9 @@ flutter:
   assets:
     - assets/
     - assets/app/
+    - assets/chat_sys_prompt.md
+    - assets/plan_sys_prompt.md
+    - assets/quiz_sys_prompt.md
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -7,12 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:taleemmate/app.dart';
 import 'package:taleemmate/services/firebase/crash/crashlytics.dart';
 import 'package:taleemmate/services/flavor/flavor.dart';
+import 'package:taleemmate/services/http/alice.dart';
 
 /// Toggle to connect to the local Firebase emulators instead of live Firebase.
 ///
 /// The correct long-term approach is a dedicated local flavor (TODO); for now
 /// flip this flag while building against the emulator suite.
-const useFirebaseEmulators = false;
+const useFirebaseEmulators = true;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,7 +39,7 @@ void main() async {
   }
 
   /// Services
-  // AppAlice.ins.init();
+  AppAlice.ins.init();
   await EnhancedCrashlytics.ins.init();
   // await AppPerformance.ins.init();
   // await FireRemoteConfig.ins.init();
