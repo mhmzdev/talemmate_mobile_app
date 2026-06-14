@@ -7,9 +7,9 @@ class ScheduleDao extends DatabaseAccessor<AppDatabase>
 
   Future<List<StudyWindowRow>> allWindows() => select(studyWindows).get();
 
-  Future<ScheduleRow?> findByUser(String userId) =>
-      (select(schedules)..where((s) => s.userId.equals(userId)))
-          .getSingleOrNull();
+  Future<ScheduleRow?> findByUser(String userId) => (select(
+    schedules,
+  )..where((s) => s.userId.equals(userId))).getSingleOrNull();
 
   Stream<List<StudyBlockRow>> watchBlocksForDate(DateTime date) =>
       (select(studyBlocks)..where((b) => b.date.equals(date))).watch();

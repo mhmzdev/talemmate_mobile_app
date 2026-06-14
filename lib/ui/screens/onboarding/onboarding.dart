@@ -20,6 +20,7 @@ import 'package:taleemmate/configs/configs.dart';
 import 'package:taleemmate/router/routes.dart';
 import 'package:taleemmate/blocs/user/cubit.dart';
 import 'package:taleemmate/blocs/library/cubit.dart';
+import 'package:taleemmate/blocs/material/cubit.dart';
 import 'package:taleemmate/blocs/onboarding/cubit.dart';
 import 'package:taleemmate/core/models/onboarding/onboarding_data.dart';
 import 'package:taleemmate/core/models/library/library_item.dart';

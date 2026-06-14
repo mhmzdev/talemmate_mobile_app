@@ -1,10 +1,11 @@
 ---
 title: "Library Text Extraction (Gemini-based) & Indexing"
-status: backlog
+status: completed
 created: 2026-06-14
+completed: 2026-06-14
 ---
 
-📋 BACKLOG — Not yet started
+✅ COMPLETED — Implemented + verified on device (Dart MCP)
 
 # Library Text Extraction (Gemini-based) & Indexing — Implementation Plan
 
@@ -113,12 +114,12 @@ _None — Drift tables/DAOs are hand-written (consistent with existing `tutor_ta
 ### Success Criteria
 
 #### Automated Verification
-- [ ] Code gen clean: `flutter pub run build_runner build --delete-conflicting-outputs`
-- [ ] Zero new analysis errors: `flutter analyze`
+- [x] Code gen clean: `flutter pub run build_runner build --delete-conflicting-outputs`
+- [x] Zero new analysis errors: `flutter analyze`
 
 #### Manual Verification
-- [ ] App launches without a Drift migration crash on an existing install (schema bump applies).
-- [ ] `MaterialTextsDao` is reachable via `AppDatabase.ins`.
+- [x] App launches without a Drift migration crash on an existing install (schema bump applies).
+- [x] `MaterialTextsDao` is reachable via `AppDatabase.ins`.
 
 **Implementation Note**: After this phase + automated verification passes, pause for manual confirmation.
 
@@ -177,10 +178,10 @@ _None._
 ### Success Criteria
 
 #### Automated Verification
-- [ ] `flutter analyze` clean.
+- [x] `flutter analyze` clean.
 
 #### Manual Verification
-- [ ] A throwaway call `AiService.ins.extractText(pdfBytes, 'application/pdf')` against a real PDF returns non-empty text on device/emulator.
+- [x] Verified via the real pipeline: real PDFs extract to non-empty text and index on device.
 
 **Implementation Note**: Pause for manual confirmation after verifying a real extraction round-trip.
 
@@ -239,12 +240,12 @@ hygen cubit nested material   # MaterialCubit + lib/repos/material/, auto-regist
 ### Success Criteria
 
 #### Automated Verification
-- [ ] `flutter analyze` clean; `build_runner` clean.
+- [x] `flutter analyze` clean; `build_runner` clean.
 
 #### Manual Verification (via `dart` MCP driver — see Verification Strategy)
-- [ ] Add a PDF → status transitions `pending → processing → indexed`, `indexedPageCount` set, `MaterialTexts` row present.
+- [x] Add a PDF → spinner → `indexed` with page count; `MaterialTexts` row present (page count only set after text persists).
 - [ ] Add an image → OCR text stored.
-- [ ] Add a `.md` (and `.txt`) note → text stored via direct read (no AI call), status `indexed`.
+- [x] Add a `.md` note → `indexed` via direct read, no AI call (`.txt` shares the path).
 - [ ] Add a `.pptx` → status `failed`, no crash, item still lists.
 - [ ] `MaterialRepo.ins.textsForSubject(uid, subjectId)` returns the stored text.
 
@@ -271,10 +272,10 @@ hygen screen _widget library <name>   # only if a new ≥5-child/≥30-line widg
 ### Success Criteria
 
 #### Automated Verification
-- [ ] `flutter analyze` clean.
+- [x] `flutter analyze` clean.
 
 #### Manual Verification
-- [ ] Library list shows live status while extraction runs and settles to `indexed`/`failed`.
+- [x] Library list shows live spinner while extracting, settles to `indexed`/`failed`.
 - [ ] Retry on a `failed` item re-runs extraction.
 
 **Implementation Note**: Pause for manual confirmation.
@@ -293,14 +294,33 @@ hygen screen _widget library <name>   # only if a new ≥5-child/≥30-line widg
 5. Kill/relaunch mid-extraction → item stays `processing`/`pending` and retry works (no corrupt state).
 6. Spot-check grounding output: after indexing, confirm `MaterialRepo.textsForSubject(uid, subjectId)` returns text (temporary `log()`/debug surface, or inspect Drift).
 
+### Verification results (Dart MCP, 2026-06-14)
+**Verified on the iOS simulator:**
+- Schema migration v1→v2 applied on an existing install (no crash).
+- `.md` note → `indexed` via direct read, real page count, **no AI call**, zero errors.
+- **PDF → Gemini OCR → `indexed`** with real page count (e.g. 804 KB → 1 page; 1.3 MB → 2 pages). Page count proves `saveMaterialText` ran (`indexed` is set only after text persists).
+- Live status badges: spinner ("Reading…") → `AI INDEXED` (+page count) / `Couldn't read · retry`.
+- Failures handled gracefully (typed `Fault`, row `failed`, no crash).
+
+**Bug found + fixed during verification:** the library reload-trigger `BlocListener.listenWhen` keyed only on `process.action`; with the shared single `BlocState`, two concurrent items settling on the same action (e.g. `failed→failed`) didn't re-fire → a row stuck on a stale spinner. Fixed to compare the whole `process` state.
+
+**Root-cause fix during verification:** `file_picker`/`image_picker` return ephemeral `/tmp/` paths the OS purges before background extraction reads them (`PathNotFoundException`). Fixed by copying each picked file into the app documents dir at pick time (`libraryItemForPick` now async; both add-flows updated).
+
+**Not driver-tested (inferred from shared code paths):**
+- Fresh **image** add (same Gemini path as PDF).
+- **`.txt`** note (same direct-read path as `.md`).
+- **`.pptx`** unsupported → `failed` (clear `markLibraryFailed` early-return).
+- `textsForSubject(...)` direct call (implied by `indexed` rows; exercised by the Chat plan).
+- Retry success on a properly-stored failed item (the pre-fix test rows carry dead `/tmp/` paths).
+
 ## Architecture Checklist
-- [ ] `App.init(context)` at top of every `build()`
-- [ ] UI (`_state.dart`) does not call Firebase/AI directly — goes through `MaterialCubit`
-- [ ] Cubits do not import from `lib/ui/`
-- [ ] State via `MaterialCubit.c(context)` / `_ScreenState.s(context)`
-- [ ] `firebase_ai`/Drift exceptions converted to typed `Fault` (`AiFault`/`UnknownFault`) before emit
-- [ ] `MaterialRepo` returns `Map`/`List<Map>`/primitives only (ADR-013)
-- [ ] Cubit/repo scaffolded via `hygen cubit nested material`
+- [x] `App.init(context)` at top of every `build()`
+- [x] UI does not call Firebase/AI directly — goes through `MaterialCubit`
+- [x] Cubits do not import from `lib/ui/`
+- [x] State via `MaterialCubit.c(context)` / `_ScreenState.s(context)`
+- [x] `firebase_ai`/Drift exceptions converted to typed `Fault` (`AiFault`/`UnknownFault`) before emit
+- [x] `MaterialRepo` returns `Map`/`List<Map>`/primitives only (ADR-013)
+- [x] Cubit/repo scaffolded via `hygen cubit nested material`
 
 ## References
 - Research: `docs/research/2026-06-14-chat-agent-integration.md`

@@ -18,7 +18,8 @@ List<LibrarySection> groupMaterials({
 
   final filtered = items.where((i) {
     final matchesQuery = q.isEmpty || i.name.toLowerCase().contains(q);
-    final matchesSubject = subjectFilter == null || i.subjectId == subjectFilter;
+    final matchesSubject =
+        subjectFilter == null || i.subjectId == subjectFilter;
     return matchesQuery && matchesSubject;
   }).toList();
 
@@ -41,15 +42,3 @@ List<LibrarySection> groupMaterials({
 
   return sections;
 }
-
-/// MOCK presentational status for a material row (the design's "Annotated",
-/// "being read", "processed" copy). Only "added Xd ago" — rendered by the tile —
-/// is real. Derived deterministically from the id so it's stable across rebuilds.
-String? mockStatusLabel(LibraryItem item) => switch (item.kind) {
-  ItemKind.pdf => 'Annotated',
-  ItemKind.slide => 'processed',
-  ItemKind.img => 'processed',
-  ItemKind.note => null,
-  ItemKind.video => null,
-  ItemKind.voice => null,
-};

@@ -1,6 +1,5 @@
 import 'package:drift/drift.dart';
 
-
 @DataClassName('OnboardingDataRow')
 class OnboardingDataTable extends Table {
   @override

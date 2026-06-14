@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:taleemmate/core/models/library/library_item.dart';
 import 'package:uuid/uuid.dart';
 
@@ -79,22 +83,48 @@ ItemKind itemKindForExtension(String? ext) =>
       _ => ItemKind.note,
     };
 
-/// Builds a [LibraryItem] from a [PickedMaterial]. `processingStatus` is mocked
-/// as `indexed` (no real OCR/indexing yet).
-LibraryItem libraryItemForPick({
+/// Copies a freshly-picked file out of the OS temp/cache dir (which iOS purges)
+/// into the app's persistent documents dir, so background extraction — and any
+/// future read — can rely on it. Returns the stable path, or the original path
+/// on failure (extraction will then surface a handled failure). Keyed by [id]
+/// so the on-disk name is stable and collision-free.
+Future<String?> _persistPickedFile(String id, PickedMaterial pick) async {
+  final src = pick.path;
+  if (src == null) return null;
+  try {
+    final docs = await getApplicationDocumentsDirectory();
+    final dir = Directory(p.join(docs.path, 'library'));
+    if (!await dir.exists()) await dir.create(recursive: true);
+    final dest = p.join(dir.path, '$id${p.extension(src)}');
+    await File(src).copy(dest);
+    return dest;
+  } catch (_) {
+    return src;
+  }
+}
+
+/// Builds a [LibraryItem] from a [PickedMaterial], persisting the picked file to
+/// stable storage first (see [_persistPickedFile]). Starts as `pending` — the
+/// text-extraction pipeline (`MaterialCubit.process`) drives it to
+/// `processing → indexed | failed`.
+Future<LibraryItem> libraryItemForPick({
   required PickedMaterial pick,
   required String userId,
   String? subjectId,
   String? colorHex,
-}) => LibraryItem(
-  id: const Uuid().v4(),
-  userId: userId,
-  name: pick.name,
-  kind: itemKindForExtension(pick.ext),
-  fileSize: pick.sizeBytes,
-  uploadedAt: DateTime.now(),
-  processingStatus: ProcessingStatus.indexed,
-  metadata: pick.path,
-  subjectId: subjectId,
-  colorHex: colorHex,
-);
+}) async {
+  final id = const Uuid().v4();
+  final path = await _persistPickedFile(id, pick);
+  return LibraryItem(
+    id: id,
+    userId: userId,
+    name: pick.name,
+    kind: itemKindForExtension(pick.ext),
+    fileSize: pick.sizeBytes,
+    uploadedAt: DateTime.now(),
+    processingStatus: ProcessingStatus.pending,
+    metadata: path,
+    subjectId: subjectId,
+    colorHex: colorHex,
+  );
+}

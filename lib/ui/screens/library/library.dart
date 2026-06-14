@@ -1,4 +1,6 @@
-import 'package:flutter/material.dart';
+// Hide Flutter's MaterialState — this screen references our MaterialCubit's
+// MaterialState (background text-extraction) in a BlocListener type argument.
+import 'package:flutter/material.dart' hide MaterialState;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
@@ -6,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 import 'package:taleemmate/blocs/library/cubit.dart';
+import 'package:taleemmate/blocs/material/cubit.dart';
 import 'package:taleemmate/configs/configs.dart';
 import 'package:taleemmate/core/models/library/library_item.dart';
 import 'package:taleemmate/core/models/subject/subject.dart';
@@ -15,6 +18,7 @@ import 'package:taleemmate/ui/widgets/core/screen/screen.dart';
 import 'package:taleemmate/ui/widgets/design/alerts/app_alert_base.dart';
 import 'package:taleemmate/ui/widgets/design/library/library_item_tile.dart';
 import 'package:taleemmate/ui/widgets/design/library/subject_chips.dart';
+import 'package:taleemmate/ui/widgets/design/misc/app_ai_pill.dart';
 import 'package:taleemmate/ui/widgets/design/misc/app_choice_chip.dart';
 import 'package:taleemmate/ui/widgets/design/modals/app_modal_base.dart';
 import 'package:taleemmate/ui/widgets/forms/forms.dart';
@@ -25,6 +29,8 @@ part 'static/_form_data.dart';
 part 'static/_form_keys.dart';
 
 part '_state.dart';
+part 'widgets/_material_status.dart';
+
 part 'utils.dart';
 part 'widgets/_header.dart';
 part 'widgets/_search_bar.dart';
@@ -83,80 +89,92 @@ class _BodyState extends State<_Body> {
         onTap: () => _AddMaterialSheet.show(context),
       ),
       child: SafeArea(
-        child: BlocConsumer<LibraryCubit, LibraryState>(
-          listenWhen: (a, b) =>
-              a.load.action != b.load.action ||
-              a.add.action != b.add.action ||
-              a.remove.action != b.remove.action,
-          listener: (context, state) {
-            if (state.load.isFailed) {
-              UIFlash.error(context, state.load.errorMessage);
-            }
-            if (state.add.isFailed) {
-              UIFlash.error(context, state.add.errorMessage);
-            }
-            if (state.remove.isFailed) {
-              UIFlash.error(context, state.remove.errorMessage);
-            }
-          },
-          builder: (context, state) {
-            final items = state.load.data ?? const <LibraryItem>[];
+        // Extraction runs in the background via MaterialCubit; re-read the list
+        // whenever an item's processing settles so its status badge updates.
+        child: BlocListener<MaterialCubit, MaterialState>(
+          // Compare the whole BlocState, not just `action` — concurrent items
+          // share this single state, so two items settling on the same action
+          // (e.g. failed→failed) must still trigger a re-read (meta/fault differ).
+          listenWhen: (a, b) => a.process != b.process,
+          listener: (context, _) => LibraryCubit.c(context).load(),
+          child: BlocConsumer<LibraryCubit, LibraryState>(
+            listenWhen: (a, b) =>
+                a.load.action != b.load.action ||
+                a.add.action != b.add.action ||
+                a.remove.action != b.remove.action,
+            listener: (context, state) {
+              if (state.load.isFailed) {
+                UIFlash.error(context, state.load.errorMessage);
+              }
+              if (state.add.isFailed) {
+                UIFlash.error(context, state.add.errorMessage);
+              }
+              if (state.remove.isFailed) {
+                UIFlash.error(context, state.remove.errorMessage);
+              }
+            },
+            builder: (context, state) {
+              final items = state.load.data ?? const <LibraryItem>[];
 
-            // First load (nothing cached yet) → full-screen skeleton.
-            if (state.load.isLoading && items.isEmpty) {
-              return const SingleChildScrollView(
-                physics: NeverScrollableScrollPhysics(),
-                child: _LibrarySkeleton(),
+              // First load (nothing cached yet) → full-screen skeleton.
+              if (state.load.isLoading && items.isEmpty) {
+                return const SingleChildScrollView(
+                  physics: NeverScrollableScrollPhysics(),
+                  child: _LibrarySkeleton(),
+                );
+              }
+
+              final totalSize = items.fold<int>(
+                0,
+                (sum, i) => sum + i.fileSize,
               );
-            }
+              final sections = groupMaterials(
+                items: items,
+                subjects: state.subjects,
+                query: screenState.searchQuery,
+                subjectFilter: screenState.activeSubjectFilter,
+              );
 
-            final totalSize = items.fold<int>(0, (sum, i) => sum + i.fileSize);
-            final sections = groupMaterials(
-              items: items,
-              subjects: state.subjects,
-              query: screenState.searchQuery,
-              subjectFilter: screenState.activeSubjectFilter,
-            );
-
-            return RefreshIndicator(
-              onRefresh: () => LibraryCubit.c(context).load(),
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: .stretch,
-                  children: [
-                    _Header(count: items.length, totalSize: totalSize),
-                    Padding(
-                      padding: Space.sym(SpaceToken.t24, SpaceToken.t04),
-                      child: Column(
-                        crossAxisAlignment: .stretch,
-                        children: [
-                          const _SearchBar(),
-                          Space.y.t12,
-                          _FilterChips(
-                            subjects: state.subjects,
-                            selectedId: screenState.activeSubjectFilter,
-                          ),
-                          _Content(state: state, sections: sections),
-                          Space.y.t16,
-                          const _AddMaterialTile(),
-                          Space.y.t12,
-                          Text(
-                            'New uploads are processed privately on your device '
-                            'for OCR & embeddings.',
-                            style: AppText.b2.cl(AppTheme.c.subText),
-                            textAlign: .center,
-                          ),
-                          Space.y.t24,
-                        ],
+              return RefreshIndicator(
+                onRefresh: () => LibraryCubit.c(context).load(),
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: .stretch,
+                    children: [
+                      _Header(count: items.length, totalSize: totalSize),
+                      Padding(
+                        padding: Space.sym(SpaceToken.t24, SpaceToken.t04),
+                        child: Column(
+                          crossAxisAlignment: .stretch,
+                          children: [
+                            const _SearchBar(),
+                            Space.y.t12,
+                            _FilterChips(
+                              subjects: state.subjects,
+                              selectedId: screenState.activeSubjectFilter,
+                            ),
+                            _Content(state: state, sections: sections),
+                            Space.y.t16,
+                            const _AddMaterialTile(),
+                            Space.y.t12,
+                            Text(
+                              'New uploads are processed privately on your device '
+                              'for OCR & embeddings.',
+                              style: AppText.b2.cl(AppTheme.c.subText),
+                              textAlign: .center,
+                            ),
+                            Space.y.t24,
+                          ],
+                        ),
                       ),
-                    ),
-                    Space.y.t100,
-                  ],
+                      Space.y.t100,
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );

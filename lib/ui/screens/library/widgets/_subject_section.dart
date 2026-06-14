@@ -31,7 +31,10 @@ class _SubjectSection extends StatelessWidget {
                     Container(
                       width: 7,
                       height: 7,
-                      decoration: BoxDecoration(shape: .circle, color: dotColor),
+                      decoration: BoxDecoration(
+                        shape: .circle,
+                        color: dotColor,
+                      ),
                     ),
                     Space.x.t08,
                     Flexible(
@@ -61,11 +64,10 @@ class _SubjectSection extends StatelessWidget {
             (item) => [
               LibraryItemTile(
                 item: item,
-                statusLabel: mockStatusLabel(item),
-                showAiIndexed:
-                    item.processingStatus == ProcessingStatus.indexed,
+                status: _MaterialStatus(item: item),
                 trailing: AppTouch(
-                  onTap: () => _showMaterialActions(context, item, subject?.name),
+                  onTap: () =>
+                      _showMaterialActions(context, item, subject?.name),
                   hasSplash: false,
                   child: Icon(
                     LucideIcons.ellipsis,

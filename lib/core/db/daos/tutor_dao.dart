@@ -16,9 +16,9 @@ class TutorDao extends DatabaseAccessor<AppDatabase> with _$TutorDaoMixin {
             ..orderBy([(m) => OrderingTerm.asc(m.timestamp)]))
           .watch();
 
-  Future<TutorSettingsRow?> settingsForUser(String userId) =>
-      (select(tutorSettingsTable)..where((s) => s.userId.equals(userId)))
-          .getSingleOrNull();
+  Future<TutorSettingsRow?> settingsForUser(String userId) => (select(
+    tutorSettingsTable,
+  )..where((s) => s.userId.equals(userId))).getSingleOrNull();
 
   Future<void> upsertConversation(TutorConversationsCompanion companion) =>
       into(tutorConversations).insertOnConflictUpdate(companion);

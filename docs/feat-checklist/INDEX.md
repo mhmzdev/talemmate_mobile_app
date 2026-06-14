@@ -9,3 +9,4 @@ keep · 🚧 by-design gap.
 |---|---|
 | [onboarding-flow](onboarding-flow.md) | Register → onboarding → home; launch gate; login routing; sign-out back-out; completion |
 | [library-materials-module](library-materials-module.md) | Library screen (grouped-by-subject + Unsorted, in-state search + filter chips, pull-to-refresh); "…" actions sheet + delete; post-onboarding add-material; session userId (ADR-014); shared widgets + picker service |
+| [library-text-extraction](library-text-extraction.md) | Gemini text-extraction pipeline (MaterialCubit/Repo, MaterialTexts schema v2); supported/unsupported kinds; live status badges + retry; copy-picked-files-to-stable-storage; grounding retrieval |

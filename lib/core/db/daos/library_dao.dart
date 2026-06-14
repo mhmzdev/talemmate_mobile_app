@@ -10,10 +10,9 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
             ..orderBy([(l) => OrderingTerm.desc(l.uploadedAt)]))
           .watch();
 
-  Stream<List<LibraryItemRow>> watchBySubject(String subjectId) =>
-      (select(libraryItems)
-            ..where((l) => l.subjectId.equals(subjectId)))
-          .watch();
+  Stream<List<LibraryItemRow>> watchBySubject(String subjectId) => (select(
+    libraryItems,
+  )..where((l) => l.subjectId.equals(subjectId))).watch();
 
   /// One-shot read of a user's materials, newest first. Used by [LibraryDao]'s
   /// repo for the load-once + pull-to-refresh flow (no live stream).
@@ -25,6 +24,21 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
 
   Future<void> upsert(LibraryItemsCompanion companion) =>
       into(libraryItems).insertOnConflictUpdate(companion);
+
+  /// Updates only the processing fields of one item — driven by the
+  /// text-extraction pipeline as it moves through `processing → indexed/failed`.
+  Future<void> setStatus(
+    String id,
+    ProcessingStatus status, {
+    int? indexedPageCount,
+  }) => (update(libraryItems)..where((l) => l.id.equals(id))).write(
+    LibraryItemsCompanion(
+      processingStatus: Value(status),
+      indexedPageCount: indexedPageCount == null
+          ? const Value.absent()
+          : Value(indexedPageCount),
+    ),
+  );
 
   Future<int> deleteItem(String id) =>
       (delete(libraryItems)..where((l) => l.id.equals(id))).go();

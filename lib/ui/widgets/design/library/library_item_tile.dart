@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:taleemmate/configs/configs.dart';
 import 'package:taleemmate/core/models/library/library_item.dart';
-import 'package:taleemmate/ui/widgets/design/misc/app_ai_pill.dart';
 
 /// Badge colour per material kind — the coloured square in front of a row.
 extension ItemKindBadge on ItemKind {
@@ -23,8 +22,7 @@ class LibraryItemTile extends StatelessWidget {
     super.key,
     required this.item,
     this.subjectName,
-    this.statusLabel,
-    this.showAiIndexed = false,
+    this.status,
     this.trailing,
     this.onTap,
   });
@@ -34,12 +32,9 @@ class LibraryItemTile extends StatelessWidget {
   /// Resolved name of the subject this material is attached to (if any).
   final String? subjectName;
 
-  /// MOCK presentational status ("Annotated", "being read"). Library passes it;
-  /// onboarding leaves it null.
-  final String? statusLabel;
-
-  /// Renders the gold "AI INDEXED" pill when true.
-  final bool showAiIndexed;
+  /// Real extraction-status affordance shown in the meta row (spinner / AI
+  /// INDEXED pill / tap-to-retry). Library passes it; onboarding leaves it null.
+  final Widget? status;
 
   /// Trailing affordance — onboarding's remove X, Library's "…" menu button.
   final Widget? trailing;
@@ -79,8 +74,7 @@ class LibraryItemTile extends StatelessWidget {
         ),
       Text(item.fileSize.readableSize, style: metaStyle),
       Text(_agoLabel(item.uploadedAt), style: metaStyle),
-      if (statusLabel != null) Text(statusLabel!, style: metaStyle),
-      if (showAiIndexed) const AppAiPill(text: 'AI INDEXED'),
+      ?status,
     ];
 
     return GestureDetector(

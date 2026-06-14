@@ -175,10 +175,11 @@ class _ScreenState extends ChangeNotifier {
   }
 
   /// Turns picks into materials attached to the selected subject. `userId` is
-  /// left empty here and filled with the real uid in [buildData].
-  void _addPicks(List<PickedMaterial> picks) {
+  /// left empty here and filled with the real uid in [buildData]. Async because
+  /// each picked file is copied to stable storage (see [libraryItemForPick]).
+  Future<void> _addPicks(List<PickedMaterial> picks) async {
     final subject = _materialSubject;
-    materials.addAll(
+    final items = await Future.wait(
       picks.map(
         (p) => libraryItemForPick(
           pick: p,
@@ -188,13 +189,14 @@ class _ScreenState extends ChangeNotifier {
         ),
       ),
     );
+    materials.addAll(items);
     notifyListeners();
   }
 
   Future<void> addFiles(BuildContext context) async {
     if (!_requireSubject(context)) return;
     try {
-      _addPicks(await MaterialPicker.pickFiles());
+      await _addPicks(await MaterialPicker.pickFiles());
     } catch (e, st) {
       'onboarding.addFiles error: $e\n$st'.appLog(level: AppLogLevel.error);
       if (context.mounted) UIFlash.error(context, 'Could not add those files.');
@@ -204,7 +206,7 @@ class _ScreenState extends ChangeNotifier {
   Future<void> addImages(BuildContext context) async {
     if (!_requireSubject(context)) return;
     try {
-      _addPicks(await MaterialPicker.pickImages());
+      await _addPicks(await MaterialPicker.pickImages());
     } catch (e, st) {
       'onboarding.addImages error: $e\n$st'.appLog(level: AppLogLevel.error);
       if (context.mounted) UIFlash.error(context, 'Could not add those photos.');
@@ -215,7 +217,7 @@ class _ScreenState extends ChangeNotifier {
     if (!_requireSubject(context)) return;
     try {
       final shot = await MaterialPicker.captureImage();
-      if (shot != null) _addPicks([shot]);
+      if (shot != null) await _addPicks([shot]);
     } catch (e, st) {
       'onboarding.captureImage error: $e\n$st'.appLog(level: AppLogLevel.error);
       if (context.mounted) UIFlash.error(context, 'Could not capture a photo.');

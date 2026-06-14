@@ -3389,6 +3389,376 @@ class LibraryItemsCompanion extends UpdateCompanion<LibraryItemRow> {
   }
 }
 
+class $MaterialTextsTable extends MaterialTexts
+    with TableInfo<$MaterialTextsTable, MaterialTextRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MaterialTextsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _itemIdMeta = const VerificationMeta('itemId');
+  @override
+  late final GeneratedColumn<String> itemId = GeneratedColumn<String>(
+    'item_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES library_items (id)',
+    ),
+  );
+  static const VerificationMeta _contentMeta = const VerificationMeta(
+    'content',
+  );
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+    'content',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pageCountMeta = const VerificationMeta(
+    'pageCount',
+  );
+  @override
+  late final GeneratedColumn<int> pageCount = GeneratedColumn<int>(
+    'page_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _charCountMeta = const VerificationMeta(
+    'charCount',
+  );
+  @override
+  late final GeneratedColumn<int> charCount = GeneratedColumn<int>(
+    'char_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _extractedAtMeta = const VerificationMeta(
+    'extractedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> extractedAt = GeneratedColumn<DateTime>(
+    'extracted_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    itemId,
+    content,
+    pageCount,
+    charCount,
+    extractedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'material_texts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MaterialTextRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('item_id')) {
+      context.handle(
+        _itemIdMeta,
+        itemId.isAcceptableOrUnknown(data['item_id']!, _itemIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_itemIdMeta);
+    }
+    if (data.containsKey('content')) {
+      context.handle(
+        _contentMeta,
+        content.isAcceptableOrUnknown(data['content']!, _contentMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_contentMeta);
+    }
+    if (data.containsKey('page_count')) {
+      context.handle(
+        _pageCountMeta,
+        pageCount.isAcceptableOrUnknown(data['page_count']!, _pageCountMeta),
+      );
+    }
+    if (data.containsKey('char_count')) {
+      context.handle(
+        _charCountMeta,
+        charCount.isAcceptableOrUnknown(data['char_count']!, _charCountMeta),
+      );
+    }
+    if (data.containsKey('extracted_at')) {
+      context.handle(
+        _extractedAtMeta,
+        extractedAt.isAcceptableOrUnknown(
+          data['extracted_at']!,
+          _extractedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_extractedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {itemId};
+  @override
+  MaterialTextRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MaterialTextRow(
+      itemId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}item_id'],
+      )!,
+      content: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content'],
+      )!,
+      pageCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page_count'],
+      )!,
+      charCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}char_count'],
+      )!,
+      extractedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}extracted_at'],
+      )!,
+    );
+  }
+
+  @override
+  $MaterialTextsTable createAlias(String alias) {
+    return $MaterialTextsTable(attachedDatabase, alias);
+  }
+}
+
+class MaterialTextRow extends DataClass implements Insertable<MaterialTextRow> {
+  final String itemId;
+  final String content;
+  final int pageCount;
+  final int charCount;
+  final DateTime extractedAt;
+  const MaterialTextRow({
+    required this.itemId,
+    required this.content,
+    required this.pageCount,
+    required this.charCount,
+    required this.extractedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['item_id'] = Variable<String>(itemId);
+    map['content'] = Variable<String>(content);
+    map['page_count'] = Variable<int>(pageCount);
+    map['char_count'] = Variable<int>(charCount);
+    map['extracted_at'] = Variable<DateTime>(extractedAt);
+    return map;
+  }
+
+  MaterialTextsCompanion toCompanion(bool nullToAbsent) {
+    return MaterialTextsCompanion(
+      itemId: Value(itemId),
+      content: Value(content),
+      pageCount: Value(pageCount),
+      charCount: Value(charCount),
+      extractedAt: Value(extractedAt),
+    );
+  }
+
+  factory MaterialTextRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MaterialTextRow(
+      itemId: serializer.fromJson<String>(json['itemId']),
+      content: serializer.fromJson<String>(json['content']),
+      pageCount: serializer.fromJson<int>(json['pageCount']),
+      charCount: serializer.fromJson<int>(json['charCount']),
+      extractedAt: serializer.fromJson<DateTime>(json['extractedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'itemId': serializer.toJson<String>(itemId),
+      'content': serializer.toJson<String>(content),
+      'pageCount': serializer.toJson<int>(pageCount),
+      'charCount': serializer.toJson<int>(charCount),
+      'extractedAt': serializer.toJson<DateTime>(extractedAt),
+    };
+  }
+
+  MaterialTextRow copyWith({
+    String? itemId,
+    String? content,
+    int? pageCount,
+    int? charCount,
+    DateTime? extractedAt,
+  }) => MaterialTextRow(
+    itemId: itemId ?? this.itemId,
+    content: content ?? this.content,
+    pageCount: pageCount ?? this.pageCount,
+    charCount: charCount ?? this.charCount,
+    extractedAt: extractedAt ?? this.extractedAt,
+  );
+  MaterialTextRow copyWithCompanion(MaterialTextsCompanion data) {
+    return MaterialTextRow(
+      itemId: data.itemId.present ? data.itemId.value : this.itemId,
+      content: data.content.present ? data.content.value : this.content,
+      pageCount: data.pageCount.present ? data.pageCount.value : this.pageCount,
+      charCount: data.charCount.present ? data.charCount.value : this.charCount,
+      extractedAt: data.extractedAt.present
+          ? data.extractedAt.value
+          : this.extractedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MaterialTextRow(')
+          ..write('itemId: $itemId, ')
+          ..write('content: $content, ')
+          ..write('pageCount: $pageCount, ')
+          ..write('charCount: $charCount, ')
+          ..write('extractedAt: $extractedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(itemId, content, pageCount, charCount, extractedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MaterialTextRow &&
+          other.itemId == this.itemId &&
+          other.content == this.content &&
+          other.pageCount == this.pageCount &&
+          other.charCount == this.charCount &&
+          other.extractedAt == this.extractedAt);
+}
+
+class MaterialTextsCompanion extends UpdateCompanion<MaterialTextRow> {
+  final Value<String> itemId;
+  final Value<String> content;
+  final Value<int> pageCount;
+  final Value<int> charCount;
+  final Value<DateTime> extractedAt;
+  final Value<int> rowid;
+  const MaterialTextsCompanion({
+    this.itemId = const Value.absent(),
+    this.content = const Value.absent(),
+    this.pageCount = const Value.absent(),
+    this.charCount = const Value.absent(),
+    this.extractedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MaterialTextsCompanion.insert({
+    required String itemId,
+    required String content,
+    this.pageCount = const Value.absent(),
+    this.charCount = const Value.absent(),
+    required DateTime extractedAt,
+    this.rowid = const Value.absent(),
+  }) : itemId = Value(itemId),
+       content = Value(content),
+       extractedAt = Value(extractedAt);
+  static Insertable<MaterialTextRow> custom({
+    Expression<String>? itemId,
+    Expression<String>? content,
+    Expression<int>? pageCount,
+    Expression<int>? charCount,
+    Expression<DateTime>? extractedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (itemId != null) 'item_id': itemId,
+      if (content != null) 'content': content,
+      if (pageCount != null) 'page_count': pageCount,
+      if (charCount != null) 'char_count': charCount,
+      if (extractedAt != null) 'extracted_at': extractedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MaterialTextsCompanion copyWith({
+    Value<String>? itemId,
+    Value<String>? content,
+    Value<int>? pageCount,
+    Value<int>? charCount,
+    Value<DateTime>? extractedAt,
+    Value<int>? rowid,
+  }) {
+    return MaterialTextsCompanion(
+      itemId: itemId ?? this.itemId,
+      content: content ?? this.content,
+      pageCount: pageCount ?? this.pageCount,
+      charCount: charCount ?? this.charCount,
+      extractedAt: extractedAt ?? this.extractedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (itemId.present) {
+      map['item_id'] = Variable<String>(itemId.value);
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (pageCount.present) {
+      map['page_count'] = Variable<int>(pageCount.value);
+    }
+    if (charCount.present) {
+      map['char_count'] = Variable<int>(charCount.value);
+    }
+    if (extractedAt.present) {
+      map['extracted_at'] = Variable<DateTime>(extractedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MaterialTextsCompanion(')
+          ..write('itemId: $itemId, ')
+          ..write('content: $content, ')
+          ..write('pageCount: $pageCount, ')
+          ..write('charCount: $charCount, ')
+          ..write('extractedAt: $extractedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $QuizzesTable extends Quizzes with TableInfo<$QuizzesTable, QuizRow> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -9953,6 +10323,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SchedulesTable schedules = $SchedulesTable(this);
   late final $StudyBlocksTable studyBlocks = $StudyBlocksTable(this);
   late final $LibraryItemsTable libraryItems = $LibraryItemsTable(this);
+  late final $MaterialTextsTable materialTexts = $MaterialTextsTable(this);
   late final $QuizzesTable quizzes = $QuizzesTable(this);
   late final $QuizQuestionsTable quizQuestions = $QuizQuestionsTable(this);
   late final $QuizAttemptsTable quizAttempts = $QuizAttemptsTable(this);
@@ -9982,6 +10353,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final SubjectDao subjectDao = SubjectDao(this as AppDatabase);
   late final ScheduleDao scheduleDao = ScheduleDao(this as AppDatabase);
   late final LibraryDao libraryDao = LibraryDao(this as AppDatabase);
+  late final MaterialTextsDao materialTextsDao = MaterialTextsDao(
+    this as AppDatabase,
+  );
   late final QuizDao quizDao = QuizDao(this as AppDatabase);
   late final ProgressDao progressDao = ProgressDao(this as AppDatabase);
   late final TutorDao tutorDao = TutorDao(this as AppDatabase);
@@ -9999,6 +10373,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     schedules,
     studyBlocks,
     libraryItems,
+    materialTexts,
     quizzes,
     quizQuestions,
     quizAttempts,
@@ -13198,6 +13573,27 @@ final class $$LibraryItemsTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<$MaterialTextsTable, List<MaterialTextRow>>
+  _materialTextsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.materialTexts,
+    aliasName: $_aliasNameGenerator(
+      db.libraryItems.id,
+      db.materialTexts.itemId,
+    ),
+  );
+
+  $$MaterialTextsTableProcessedTableManager get materialTextsRefs {
+    final manager = $$MaterialTextsTableTableManager(
+      $_db,
+      $_db.materialTexts,
+    ).filter((f) => f.itemId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_materialTextsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$LibraryItemsTableFilterComposer
@@ -13282,6 +13678,31 @@ class $$LibraryItemsTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> materialTextsRefs(
+    Expression<bool> Function($$MaterialTextsTableFilterComposer f) f,
+  ) {
+    final $$MaterialTextsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.materialTexts,
+      getReferencedColumn: (t) => t.itemId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MaterialTextsTableFilterComposer(
+            $db: $db,
+            $table: $db.materialTexts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -13436,6 +13857,31 @@ class $$LibraryItemsTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> materialTextsRefs<T extends Object>(
+    Expression<T> Function($$MaterialTextsTableAnnotationComposer a) f,
+  ) {
+    final $$MaterialTextsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.materialTexts,
+      getReferencedColumn: (t) => t.itemId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MaterialTextsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.materialTexts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$LibraryItemsTableTableManager
@@ -13451,7 +13897,7 @@ class $$LibraryItemsTableTableManager
           $$LibraryItemsTableUpdateCompanionBuilder,
           (LibraryItemRow, $$LibraryItemsTableReferences),
           LibraryItemRow,
-          PrefetchHooks Function({bool subjectId})
+          PrefetchHooks Function({bool subjectId, bool materialTextsRefs})
         > {
   $$LibraryItemsTableTableManager(_$AppDatabase db, $LibraryItemsTable table)
     : super(
@@ -13528,7 +13974,360 @@ class $$LibraryItemsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({subjectId = false}) {
+          prefetchHooksCallback:
+              ({subjectId = false, materialTextsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (materialTextsRefs) db.materialTexts,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (subjectId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.subjectId,
+                                    referencedTable:
+                                        $$LibraryItemsTableReferences
+                                            ._subjectIdTable(db),
+                                    referencedColumn:
+                                        $$LibraryItemsTableReferences
+                                            ._subjectIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (materialTextsRefs)
+                        await $_getPrefetchedData<
+                          LibraryItemRow,
+                          $LibraryItemsTable,
+                          MaterialTextRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$LibraryItemsTableReferences
+                              ._materialTextsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$LibraryItemsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).materialTextsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.itemId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$LibraryItemsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LibraryItemsTable,
+      LibraryItemRow,
+      $$LibraryItemsTableFilterComposer,
+      $$LibraryItemsTableOrderingComposer,
+      $$LibraryItemsTableAnnotationComposer,
+      $$LibraryItemsTableCreateCompanionBuilder,
+      $$LibraryItemsTableUpdateCompanionBuilder,
+      (LibraryItemRow, $$LibraryItemsTableReferences),
+      LibraryItemRow,
+      PrefetchHooks Function({bool subjectId, bool materialTextsRefs})
+    >;
+typedef $$MaterialTextsTableCreateCompanionBuilder =
+    MaterialTextsCompanion Function({
+      required String itemId,
+      required String content,
+      Value<int> pageCount,
+      Value<int> charCount,
+      required DateTime extractedAt,
+      Value<int> rowid,
+    });
+typedef $$MaterialTextsTableUpdateCompanionBuilder =
+    MaterialTextsCompanion Function({
+      Value<String> itemId,
+      Value<String> content,
+      Value<int> pageCount,
+      Value<int> charCount,
+      Value<DateTime> extractedAt,
+      Value<int> rowid,
+    });
+
+final class $$MaterialTextsTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $MaterialTextsTable, MaterialTextRow> {
+  $$MaterialTextsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $LibraryItemsTable _itemIdTable(_$AppDatabase db) =>
+      db.libraryItems.createAlias(
+        $_aliasNameGenerator(db.materialTexts.itemId, db.libraryItems.id),
+      );
+
+  $$LibraryItemsTableProcessedTableManager get itemId {
+    final $_column = $_itemColumn<String>('item_id')!;
+
+    final manager = $$LibraryItemsTableTableManager(
+      $_db,
+      $_db.libraryItems,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_itemIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$MaterialTextsTableFilterComposer
+    extends Composer<_$AppDatabase, $MaterialTextsTable> {
+  $$MaterialTextsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get pageCount => $composableBuilder(
+    column: $table.pageCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get charCount => $composableBuilder(
+    column: $table.charCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get extractedAt => $composableBuilder(
+    column: $table.extractedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$LibraryItemsTableFilterComposer get itemId {
+    final $$LibraryItemsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.itemId,
+      referencedTable: $db.libraryItems,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LibraryItemsTableFilterComposer(
+            $db: $db,
+            $table: $db.libraryItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MaterialTextsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MaterialTextsTable> {
+  $$MaterialTextsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get pageCount => $composableBuilder(
+    column: $table.pageCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get charCount => $composableBuilder(
+    column: $table.charCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get extractedAt => $composableBuilder(
+    column: $table.extractedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$LibraryItemsTableOrderingComposer get itemId {
+    final $$LibraryItemsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.itemId,
+      referencedTable: $db.libraryItems,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LibraryItemsTableOrderingComposer(
+            $db: $db,
+            $table: $db.libraryItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MaterialTextsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MaterialTextsTable> {
+  $$MaterialTextsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get content =>
+      $composableBuilder(column: $table.content, builder: (column) => column);
+
+  GeneratedColumn<int> get pageCount =>
+      $composableBuilder(column: $table.pageCount, builder: (column) => column);
+
+  GeneratedColumn<int> get charCount =>
+      $composableBuilder(column: $table.charCount, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get extractedAt => $composableBuilder(
+    column: $table.extractedAt,
+    builder: (column) => column,
+  );
+
+  $$LibraryItemsTableAnnotationComposer get itemId {
+    final $$LibraryItemsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.itemId,
+      referencedTable: $db.libraryItems,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LibraryItemsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.libraryItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MaterialTextsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MaterialTextsTable,
+          MaterialTextRow,
+          $$MaterialTextsTableFilterComposer,
+          $$MaterialTextsTableOrderingComposer,
+          $$MaterialTextsTableAnnotationComposer,
+          $$MaterialTextsTableCreateCompanionBuilder,
+          $$MaterialTextsTableUpdateCompanionBuilder,
+          (MaterialTextRow, $$MaterialTextsTableReferences),
+          MaterialTextRow,
+          PrefetchHooks Function({bool itemId})
+        > {
+  $$MaterialTextsTableTableManager(_$AppDatabase db, $MaterialTextsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MaterialTextsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MaterialTextsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MaterialTextsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> itemId = const Value.absent(),
+                Value<String> content = const Value.absent(),
+                Value<int> pageCount = const Value.absent(),
+                Value<int> charCount = const Value.absent(),
+                Value<DateTime> extractedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MaterialTextsCompanion(
+                itemId: itemId,
+                content: content,
+                pageCount: pageCount,
+                charCount: charCount,
+                extractedAt: extractedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String itemId,
+                required String content,
+                Value<int> pageCount = const Value.absent(),
+                Value<int> charCount = const Value.absent(),
+                required DateTime extractedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => MaterialTextsCompanion.insert(
+                itemId: itemId,
+                content: content,
+                pageCount: pageCount,
+                charCount: charCount,
+                extractedAt: extractedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$MaterialTextsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({itemId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -13548,15 +14347,15 @@ class $$LibraryItemsTableTableManager
                       dynamic
                     >
                   >(state) {
-                    if (subjectId) {
+                    if (itemId) {
                       state =
                           state.withJoin(
                                 currentTable: table,
-                                currentColumn: table.subjectId,
-                                referencedTable: $$LibraryItemsTableReferences
-                                    ._subjectIdTable(db),
-                                referencedColumn: $$LibraryItemsTableReferences
-                                    ._subjectIdTable(db)
+                                currentColumn: table.itemId,
+                                referencedTable: $$MaterialTextsTableReferences
+                                    ._itemIdTable(db),
+                                referencedColumn: $$MaterialTextsTableReferences
+                                    ._itemIdTable(db)
                                     .id,
                               )
                               as T;
@@ -13573,19 +14372,19 @@ class $$LibraryItemsTableTableManager
       );
 }
 
-typedef $$LibraryItemsTableProcessedTableManager =
+typedef $$MaterialTextsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $LibraryItemsTable,
-      LibraryItemRow,
-      $$LibraryItemsTableFilterComposer,
-      $$LibraryItemsTableOrderingComposer,
-      $$LibraryItemsTableAnnotationComposer,
-      $$LibraryItemsTableCreateCompanionBuilder,
-      $$LibraryItemsTableUpdateCompanionBuilder,
-      (LibraryItemRow, $$LibraryItemsTableReferences),
-      LibraryItemRow,
-      PrefetchHooks Function({bool subjectId})
+      $MaterialTextsTable,
+      MaterialTextRow,
+      $$MaterialTextsTableFilterComposer,
+      $$MaterialTextsTableOrderingComposer,
+      $$MaterialTextsTableAnnotationComposer,
+      $$MaterialTextsTableCreateCompanionBuilder,
+      $$MaterialTextsTableUpdateCompanionBuilder,
+      (MaterialTextRow, $$MaterialTextsTableReferences),
+      MaterialTextRow,
+      PrefetchHooks Function({bool itemId})
     >;
 typedef $$QuizzesTableCreateCompanionBuilder =
     QuizzesCompanion Function({
@@ -19139,6 +19938,8 @@ class $AppDatabaseManager {
       $$StudyBlocksTableTableManager(_db, _db.studyBlocks);
   $$LibraryItemsTableTableManager get libraryItems =>
       $$LibraryItemsTableTableManager(_db, _db.libraryItems);
+  $$MaterialTextsTableTableManager get materialTexts =>
+      $$MaterialTextsTableTableManager(_db, _db.materialTexts);
   $$QuizzesTableTableManager get quizzes =>
       $$QuizzesTableTableManager(_db, _db.quizzes);
   $$QuizQuestionsTableTableManager get quizQuestions =>
@@ -19231,6 +20032,24 @@ class LibraryDaoManager {
       $$SubjectsTableTableManager(_db.attachedDatabase, _db.subjects);
   $$LibraryItemsTableTableManager get libraryItems =>
       $$LibraryItemsTableTableManager(_db.attachedDatabase, _db.libraryItems);
+}
+
+mixin _$MaterialTextsDaoMixin on DatabaseAccessor<AppDatabase> {
+  $SubjectsTable get subjects => attachedDatabase.subjects;
+  $LibraryItemsTable get libraryItems => attachedDatabase.libraryItems;
+  $MaterialTextsTable get materialTexts => attachedDatabase.materialTexts;
+  MaterialTextsDaoManager get managers => MaterialTextsDaoManager(this);
+}
+
+class MaterialTextsDaoManager {
+  final _$MaterialTextsDaoMixin _db;
+  MaterialTextsDaoManager(this._db);
+  $$SubjectsTableTableManager get subjects =>
+      $$SubjectsTableTableManager(_db.attachedDatabase, _db.subjects);
+  $$LibraryItemsTableTableManager get libraryItems =>
+      $$LibraryItemsTableTableManager(_db.attachedDatabase, _db.libraryItems);
+  $$MaterialTextsTableTableManager get materialTexts =>
+      $$MaterialTextsTableTableManager(_db.attachedDatabase, _db.materialTexts);
 }
 
 mixin _$QuizDaoMixin on DatabaseAccessor<AppDatabase> {

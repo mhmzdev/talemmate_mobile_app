@@ -45,18 +45,19 @@ class _AddMaterialSheetState extends State<_AddMaterialSheet> {
       if (picks.isEmpty || !mounted) return;
       final uid = LibraryCubit.c(context).state.userId ?? '';
       final subject = _selectedSubject;
-      setState(() {
-        _picked.addAll(
-          picks.map(
-            (p) => libraryItemForPick(
-              pick: p,
-              userId: uid,
-              subjectId: subject?.id,
-              colorHex: subject?.colorHex,
-            ),
+      // Persist each picked file to stable storage before listing it.
+      final items = await Future.wait(
+        picks.map(
+          (p) => libraryItemForPick(
+            pick: p,
+            userId: uid,
+            subjectId: subject?.id,
+            colorHex: subject?.colorHex,
           ),
-        );
-      });
+        ),
+      );
+      if (!mounted) return;
+      setState(() => _picked.addAll(items));
     } catch (e) {
       if (mounted) UIFlash.error(context, 'Could not add that.');
     }
@@ -69,8 +70,15 @@ class _AddMaterialSheetState extends State<_AddMaterialSheet> {
     }
     setState(() => _saving = true);
     final cubit = LibraryCubit.c(context);
-    for (final item in _picked) {
+    final materialCubit = MaterialCubit.c(context);
+    final added = List<LibraryItem>.from(_picked);
+    for (final item in added) {
       await cubit.add(item);
+    }
+    // Kick off background text extraction for each (fire-and-forget) — the
+    // library list reflects each row's status as it settles.
+    for (final item in added) {
+      materialCubit.process(item);
     }
     if (mounted) Navigator.pop(context);
   }

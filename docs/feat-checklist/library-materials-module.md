@@ -149,9 +149,12 @@
 
 ## By-design gaps 🚧 (not implemented — don't treat as bugs)
 
-- **No real OCR / AI indexing** — the `AI INDEXED` pill and the status copy
-  ("Annotated", "processed", "being read", page/word counts) are presentational
-  **mocks**. Only "added Xd ago" derives from real `uploadedAt`.
+- **AI indexing is now real (superseded)** — text extraction is implemented; new
+  materials get a real `processingStatus` + page count via the Gemini pipeline,
+  and the row status badge is now driven by `_MaterialStatus` (spinner / `AI
+  INDEXED` + page count / "Couldn't read · retry"), not mock copy. See
+  [library-text-extraction](library-text-extraction.md). Items added **before**
+  that feature keep their mock `indexed` status (no backfill).
 - **Open document / Ask the tutor are placeholders** — both show a "coming soon"
   `UIFlash.info`; there is no in-app document viewer and the tutor module isn't
   built yet.

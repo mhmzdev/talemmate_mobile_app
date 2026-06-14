@@ -1,6 +1,8 @@
 part of '../database.dart';
 
-@DriftAccessor(tables: [ProgressMetrics, StudyStreaks, DailyScores, SessionMetrics])
+@DriftAccessor(
+  tables: [ProgressMetrics, StudyStreaks, DailyScores, SessionMetrics],
+)
 class ProgressDao extends DatabaseAccessor<AppDatabase>
     with _$ProgressDaoMixin {
   ProgressDao(super.db);
@@ -8,9 +10,9 @@ class ProgressDao extends DatabaseAccessor<AppDatabase>
   Stream<List<ProgressMetricRow>> watchByUser(String userId) =>
       (select(progressMetrics)..where((p) => p.userId.equals(userId))).watch();
 
-  Future<StudyStreakRow?> streakForUser(String userId) =>
-      (select(studyStreaks)..where((s) => s.userId.equals(userId)))
-          .getSingleOrNull();
+  Future<StudyStreakRow?> streakForUser(String userId) => (select(
+    studyStreaks,
+  )..where((s) => s.userId.equals(userId))).getSingleOrNull();
 
   Future<List<DailyScoreRow>> scoresForUser(
     String userId, {

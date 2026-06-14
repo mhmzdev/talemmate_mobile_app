@@ -12,6 +12,14 @@ class _CompleteListener extends StatelessWidget {
           UIFlash.error(context, state.complete.errorMessage);
         }
         if (state.complete.isSuccess) {
+          // Kick off background text extraction for the uploaded materials —
+          // fire-and-forget; the Library reflects each row's status when opened.
+          final materialCubit = MaterialCubit.c(context);
+          final materials =
+              state.complete.data?.uploadedMaterials ?? const <LibraryItem>[];
+          for (final item in materials) {
+            materialCubit.process(item);
+          }
           AppRoutes.stepwiseLoader.pushReplace(context);
         }
       },

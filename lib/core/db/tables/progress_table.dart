@@ -34,8 +34,7 @@ class DailyScores extends Table {
   TextColumn get userId => text()();
   DateTimeColumn get date => dateTime()();
   IntColumn get score => integer()();
-  TextColumn get topicId =>
-      text().references(Topics, #id).nullable()();
+  TextColumn get topicId => text().references(Topics, #id).nullable()();
 }
 
 @DataClassName('SessionMetricRow')

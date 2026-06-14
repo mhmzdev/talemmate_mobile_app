@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:taleemmate/core/db/converters.dart';
 import 'package:taleemmate/core/db/tables/library_table.dart';
+import 'package:taleemmate/core/db/tables/material_texts_table.dart';
 import 'package:taleemmate/core/db/tables/onboarding_table.dart';
 import 'package:taleemmate/core/db/tables/progress_table.dart';
 import 'package:taleemmate/core/db/tables/quiz_table.dart';
@@ -22,6 +23,7 @@ import 'package:taleemmate/core/models/tutor/tutor_message.dart';
 import 'package:taleemmate/core/models/tutor/tutor_settings.dart';
 
 export 'tables/library_table.dart';
+export 'tables/material_texts_table.dart';
 export 'tables/onboarding_table.dart';
 export 'tables/progress_table.dart';
 export 'tables/quiz_table.dart';
@@ -33,6 +35,7 @@ part 'database.g.dart';
 part 'daos/subject_dao.dart';
 part 'daos/schedule_dao.dart';
 part 'daos/library_dao.dart';
+part 'daos/material_texts_dao.dart';
 part 'daos/quiz_dao.dart';
 part 'daos/progress_dao.dart';
 part 'daos/tutor_dao.dart';
@@ -48,6 +51,7 @@ part 'daos/onboarding_dao.dart';
     Schedules,
     StudyBlocks,
     LibraryItems,
+    MaterialTexts,
     Quizzes,
     QuizQuestions,
     QuizAttempts,
@@ -69,6 +73,7 @@ part 'daos/onboarding_dao.dart';
     SubjectDao,
     ScheduleDao,
     LibraryDao,
+    MaterialTextsDao,
     QuizDao,
     ProgressDao,
     TutorDao,
@@ -84,11 +89,15 @@ class AppDatabase extends _$AppDatabase {
   static final AppDatabase ins = AppDatabase();
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) => m.createAll(),
+    onUpgrade: (m, from, to) async {
+      // v2: extracted-text storage for library materials (text extraction).
+      if (from < 2) await m.createTable(materialTexts);
+    },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
     },
@@ -192,6 +201,59 @@ class AppDatabase extends _$AppDatabase {
         indexedPageCount: Value(m.indexedPageCount),
       ),
     );
+  }
+
+  // --- Text-extraction pipeline -------------------------------------------
+  // Primitive-only surface so `MaterialRepo` stays model-free (ADR-013): the
+  // `ProcessingStatus` enum and row→Map conversion live here, not in the repo.
+
+  /// Marks an item as actively extracting.
+  Future<void> markLibraryProcessing(String id) =>
+      libraryDao.setStatus(id, ProcessingStatus.processing);
+
+  /// Marks an item indexed and records the (estimated) page count.
+  Future<void> markLibraryIndexed(String id, int pageCount) => libraryDao
+      .setStatus(id, ProcessingStatus.indexed, indexedPageCount: pageCount);
+
+  /// Marks an item failed (unsupported kind or an extraction error).
+  Future<void> markLibraryFailed(String id) =>
+      libraryDao.setStatus(id, ProcessingStatus.failed);
+
+  /// Persists extracted text for an item (upsert — re-runs overwrite).
+  Future<void> saveMaterialText({
+    required String itemId,
+    required String content,
+    required int pageCount,
+    required int charCount,
+    required DateTime extractedAt,
+  }) => materialTextsDao.upsert(
+    MaterialTextsCompanion(
+      itemId: Value(itemId),
+      content: Value(content),
+      pageCount: Value(pageCount),
+      charCount: Value(charCount),
+      extractedAt: Value(extractedAt),
+    ),
+  );
+
+  /// All extracted text for a user's items in a subject, as plain maps — the
+  /// grounding source consumed by the Chat agent.
+  Future<List<Map<String, dynamic>>> materialTextsForSubject(
+    String userId,
+    String subjectId,
+  ) async {
+    final rows = await materialTextsDao.forSubject(userId, subjectId);
+    return rows
+        .map(
+          (r) => <String, dynamic>{
+            'itemId': r.itemId,
+            'content': r.content,
+            'pageCount': r.pageCount,
+            'charCount': r.charCount,
+            'extractedAt': r.extractedAt.toIso8601String(),
+          },
+        )
+        .toList();
   }
 
   static QueryExecutor _openConnection() => driftDatabase(name: 'taleemmate');

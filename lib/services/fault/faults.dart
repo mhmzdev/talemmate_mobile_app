@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:firebase_ai/firebase_ai.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:taleemmate/configs/configs.dart';
 import 'package:taleemmate/services/logging/app_log.dart';
@@ -192,6 +193,36 @@ final class FirebaseFault<T> extends Fault<T> {
   }
 }
 
+/// Represents a fault caused by a `firebase_ai` (Gemini) call — used by the
+/// material text-extraction pipeline and the chat agent.
+final class AiFault<T> extends Fault<T> {
+  final String errorMessage;
+  const AiFault(this.errorMessage, StackTrace stackTrace)
+    : super._internal(stackTrace);
+
+  factory AiFault.fromAiException(
+    FirebaseAIException ex,
+    StackTrace stackTrace,
+  ) {
+    ex.message.appLog(level: AppLogLevel.error, tag: 'AiFault');
+
+    return switch (ex) {
+      InvalidApiKey _ => AiFault(
+        'AI service is misconfigured. Please contact support.',
+        stackTrace,
+      ),
+      UnsupportedUserLocation _ => AiFault(
+        'AI features are not available in your region yet.',
+        stackTrace,
+      ),
+      _ => AiFault(
+        'Couldn\'t read this material. Please try again.',
+        stackTrace,
+      ),
+    };
+  }
+}
+
 /// Represents a fault caused by an exception
 final class ExceptionFault<T> extends Fault<T> {
   final Exception exception;
@@ -237,6 +268,7 @@ extension FaultExtension on Fault {
     final FirebaseAuthFault authFault => authFault.errorMessage,
     final FirebaseFault firebaseFault => firebaseFault.errorMessage.splitError,
     final NetworkFault networkFault => networkFault.text.splitError,
+    final AiFault aiFault => aiFault.errorMessage,
     final HttpFault httpFault => httpFault.body.message.toString(),
   };
 }

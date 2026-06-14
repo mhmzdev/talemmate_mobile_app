@@ -1,6 +1,8 @@
 part of '../database.dart';
 
-@DriftAccessor(tables: [Quizzes, QuizQuestions, QuizAttempts, QuizFeedbackItems])
+@DriftAccessor(
+  tables: [Quizzes, QuizQuestions, QuizAttempts, QuizFeedbackItems],
+)
 class QuizDao extends DatabaseAccessor<AppDatabase> with _$QuizDaoMixin {
   QuizDao(super.db);
 
@@ -19,10 +21,9 @@ class QuizDao extends DatabaseAccessor<AppDatabase> with _$QuizDaoMixin {
             ..orderBy([(a) => OrderingTerm.desc(a.timestamp)]))
           .get();
 
-  Future<QuizFeedbackRow?> feedbackForAttempt(String attemptId) =>
-      (select(quizFeedbackItems)
-            ..where((f) => f.attemptId.equals(attemptId)))
-          .getSingleOrNull();
+  Future<QuizFeedbackRow?> feedbackForAttempt(String attemptId) => (select(
+    quizFeedbackItems,
+  )..where((f) => f.attemptId.equals(attemptId))).getSingleOrNull();
 
   Future<void> upsertQuiz(QuizzesCompanion companion) =>
       into(quizzes).insertOnConflictUpdate(companion);
