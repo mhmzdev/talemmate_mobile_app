@@ -19,6 +19,7 @@ import 'package:taleemmate/core/models/settings/language_preferences.dart';
 import 'package:taleemmate/core/models/subject/topic.dart';
 import 'package:taleemmate/core/models/tutor/citation.dart';
 import 'package:taleemmate/core/models/tutor/follow_up_point.dart';
+import 'package:taleemmate/core/models/tutor/tutor_conversation.dart';
 import 'package:taleemmate/core/models/tutor/tutor_message.dart';
 import 'package:taleemmate/core/models/tutor/tutor_settings.dart';
 
@@ -243,18 +244,122 @@ class AppDatabase extends _$AppDatabase {
     String subjectId,
   ) async {
     final rows = await materialTextsDao.forSubject(userId, subjectId);
-    return rows
-        .map(
-          (r) => <String, dynamic>{
-            'itemId': r.itemId,
-            'content': r.content,
-            'pageCount': r.pageCount,
-            'charCount': r.charCount,
-            'extractedAt': r.extractedAt.toIso8601String(),
-          },
-        )
-        .toList();
+    return rows.map((e) {
+      final (r, name) = e;
+      return <String, dynamic>{
+        'itemId': r.itemId,
+        'name': name,
+        'content': r.content,
+        'pageCount': r.pageCount,
+        'charCount': r.charCount,
+        'extractedAt': r.extractedAt.toIso8601String(),
+      };
+    }).toList();
   }
+
+  // --- Chat / tutor persistence ------------------------------------------
+  // Model↔row conversion lives here so `ChatRepo` stays model-free (ADR-013):
+  // the repo passes/receives `Map`s; `Tutor*.fromJson`/`toJson` happen here.
+
+  /// Live per-user conversation list (newest first), as JSON-shaped maps.
+  Stream<List<Map<String, dynamic>>> watchTutorConversations(String userId) =>
+      tutorDao
+          .watchByUser(userId)
+          .map(
+            (rows) => rows.map(_tutorConversationToMap).toList(),
+          );
+
+  /// Live message list for a conversation (oldest first), as JSON-shaped maps.
+  Stream<List<Map<String, dynamic>>> watchTutorMessages(
+    String conversationId,
+  ) => tutorDao
+      .watchMessages(conversationId)
+      .map(
+        (rows) => rows.map(_tutorMessageToMap).toList(),
+      );
+
+  /// Upserts a conversation from a `TutorConversation.toJson()` map.
+  Future<void> saveTutorConversation(Map<String, dynamic> json) {
+    final c = TutorConversation.fromJson(json);
+    return tutorDao.upsertConversation(
+      TutorConversationsCompanion(
+        id: Value(c.id),
+        userId: Value(c.userId),
+        subjectId: Value(c.subjectId),
+        topicId: Value(c.topicId),
+        title: Value(c.title),
+        groundedSourceCount: Value(c.groundedSourceCount),
+        createdAt: Value(c.createdAt),
+        lastMessageAt: Value(c.lastMessageAt),
+      ),
+    );
+  }
+
+  /// Inserts a message from a `TutorMessage.toJson()` map.
+  Future<void> saveTutorMessage(Map<String, dynamic> json) {
+    final m = TutorMessage.fromJson(json);
+    return tutorDao.insertMessage(
+      TutorMessagesCompanion(
+        id: Value(m.id),
+        conversationId: Value(m.conversationId),
+        sender: Value(m.sender),
+        content: Value(m.text),
+        timestamp: Value(m.timestamp),
+        followUpPoints: Value(m.followUpPoints),
+        citations: Value(m.citations),
+        kickerQuestion: Value(m.kickerQuestion),
+      ),
+    );
+  }
+
+  /// The user's tutor settings as a JSON-shaped map, or null if unset.
+  Future<Map<String, dynamic>?> tutorSettings(String userId) async {
+    final row = await tutorDao.settingsForUser(userId);
+    if (row == null) return null;
+    return _tutorSettingsToMap(row);
+  }
+
+  /// Upserts tutor settings from a `TutorSettings.toJson()` map.
+  Future<void> saveTutorSettings(Map<String, dynamic> json) {
+    final s = TutorSettings.fromJson(json);
+    return tutorDao.upsertSettings(
+      TutorSettingsTableCompanion(
+        userId: Value(s.userId),
+        showCitationsOnEveryReply: Value(s.showCitationsOnEveryReply),
+        scope: Value(s.scope),
+        reasoningDepth: Value(s.reasoningDepth),
+      ),
+    );
+  }
+
+  Map<String, dynamic> _tutorConversationToMap(TutorConversationRow r) => {
+    'id': r.id,
+    'userId': r.userId,
+    'subjectId': r.subjectId,
+    'topicId': r.topicId,
+    'title': r.title,
+    'groundedSourceCount': r.groundedSourceCount,
+    'createdAt': r.createdAt.toIso8601String(),
+    'lastMessageAt': r.lastMessageAt.toIso8601String(),
+  };
+
+  Map<String, dynamic> _tutorMessageToMap(TutorMessageRow r) => {
+    'id': r.id,
+    'conversationId': r.conversationId,
+    'sender': r.sender.name,
+    'text': r.content,
+    'timestamp': r.timestamp.toIso8601String(),
+    'followUpPoints': r.followUpPoints.map((e) => e.toJson()).toList(),
+    'citations': r.citations.map((e) => e.toJson()).toList(),
+    'kickerQuestion': r.kickerQuestion,
+  };
+
+  Map<String, dynamic> _tutorSettingsToMap(TutorSettingsRow r) => {
+    'userId': r.userId,
+    'showCitationsOnEveryReply': r.showCitationsOnEveryReply,
+    'scope': r.scope.name,
+    'reasoningDepth': r.reasoningDepth.name,
+  };
 
   static QueryExecutor _openConnection() => driftDatabase(name: 'taleemmate');
 }

@@ -12,8 +12,13 @@ class MaterialTextsDao extends DatabaseAccessor<AppDatabase>
     materialTexts,
   )..where((t) => t.itemId.equals(itemId))).getSingleOrNull();
 
-  /// All extracted text for a user's items in a subject (grounding source).
-  Future<List<MaterialTextRow>> forSubject(String userId, String subjectId) {
+  /// All extracted text for a user's items in a subject (grounding source),
+  /// paired with the owning material's display name so the chat agent can tag
+  /// each chunk `[itemId | name]` and cite it by name.
+  Future<List<(MaterialTextRow, String)>> forSubject(
+    String userId,
+    String subjectId,
+  ) {
     final q =
         select(materialTexts).join([
           innerJoin(
@@ -24,6 +29,10 @@ class MaterialTextsDao extends DatabaseAccessor<AppDatabase>
           libraryItems.userId.equals(userId) &
               libraryItems.subjectId.equals(subjectId),
         );
-    return q.map((r) => r.readTable(materialTexts)).get();
+    return q
+        .map(
+          (r) => (r.readTable(materialTexts), r.readTable(libraryItems).name),
+        )
+        .get();
   }
 }
