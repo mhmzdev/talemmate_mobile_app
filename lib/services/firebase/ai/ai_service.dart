@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:firebase_ai/firebase_ai.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:taleemmate/gen/assets/assets.gen.dart';
+import 'package:taleemmate/services/firebase/ai/agent_tools.dart';
+import 'package:taleemmate/services/firebase/ai/system_prompts.dart';
 
 /// Low-level, reusable `firebase_ai` (Gemini) wrapper. Owns the configured
 /// models the app talks to. Callers get raw text back or a [FirebaseAIException]
@@ -16,15 +16,17 @@ class AiService {
   /// cheap, fast tier — extraction is a mechanical transcription task.
   static const _extractionModel = 'gemini-2.5-flash';
 
-  GenerativeModel? _extractor;
-  String? _extractionInstruction;
+  /// Conversational tutor tier — Flash balances cost and latency for chat.
+  static const _chatModel = 'gemini-2.5-flash';
 
-  /// Lazily builds the extraction model, loading its system instruction from
-  /// the bundled asset (kept out of code so the prompt is editable).
+  GenerativeModel? _extractor;
+
+  GenerativeModel? _chat;
+
+  /// Lazily builds the extraction model, sourcing its system instruction from
+  /// [SystemPrompts] (kept out of code so the prompt is editable).
   Future<GenerativeModel> _extractorModel() async {
-    final instruction = _extractionInstruction ??= await rootBundle.loadString(
-      Assets.libraryExtractionSysPrompt,
-    );
+    final instruction = await SystemPrompts.library();
     return _extractor ??= FirebaseAI.googleAI().generativeModel(
       model: _extractionModel,
       systemInstruction: Content.system(instruction),
@@ -43,4 +45,18 @@ class AiService {
     ]);
     return res.text ?? '';
   }
+
+  /// Grounded tutor model: JSON-only structured output ([AgentTools.chatSchema])
+  /// with the supplied [systemPrompt] as its system instruction. Built once and
+  /// reused — the prompt is a stable bundled asset. Callers send the assembled
+  /// conversation `Content` list to `generateContent`.
+  GenerativeModel chatModel(String systemPrompt) =>
+      _chat ??= FirebaseAI.googleAI().generativeModel(
+        model: _chatModel,
+        systemInstruction: Content.system(systemPrompt),
+        generationConfig: GenerationConfig(
+          responseMimeType: 'application/json',
+          responseSchema: AgentTools.ins.chatSchema,
+        ),
+      );
 }

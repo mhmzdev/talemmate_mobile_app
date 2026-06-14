@@ -6,23 +6,63 @@ class AgentTools {
   static final _instance = AgentTools._();
   static AgentTools get ins => _instance;
 
-  /// Schema for dream refinement based on [chat_sys_prompt.md]
-  /// This will only be used to write a dream refinement prompt for another LLM
-  /// to generate an image based on the refined prompt
-  Schema get chatSchema => Schema(
-    SchemaType.object,
+  /// Structured-output schema for the grounded tutor chat (see
+  /// [chat_sys_prompt.md]). Maps 1:1 onto `TutorMessage`: a markdown [text]
+  /// answer, the [citations] that back it (referencing the student's library
+  /// items by id), suggested [followUpPoints], and an optional
+  /// [kickerQuestion]. Fed to `GenerationConfig.responseSchema` so Gemini
+  /// always returns parseable JSON.
+  Schema get chatSchema => Schema.object(
     properties: {
-      'responseMessage': Schema(
-        SchemaType.string,
+      'text': Schema.string(
         description:
-            'A full sentence response to the user\'s original message, incorporating the refined prompt and tags',
-        nullable: false,
+            "The tutor's answer in markdown, written in the student's "
+            'language (Urdu / English / Roman Urdu).',
       ),
-      'error': Schema(
-        SchemaType.string,
-        description: 'Error message if the refinement failed',
+      'citations': Schema.array(
+        description:
+            "Sources from the student's own materials that support the "
+            'answer. Empty when the answer comes from general knowledge — '
+            'never fabricate a citation.',
+        items: Schema.object(
+          properties: {
+            'source': Schema.string(
+              description: 'Human-readable name of the cited material.',
+            ),
+            'libraryItemId': Schema.string(
+              nullable: true,
+              description:
+                  'The id of the grounded library item, taken from its '
+                  '[id | name] tag. Null if not from the materials.',
+            ),
+            'pageReference': Schema.string(
+              nullable: true,
+              description: 'Page or section reference, if known.',
+            ),
+          },
+          optionalProperties: ['libraryItemId', 'pageReference'],
+        ),
+      ),
+      'followUpPoints': Schema.array(
+        description: 'Up to 3 suggested follow-up explorations.',
+        items: Schema.object(
+          properties: {
+            'label': Schema.string(
+              description: 'Short tappable chip label (2-4 words).',
+            ),
+            'body': Schema.string(
+              description: 'The full follow-up question sent if tapped.',
+            ),
+          },
+        ),
+      ),
+      'kickerQuestion': Schema.string(
         nullable: true,
+        description:
+            'An optional single question that checks understanding. Null '
+            'for simple factual replies.',
       ),
     },
+    optionalProperties: ['kickerQuestion'],
   );
 }
