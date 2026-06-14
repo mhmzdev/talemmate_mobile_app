@@ -1,10 +1,11 @@
 ---
 title: "Chat Agent (firebase_ai) — Grounded Tutor"
-status: backlog
+status: completed
 created: 2026-06-14
+completed: 2026-06-14
 ---
 
-📋 BACKLOG — Not yet started
+✅ COMPLETED — All 4 phases implemented + driver-verified. See [feature checklist](../../feat-checklist/chat-agent.md).
 
 # Chat Agent (firebase_ai) — Grounded Tutor — Implementation Plan
 
