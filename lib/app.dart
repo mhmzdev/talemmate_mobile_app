@@ -1,3 +1,5 @@
+import 'package:taleemmate/services/flavor/flavor.dart';
+
 import 'blocs/library/cubit.dart';
 import 'blocs/onboarding/cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,6 +13,7 @@ import 'package:taleemmate/core/db/database.dart';
 import 'providers/app.dart';
 import 'router/router.dart';
 import 'router/routes.dart';
+import 'services/http/alice.dart';
 import 'services/logging/route_logger.dart';
 
 class TaleemMate extends StatefulWidget {
@@ -21,6 +24,15 @@ class TaleemMate extends StatefulWidget {
 }
 
 class _TaleemMateState extends State<TaleemMate> {
+  @override
+  void initState() {
+    super.initState();
+
+    if (!AppFlavor.isProdRelease) {
+      AppAlice.ins.setNavigatorKey(navigator);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     App.init(context);

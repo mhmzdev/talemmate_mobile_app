@@ -61,8 +61,8 @@ dependencies:
   # network
   dio: 5.9.0
   firebase_performance_dio: 0.7.1
-  # alice:
-  #   path: packages/alice
+  alice:
+    path: packages/alice
 
   # cache
   path: 1.9.1
