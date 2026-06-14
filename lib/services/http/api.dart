@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:firebase_performance_dio/firebase_performance_dio.dart';
 
 import 'package:taleemmate/configs/configs.dart';
 import 'package:taleemmate/services/flavor/flavor.dart';
@@ -27,6 +28,7 @@ abstract class BaseApi {
       ),
     );
     ins.interceptors.add(_RetryInterceptor(ins));
+    ins.interceptors.add(DioFirebasePerformanceInterceptor());
     if (!AppFlavor.isProdRelease) {
       ins.interceptors.add(AppAlice.ins.getDioInterceptor());
     }
