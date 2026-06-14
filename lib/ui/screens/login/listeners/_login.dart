@@ -15,7 +15,10 @@ class _LoginListener extends StatelessWidget {
           // Seed the session uid for the app-wide Library module (ADR-014)
           // before routing into the signed-in shell.
           final uid = state.user?.uid;
-          if (uid != null) LibraryCubit.c(context).initUid(uid);
+          if (uid != null) {
+            LibraryCubit.c(context).initUid(uid);
+            ChatCubit.c(context).initUid(uid);
+          }
           final done = state.userData?.isOnboardingComplete ?? false;
           (done ? AppRoutes.home : AppRoutes.onboarding).pushReplace(context);
         }

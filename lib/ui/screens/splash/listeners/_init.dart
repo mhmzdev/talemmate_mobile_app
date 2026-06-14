@@ -17,7 +17,10 @@ class _InitListener extends StatelessWidget {
         if (state.init.isSuccess) {
           // Session resumed → seed the Library module's session uid (ADR-014).
           final uid = state.user?.uid;
-          if (uid != null) LibraryCubit.c(context).initUid(uid);
+          if (uid != null) {
+            LibraryCubit.c(context).initUid(uid);
+            ChatCubit.c(context).initUid(uid);
+          }
           final data = state.userData;
           final isLoggedIn = data != null;
 
