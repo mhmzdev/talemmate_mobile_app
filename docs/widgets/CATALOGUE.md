@@ -61,6 +61,26 @@ AppButton(
 
 ---
 
+### `AppIconButton` — `lib/ui/widgets/core/buttons/app_icon_button.dart`
+
+**The standard icon-only button.** A circular `subBackground` tap target wrapping a single Lucide icon. Use for header/toolbar actions and any standalone icon affordance — don't hand-roll an `AppTouch` + `Container` + `Icon`.
+
+```dart
+AppIconButton(
+  icon: LucideIcons.settings_2,
+  onTap: () => _openSettings(),
+  padding: Space.a.t12,   // optional — defaults to Space.a.t12
+)
+```
+
+| Param | Type | Notes |
+|---|---|---|
+| `icon` | `IconData` | Lucide icon (24px) |
+| `onTap` | `VoidCallback` | Required |
+| `padding` | `EdgeInsets?` | Defaults to `Space.a.t12` |
+
+---
+
 ### `BottomBar` — `lib/ui/widgets/core/bottom_bar/bottom_bar.dart`
 
 Tab navigation bar for the five main routes. Rendered automatically by `Screen` — never instantiate directly.
@@ -80,6 +100,28 @@ Full-screen overlay loader. Used inside `overlayBuilders` via `BlocConsumer`:
 builder: (context, state) {
   return FullScreenLoader(loading: state.someAction.isLoading);
 }
+```
+
+---
+
+### `AppAiPill` — `lib/ui/widgets/design/misc/app_ai_pill.dart`
+
+Small gold pill (dot + label) flagging an AI affordance. Used across the app — Profile aside, Library "AI INDEXED" badges, the Tutor header. Default label is `AI`.
+
+```dart
+const AppAiPill()              // "● AI"
+const AppAiPill(text: 'AI INDEXED')
+```
+
+---
+
+### `AppProgressDots` — `lib/ui/widgets/design/misc/progress_dots.dart`
+
+Three staggered pulsing dots — a subtle "working" indicator. Used by `FullScreenLoader` and the Tutor typing bubble.
+
+```dart
+const AppProgressDots()                    // text-coloured, 5px
+AppProgressDots(color: AppTheme.c.subText) // muted variant
 ```
 
 ---
