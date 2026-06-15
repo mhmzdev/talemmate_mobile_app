@@ -112,6 +112,20 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
+  /// Permanently deletes a conversation. If it was the active one, the chat
+  /// surface resets to the empty state. The list updates via the stream.
+  Future<void> deleteConversation(String id) async {
+    try {
+      await _repo.deleteConversation(id);
+      if (state.active?.id == id) {
+        _msgSub?.cancel();
+        emit(state.copyWith(clearActive: true, messages: const []));
+      }
+    } on Fault catch (e) {
+      emit(state.copyWith(send: state.send.toFailed(fault: e)));
+    }
+  }
+
   /// Loads (or defaults) the user's tutor settings.
   Future<void> loadSettings() async {
     final uid = state.userId;

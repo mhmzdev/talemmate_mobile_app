@@ -28,4 +28,16 @@ class TutorDao extends DatabaseAccessor<AppDatabase> with _$TutorDaoMixin {
 
   Future<void> upsertSettings(TutorSettingsTableCompanion companion) =>
       into(tutorSettingsTable).insertOnConflictUpdate(companion);
+
+  /// Deletes a conversation and its messages in one transaction (messages
+  /// first — the FK has no cascade and `foreign_keys` is ON).
+  Future<void> deleteConversation(String conversationId) =>
+      transaction(() async {
+        await (delete(
+          tutorMessages,
+        )..where((m) => m.conversationId.equals(conversationId))).go();
+        await (delete(
+          tutorConversations,
+        )..where((c) => c.id.equals(conversationId))).go();
+      });
 }

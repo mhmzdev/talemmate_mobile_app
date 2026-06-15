@@ -53,6 +53,10 @@ class ChatRepo {
     settings: settings,
   );
 
+  /// Permanently deletes a conversation and its messages.
+  Future<void> deleteConversation(String conversationId) =>
+      _ChatProvider.deleteConversation(conversationId);
+
   /// The user's tutor settings map, or null if never saved.
   Future<Map<String, dynamic>?> settings(String userId) =>
       _ChatProvider.settings(userId);

@@ -319,6 +319,10 @@ class AppDatabase extends _$AppDatabase {
     return _tutorSettingsToMap(row);
   }
 
+  /// Deletes a conversation and all its messages.
+  Future<void> deleteTutorConversation(String id) =>
+      tutorDao.deleteConversation(id);
+
   /// Upserts tutor settings from a `TutorSettings.toJson()` map.
   Future<void> saveTutorSettings(Map<String, dynamic> json) {
     final s = TutorSettings.fromJson(json);

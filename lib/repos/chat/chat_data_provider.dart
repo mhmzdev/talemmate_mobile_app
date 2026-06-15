@@ -117,6 +117,14 @@ class _ChatProvider {
     }
   }
 
+  static Future<void> deleteConversation(String conversationId) async {
+    try {
+      await AppDatabase.ins.deleteTutorConversation(conversationId);
+    } catch (e, st) {
+      throw UnknownFault('Could not delete this conversation.', st);
+    }
+  }
+
   static Future<Map<String, dynamic>?> settings(String userId) async {
     try {
       return await AppDatabase.ins.tutorSettings(userId);

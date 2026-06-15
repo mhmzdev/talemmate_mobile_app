@@ -37,13 +37,14 @@ class ChatState extends Equatable {
     List<TutorConversation>? conversations,
     TutorConversation? active,
     List<TutorMessage>? messages,
+    bool clearActive = false,
   }) {
     return ChatState(
       send: send ?? this.send,
       settings: settings ?? this.settings,
       userId: userId ?? this.userId,
       conversations: conversations ?? this.conversations,
-      active: active ?? this.active,
+      active: clearActive ? null : (active ?? this.active),
       messages: messages ?? this.messages,
     );
   }
