@@ -16,7 +16,7 @@ class _Header extends StatelessWidget {
     final initials = user?.initials ?? '?';
 
     return Padding(
-      padding: Space.sym(SpaceToken.t24, SpaceToken.t12),
+      padding: Space.h.t20 + Space.t.t12,
       child: Row(
         children: [
           Expanded(
