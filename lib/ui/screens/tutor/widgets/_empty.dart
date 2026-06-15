@@ -45,7 +45,6 @@ class _Empty extends StatelessWidget {
             AppButton(
               label: 'Choose a subject',
               icon: LucideIcons.plus,
-              size: .large,
               onTap: () => _SubjectPicker.show(context),
             ),
             if (hasHistory) ...[

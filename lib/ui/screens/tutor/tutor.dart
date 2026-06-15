@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'package:taleemmate/blocs/chat/cubit.dart';
@@ -13,9 +14,11 @@ import 'package:taleemmate/core/models/tutor/tutor_conversation.dart';
 import 'package:taleemmate/core/models/tutor/tutor_message.dart';
 import 'package:taleemmate/core/models/tutor/tutor_settings.dart';
 import 'package:taleemmate/ui/widgets/core/button/button.dart';
+import 'package:taleemmate/ui/widgets/core/buttons/app_icon_button.dart';
 import 'package:taleemmate/ui/widgets/core/screen/screen.dart';
 import 'package:taleemmate/ui/widgets/design/alerts/app_alert_base.dart';
 import 'package:taleemmate/ui/widgets/design/library/subject_chips.dart';
+import 'package:taleemmate/ui/widgets/design/misc/app_ai_pill.dart';
 import 'package:taleemmate/ui/widgets/design/misc/app_choice_chip.dart';
 import 'package:taleemmate/ui/widgets/design/misc/progress_dots.dart';
 import 'package:taleemmate/ui/widgets/design/modals/app_modal_base.dart';
@@ -129,35 +132,46 @@ class _ChatBar extends StatelessWidget {
               crossAxisAlignment: .start,
               mainAxisSize: .min,
               children: [
-                Text(
-                  title,
-                  style: AppText.b1.w(6).cl(AppTheme.c.text),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        title,
+                        style: AppText.b1.w(6).cl(AppTheme.c.text),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Space.x.t08,
+                    const AppAiPill(),
+                  ],
                 ),
-                if (active != null)
+                if (active != null) ...[
+                  Space.y.t04,
                   Text(
-                    _subjectName(context, active.subjectId) ?? 'Tutor chat',
+                    _headerSubtitle(context, active),
                     style: AppText.b2.cl(AppTheme.c.subText),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
+                ],
               ],
             ),
           ),
-          _BarAction(
+          Space.x.t16,
+          AppIconButton(
             key: const ValueKey('tutor_history'),
             icon: LucideIcons.history,
             onTap: () => _History.show(context),
           ),
           Space.x.t04,
-          _BarAction(
+          AppIconButton(
             key: const ValueKey('tutor_new'),
             icon: LucideIcons.square_pen,
             onTap: () => _SubjectPicker.show(context),
           ),
           Space.x.t04,
-          _BarAction(
+          AppIconButton(
             key: const ValueKey('tutor_settings'),
             icon: LucideIcons.settings_2,
             onTap: () => _SettingsSheet.show(context),
@@ -166,20 +180,6 @@ class _ChatBar extends StatelessWidget {
       ),
     );
   }
-}
-
-class _BarAction extends StatelessWidget {
-  const _BarAction({super.key, required this.icon, required this.onTap});
-
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => AppTouch(
-    onTap: onTap,
-    hasSplash: false,
-    child: Icon(icon, size: SpaceToken.t24, color: AppTheme.c.text),
-  );
 }
 
 /// Reverse-scrolling message list (newest at the bottom) + typing indicator.
@@ -230,4 +230,22 @@ String? _subjectName(BuildContext context, String subjectId) {
     if (s.id == subjectId) return s.name;
   }
   return null;
+}
+
+/// Subject brand-colour hex for [subjectId], if known.
+String? _subjectColorHex(BuildContext context, String subjectId) {
+  final subjects = LibraryCubit.c(context).state.subjects;
+  for (final s in subjects) {
+    if (s.id == subjectId) return s.colorHex;
+  }
+  return null;
+}
+
+/// Header subtitle for an active conversation — subject plus, once the first
+/// reply lands, how many materials it was grounded in.
+String _headerSubtitle(BuildContext context, TutorConversation active) {
+  final subject = _subjectName(context, active.subjectId) ?? 'Tutor chat';
+  final n = active.groundedSourceCount;
+  if (n <= 0) return subject;
+  return '$subject · grounded in $n source${n == 1 ? '' : 's'}';
 }

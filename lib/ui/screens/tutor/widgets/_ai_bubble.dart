@@ -52,7 +52,7 @@ class _AiBubble extends StatelessWidget {
                 Text(
                   message.kickerQuestion!,
                   style: AppText.b2
-                      .cl(AppTheme.c.accent)
+                      .cl(AppTheme.c.subText)
                       .copyWith(fontStyle: FontStyle.italic),
                 ),
               ],
