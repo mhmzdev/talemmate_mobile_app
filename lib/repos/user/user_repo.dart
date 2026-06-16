@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:taleemmate/configs/configs.dart';
 import 'package:taleemmate/services/fault/faults.dart';
 import 'package:taleemmate/services/firebase/collections.dart';
@@ -9,10 +10,15 @@ part 'user_parser.dart';
 part 'user_data_provider.dart';
 
 class UserRepo {
-  static final UserRepo _instance = UserRepo._();
+  static UserRepo _instance = UserRepo._();
   UserRepo._();
 
   static UserRepo get ins => _instance;
+
+  /// Test seam — swap in a mock repo so cubit unit tests never hit Firebase.
+  /// Production code only reads [ins]; never call this setter outside tests.
+  @visibleForTesting
+  static set ins(UserRepo repo) => _instance = repo;
 
   /// --- repo functions --- ///
 

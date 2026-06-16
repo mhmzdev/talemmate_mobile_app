@@ -126,8 +126,12 @@ dev_dependencies:
   # flutter_flavorizr: 2.4.2
   # flutter_launcher_icons: 0.14.4
 
-  # testing
+  # testing — mocktail: no-codegen mocks for repos/Firebase types.
+  # (bloc_test is intentionally NOT used: its transitive `test` dep conflicts
+  #  with firebase_ai's web_socket_channel ^3. Cubits are tested by collecting
+  #  stream emissions; cubit-driven screens use real cubits + mock repos.)
   mockito: 5.6.3
+  mocktail: 1.0.4
 
   # Enables the Flutter Driver extension for agent-driven debugging via the
   # Dart MCP server (see test_driver/app.dart). Dev-only — never in release.
