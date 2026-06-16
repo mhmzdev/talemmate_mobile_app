@@ -77,7 +77,7 @@
 | # | Scenario | Expected | Status |
 |---|---|---|---|
 | 6.1 | Delete → confirm alert | centered alert (trash badge, "Delete this material?", Cancel \| Delete destructive) | ✅ |
-| 6.2 | Alert → Delete | `LibraryCubit.remove(id)` → `deleteItem` + reload; row gone from list **and** DB; header count/size drop | ✅ (4→3 documents, 4.4→3.1 MB) |
+| 6.2 | Alert → Delete | `LibraryCubit.remove(id)` → `AppDatabase.deleteLibraryItem` (drops `MaterialTexts` child then the item, in a transaction) + reload; row gone from list **and** DB; header count/size drop | ✅ (4→3 documents, 4.4→3.1 MB) — ⚠️ re-verify on an **indexed** item: pre-fix it failed with FK 787 (text-extraction added the child row). See [text-extraction 6.1](library-text-extraction.md) |
 | 6.3 | Alert → Cancel | nothing deleted | 🔒 |
 
 ## 7. Add new material — post-onboarding (Phase 4)

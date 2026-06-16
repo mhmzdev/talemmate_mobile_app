@@ -76,6 +76,13 @@
 | 5.2 | Onboarding finish | `_CompleteListener` fires `process` for each `uploadedMaterials` item before routing | ⏳ |
 | 5.3 | Grounding retrieval | `MaterialRepo.textsForSubject(uid, subjectId)` returns stored text maps | ⏳ (consumed by the Chat plan) |
 
+## 6. Deletion interaction (cross-feature)
+
+| # | Scenario | Expected | Status |
+|---|---|---|---|
+| 6.1 | Delete an **indexed** material | `AppDatabase.deleteLibraryItem` removes the `MaterialTexts` child **then** the `library_items` row in one transaction — no SQLite FK failure (787) | ✅ (regression-fixed) |
+| 6.2 | Delete a `pending`/`failed` material (no text row) | `deleteForItem` no-ops (0 rows); item deletes cleanly | 🔒 |
+
 ---
 
 ## Invariants / regression guards 🔒
@@ -92,6 +99,13 @@
 - **`indexed` only after text persists** — the provider writes `saveMaterialText`
   **then** `markLibraryIndexed`; on any error it `markLibraryFailed`. So an
   `indexed` row always has a `MaterialTexts` row.
+- **Delete must cascade to `MaterialTexts` first** — `material_texts.itemId` is a
+  FK to `library_items.id` with no `onDelete` action, so deleting an item before
+  its text row raises SQLite error 787. Library delete goes through
+  `AppDatabase.deleteLibraryItem` (a transaction: `deleteForItem` → `deleteItem`),
+  **not** `LibraryDao.deleteItem` directly. This pairs with the invariant above —
+  because every indexed row has a text row, the naive delete always failed once
+  extraction went live.
 - **Classify by path extension** — the picker collapses `.md`/`.txt`/`.docx`/… to
   `kind = note`; the repo recovers the real format from the path ext
   (`p.extension`). `.md`/`.txt` → direct read; pdf/img → Gemini; everything else
