@@ -1,165 +1,115 @@
 ---
+name: write-widget-test
 description: Write widget tests for TaleemMate screens and components. Use when testing UI rendering, form interactions, tap events, and navigation behaviour.
 when_to_use: Triggered when asked to write widget tests, test a screen, test a form widget, test tap/input interactions, or verify UI state changes in response to cubit state.
-allowed-tools: Read Bash
+allowed-tools: Read Write Edit Bash
 ---
 
 # Writing Widget Tests in TaleemMate
 
-Widget tests render a subtree and interact with it via `WidgetTester`.
+Widget tests render a screen and interact with it via `WidgetTester`.
+Stack: **`flutter_test` + `mocktail`** (no `bloc_test`). Full reference and the
+rationale behind every gotcha below: [docs/TESTING.md](../../../docs/TESTING.md).
 
-## Setup
+## Location & naming
 
-```dart
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mockito/mockito.dart';
-import 'package:taleemmate/configs/configs.dart';
-```
+- `test/screens/<screen>/<screen>_test.dart` — mirrors `lib/ui/screens/<screen>/`.
+- File names are `snake_case`. `hygen screen new <name>` already scaffolds this
+  file — flesh it out rather than hand-creating it.
 
-File location: `test/widget/<feature>/<name>_test.dart`
+## The harness — real driving cubit + mock repo
 
-## Minimal Test Harness
-
-Screens need `MaterialApp`, theme, and their providers:
-
-```dart
-Widget buildSubject({YourCubit? cubit}) {
-  return MaterialApp(
-    theme: AppThemeData.light(),  // from lib/configs/theme/_theme_data.dart
-    home: BlocProvider<YourCubit>(
-      create: (_) => cubit ?? YourCubit(),
-      child: ChangeNotifierProvider(
-        create: (_) => _ScreenState(),  // if testing full screen
-        child: const YourScreen(),
-      ),
-    ),
-  );
-}
-```
-
-For form screens add `FormBuilder` if the widget uses it internally (usually the Screen widget handles this).
-
-## Basic Test Template
+`TestApp` (helpers/test_app.dart) wires every cubit a signed-in shell touches,
+plus `AppProvider`, under a themed `MaterialApp`. The cubit that **drives** the
+screen stays REAL, fed through its mock repo via the `XRepo.ins` test seam. The
+bystanders (`Library`/`Chat`/`Plan`) are **Fake** cubits whose `initUid` no-ops,
+so restoring a session doesn't subscribe to Firestore.
 
 ```dart
-void main() {
-  group('LoginScreen', () {
-    testWidgets('renders email and password fields', (tester) async {
-      await tester.pumpWidget(buildSubject());
-      await tester.pumpAndSettle();
-
-      expect(find.byType(AppFormTextInput), findsNWidgets(2));
-    });
-
-    testWidgets('shows validation error on empty submit', (tester) async {
-      await tester.pumpWidget(buildSubject());
-      await tester.pumpAndSettle();
-
-      // tap submit
-      await tester.tap(find.text('Login'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('This field is required'), findsWidgets);
-    });
-
-    testWidgets('fills form and taps submit', (tester) async {
-      await tester.pumpWidget(buildSubject());
-      await tester.pumpAndSettle();
-
-      await tester.enterText(
-        find.byWidgetPredicate((w) => w is AppFormTextInput &&
-            (w as AppFormTextInput).name == 'email'),
-        'test@example.com',
-      );
-      await tester.pumpAndSettle();
-
-      // verify state or cubit was called
-    });
-  });
-}
-```
-
-## Finding Widgets
-
-```dart
-find.byType(AppFormTextInput)          // by widget type
-find.byKey(const Key('submit-btn'))    // by key (add Key to widget if needed)
-find.text('Login')                     // by displayed text
-find.descendant(of: find.byType(Form), matching: find.byType(TextField))
-```
-
-## Interactions
-
-```dart
-await tester.tap(find.text('Submit'));
-await tester.enterText(find.byType(TextField).first, 'hello');
-await tester.pump();              // single frame
-await tester.pumpAndSettle();     // until no more frames (animations done)
-await tester.drag(find.byType(ListView), const Offset(0, -300));
-```
-
-## Testing Cubit-Driven UI
-
-Use a mock cubit or a real one with faked repository:
-
-```dart
-testWidgets('shows loading overlay when state is loading', (tester) async {
-  final cubit = MockYourCubit();
-  when(cubit.state).thenReturn(YourState(fetch: BlocState<Data>().toLoading()));
-  when(cubit.stream).thenAnswer((_) => Stream.fromIterable([cubit.state]));
-
-  await tester.pumpWidget(buildSubject(cubit: cubit));
-  await tester.pump();
-
-  expect(find.byType(FullScreenLoader), findsOneWidget);
+late MockUserRepo userRepo;
+setUpAll(() => registerFallbackValue(<String, dynamic>{}));
+setUp(() {
+  setupPlatformMocks();        // SharedPreferences for AppProvider
+  userRepo = MockUserRepo();
+  UserRepo.ins = userRepo;     // real UserCubit will reach the mock
 });
-```
 
-## Testing Navigation
+Future<void> pumpLogin(WidgetTester tester) async {
+  await tester.binding.setSurfaceSize(const Size(1200, 2600));     // avoid overflow
+  addTearDown(() => tester.binding.setSurfaceSize(null));
 
-```dart
-testWidgets('navigates to home after login success', (tester) async {
-  final mockObserver = MockNavigatorObserver();
+  final userCubit = UserCubit();        addTearDown(userCubit.close);
+  final quotesCubit = QuotesCubit();    addTearDown(quotesCubit.close);
+  final libraryCubit = FakeLibraryCubit(); addTearDown(libraryCubit.close);
+  final chatCubit = FakeChatCubit();    addTearDown(chatCubit.close);
+  final planCubit = FakePlanCubit();    addTearDown(planCubit.close);
 
-  await tester.pumpWidget(MaterialApp(
-    navigatorObservers: [mockObserver],
-    routes: {'/home': (_) => const HomeScreen()},
-    home: BlocProvider(
-      create: (_) => loginCubit,
-      child: const LoginScreen(),
-    ),
+  await tester.pumpWidget(TestApp(
+    initialRoute: AppRoutes.login,
+    userCubit: userCubit, quotesCubit: quotesCubit,
+    libraryCubit: libraryCubit, chatCubit: chatCubit, planCubit: planCubit,
+    routes: { ...stubRoutes, AppRoutes.login: (_) => const LoginScreen() },
   ));
-
-  // trigger the action that navigates
-  loginCubit.emit(loginCubit.state.copyWith(login: BlocState().toSuccess()));
-  await tester.pumpAndSettle();
-
-  verify(mockObserver.didPush(any, any));
-});
+  await tester.pump(const Duration(milliseconds: 400));
+}
 ```
 
-## Golden Tests (snapshots)
+## Test groups
 
 ```dart
-testWidgets('LoginScreen golden', (tester) async {
-  await tester.pumpWidget(buildSubject());
-  await tester.pumpAndSettle();
-  await expectLater(
-    find.byType(LoginScreen),
-    matchesGoldenFile('goldens/login_screen.png'),
-  );
+group('LoginScreen — rendering', () {
+  testWidgets('shows headings and field labels', (tester) async {
+    await pumpLogin(tester);
+    expect(find.text('Welcome back'), findsOneWidget);
+    expect(find.text('Email'), findsOneWidget);
+  });
+});
+
+group('LoginScreen — sign in flow', () {
+  testWidgets('signing in routes an onboarded user home', (tester) async {
+    when(() => userRepo.login(any())).thenAnswer((_) async => fakeFirebaseUser());
+    when(() => userRepo.fetchProfile(any()))
+        .thenAnswer((_) async => TestUser.rawJson(onboarded: true));
+
+    await pumpLogin(tester);
+    await tester.tap(find.text('Login'), warnIfMissed: false);
+    await tester.pumpAndSettle();
+
+    verify(() => userRepo.login(any())).called(1);
+    expect(find.text('home-stub'), findsOneWidget);   // a stubRoutes destination
+  });
 });
 ```
 
-Update goldens with `flutter test --update-goldens`.
+## Gotchas (all handled by the helpers — keep them in mind)
 
-## Conventions
+- **Tall surface.** `setSurfaceSize` before pumping; un-scrolled screen Columns
+  overflow the default 800×600 viewport, and an overflow fails the test.
+- **Screens need a named route.** `Screen` reads `ModalRoute.of(context)!.name`,
+  so the screen must be under `routes:`/`initialRoute`. Spread `stubRoutes`
+  first, then the real route last (later keys win) so it isn't overwritten.
+- **Plain `ThemeData`,** not `materialLightTheme` — that getter reads `AppText.*`
+  which is only initialised once a screen runs `App.init(context)`.
+- **Forms are pre-seeded in debug mode** (`kDebugMode` is true under test), so
+  tapping submit validates and reaches the cubit without entering text.
+- **Don't `pumpAndSettle` over long/infinite timers.** Splash delays `init()` by
+  1s: `pump(const Duration(seconds: 1))` then settle. Pump explicit durations to
+  drain entry-animation timers so none leak past the test.
+- **Tap noise.** Some button labels render with `height: 0` text; tap with
+  `warnIfMissed: false` (or target `find.byType(AppButton)`).
 
-- One test file per screen or component. Mirror the `lib/` path under `test/widget/`.
-- Always call `pumpAndSettle()` after interactions that trigger animations.
-- Name tests as `'<shows/renders/navigates> when <condition>'`.
-- Add `Key` values to interactive widgets that are hard to find by type or text.
-- Keep `buildSubject` at the top of each `group` file — one helper per file.
+## Finders & interactions
+
+```dart
+find.text('Login')                       find.byType(AppFormTextInput)
+await tester.enterText(find.byType(AppFormTextInput).first, 'x@y.com');
+await tester.tap(find.text('Login'), warnIfMissed: false);
+await tester.pumpAndSettle();            // or pump(Duration) past known timers
+```
+
+## Run
+
+```bash
+flutter test test/screens/login/login_test.dart   # one file
+flutter test                                       # everything
+```
