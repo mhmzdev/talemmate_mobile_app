@@ -8,6 +8,11 @@ class MaterialTextsDao extends DatabaseAccessor<AppDatabase>
   Future<void> upsert(MaterialTextsCompanion c) =>
       into(materialTexts).insertOnConflictUpdate(c);
 
+  /// Removes the extracted text for an item. Must run before deleting the owning
+  /// material — `itemId` is a FK to `library_items.id`.
+  Future<int> deleteForItem(String itemId) =>
+      (delete(materialTexts)..where((t) => t.itemId.equals(itemId))).go();
+
   Future<MaterialTextRow?> forItem(String itemId) => (select(
     materialTexts,
   )..where((t) => t.itemId.equals(itemId))).getSingleOrNull();

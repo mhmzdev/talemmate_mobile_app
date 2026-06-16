@@ -19,7 +19,8 @@ class LibraryRepo {
   Future<List<Map<String, dynamic>>> materials(String userId) =>
       _LibraryProvider.materials(userId);
 
-  Future<List<Map<String, dynamic>>> subjects() => _LibraryProvider.subjects();
+  Future<List<Map<String, dynamic>>> subjects(String userId) =>
+      _LibraryProvider.subjects(userId);
 
   Future<void> add(Map<String, dynamic> values) => _LibraryProvider.add(values);
 

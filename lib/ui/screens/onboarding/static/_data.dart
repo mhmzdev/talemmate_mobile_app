@@ -1,13 +1,12 @@
 part of '../onboarding.dart';
 
-// Study time windows for step 3 schedule picker.
-const _studyWindows = [
-  ('afterFajr', 'After Fajr', '05:30-07:00'),
-  ('morning', 'Morning', '09:00-12:00'),
-  ('afternoon', 'Afternoon', '14:00-16:00'),
-  ('evening', 'Evening', '16:30-19:00'),
-  ('afterIsha', 'After Isha', '21:00-23:00'),
-];
+// Study time windows for step 3 schedule picker — derived from the shared
+// canonical catalogue (`kStudyWindowCatalog`) so the ids stay in lock-step with
+// what `PlanRepo` resolves at generation time. Shape kept as
+// (id, label, 'HH:mm-HH:mm') for the picker tiles.
+final _studyWindows = kStudyWindowCatalog
+    .map((w) => (w.id, w.label, '${w.startTime}-${w.endTime}'))
+    .toList();
 
 // Tag colors available when creating a subject.
 const _subjectColors = [

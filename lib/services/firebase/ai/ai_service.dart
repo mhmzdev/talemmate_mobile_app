@@ -19,9 +19,15 @@ class AiService {
   /// Conversational tutor tier — Flash balances cost and latency for chat.
   static const _chatModel = 'gemini-2.5-flash';
 
+  /// Weekly study-plan generator tier — Flash is fast enough for a one-shot,
+  /// structured generation at onboarding.
+  static const _planModel = 'gemini-2.5-flash';
+
   GenerativeModel? _extractor;
 
   GenerativeModel? _chat;
+
+  GenerativeModel? _planner;
 
   /// Lazily builds the extraction model, sourcing its system instruction from
   /// [SystemPrompts] (kept out of code so the prompt is editable).
@@ -57,6 +63,19 @@ class AiService {
         generationConfig: GenerationConfig(
           responseMimeType: 'application/json',
           responseSchema: AgentTools.ins.chatSchema,
+        ),
+      );
+
+  /// Structured weekly-plan generator: JSON-only output
+  /// ([AgentTools.planSchema]) with the supplied [systemPrompt] as its system
+  /// instruction. Built once and reused — the prompt is a stable bundled asset.
+  GenerativeModel planModel(String systemPrompt) =>
+      _planner ??= FirebaseAI.googleAI().generativeModel(
+        model: _planModel,
+        systemInstruction: Content.system(systemPrompt),
+        generationConfig: GenerationConfig(
+          responseMimeType: 'application/json',
+          responseSchema: AgentTools.ins.planSchema,
         ),
       );
 }

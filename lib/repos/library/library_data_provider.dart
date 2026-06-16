@@ -12,10 +12,11 @@ class _LibraryProvider {
     }
   }
 
-  /// All subjects as `Subject.fromJson`-compatible maps (for grouping headers).
-  static Future<List<Map<String, dynamic>>> subjects() async {
+  /// A user's subjects as `Subject.fromJson`-compatible maps (for grouping
+  /// headers). Scoped per account (ADR-014) — never load all subjects.
+  static Future<List<Map<String, dynamic>>> subjects(String userId) async {
     try {
-      final rows = await AppDatabase.ins.subjectDao.getAll();
+      final rows = await AppDatabase.ins.subjectDao.getByUser(userId);
       return rows.map((r) => r.toJson()).toList();
     } catch (e, st) {
       if (e is Fault) rethrow;
@@ -36,7 +37,7 @@ class _LibraryProvider {
 
   static Future<void> remove(String id) async {
     try {
-      await AppDatabase.ins.libraryDao.deleteItem(id);
+      await AppDatabase.ins.deleteLibraryItem(id);
     } catch (e, st) {
       if (e is Fault) rethrow;
       throw UnknownFault('Could not remove the material.', st);

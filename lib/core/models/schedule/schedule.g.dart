@@ -18,6 +18,7 @@ _Schedule _$ScheduleFromJson(Map<String, dynamic> json) => _Schedule(
   weekStartDate: json['weekStartDate'] == null
       ? null
       : DateTime.parse(json['weekStartDate'] as String),
+  aiReasoning: json['aiReasoning'] as String?,
   isAIGenerated: json['isAIGenerated'] as bool? ?? true,
 );
 
@@ -27,5 +28,6 @@ Map<String, dynamic> _$ScheduleToJson(_Schedule instance) => <String, dynamic>{
   'dailyTargetHours': instance.dailyTargetHours,
   'enabledWindowIds': instance.enabledWindowIds,
   'weekStartDate': instance.weekStartDate?.toIso8601String(),
+  'aiReasoning': instance.aiReasoning,
   'isAIGenerated': instance.isAIGenerated,
 };

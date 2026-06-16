@@ -13,6 +13,7 @@ sealed class Schedule with _$Schedule {
     required double dailyTargetHours,
     @Default([]) List<String> enabledWindowIds,
     DateTime? weekStartDate,
+    String? aiReasoning,
     @Default(true) bool isAIGenerated,
   }) = _Schedule;
 

@@ -15,6 +15,13 @@ class _AddExamModalState extends State<_AddExamModal> {
   ExamType _type = ExamType.midterm;
   DateTime _date = DateTime.now().add(const Duration(days: 30));
 
+  /// Midnight today — the earliest selectable exam date (date-only so the
+  /// current day is always included regardless of the time of day).
+  DateTime get _today {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day);
+  }
+
   _SubjectDraft? get _selectedSubject {
     if (_subjectId == null) return null;
     for (final s in widget.subjects) {
@@ -100,9 +107,10 @@ class _AddExamModalState extends State<_AddExamModal> {
           AppFormDateInput(
             name: _ExamFormKeys.date,
             initialValue: _date,
-            firstDate: DateTime.now(),
+            // Exams can only be today or later — never in the past.
+            firstDate: _today,
             dateFormat: DateFormat('dd MMM yyyy'),
-            lastDate: DateTime.now().add(const Duration(days: 365)),
+            lastDate: _today.add(const Duration(days: 365)),
             placeholder: 'Select exam date',
             onChanged: (date) {
               if (date != null) setState(() => _date = date);

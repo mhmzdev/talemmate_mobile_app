@@ -4,6 +4,7 @@ import 'package:taleemmate/blocs/quotes/cubit.dart';
 import 'package:taleemmate/blocs/user/cubit.dart';
 import 'package:taleemmate/blocs/library/cubit.dart';
 import 'package:taleemmate/blocs/chat/cubit.dart';
+import 'package:taleemmate/blocs/plan/cubit.dart';
 import 'package:taleemmate/configs/configs.dart';
 import 'package:provider/provider.dart';
 import 'package:taleemmate/router/routes.dart';
@@ -41,7 +42,8 @@ class _BodyState extends State<_Body> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await 1.seconds.delay;
       if (!mounted) return;
       UserCubit.c(context).init();
     });

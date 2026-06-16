@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Schedule {
 
- String get id; String get userId; double get dailyTargetHours; List<String> get enabledWindowIds; DateTime? get weekStartDate; bool get isAIGenerated;
+ String get id; String get userId; double get dailyTargetHours; List<String> get enabledWindowIds; DateTime? get weekStartDate; String? get aiReasoning; bool get isAIGenerated;
 /// Create a copy of Schedule
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $ScheduleCopyWith<Schedule> get copyWith => _$ScheduleCopyWithImpl<Schedule>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Schedule&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.dailyTargetHours, dailyTargetHours) || other.dailyTargetHours == dailyTargetHours)&&const DeepCollectionEquality().equals(other.enabledWindowIds, enabledWindowIds)&&(identical(other.weekStartDate, weekStartDate) || other.weekStartDate == weekStartDate)&&(identical(other.isAIGenerated, isAIGenerated) || other.isAIGenerated == isAIGenerated));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Schedule&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.dailyTargetHours, dailyTargetHours) || other.dailyTargetHours == dailyTargetHours)&&const DeepCollectionEquality().equals(other.enabledWindowIds, enabledWindowIds)&&(identical(other.weekStartDate, weekStartDate) || other.weekStartDate == weekStartDate)&&(identical(other.aiReasoning, aiReasoning) || other.aiReasoning == aiReasoning)&&(identical(other.isAIGenerated, isAIGenerated) || other.isAIGenerated == isAIGenerated));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,userId,dailyTargetHours,const DeepCollectionEquality().hash(enabledWindowIds),weekStartDate,isAIGenerated);
+int get hashCode => Object.hash(runtimeType,id,userId,dailyTargetHours,const DeepCollectionEquality().hash(enabledWindowIds),weekStartDate,aiReasoning,isAIGenerated);
 
 @override
 String toString() {
-  return 'Schedule(id: $id, userId: $userId, dailyTargetHours: $dailyTargetHours, enabledWindowIds: $enabledWindowIds, weekStartDate: $weekStartDate, isAIGenerated: $isAIGenerated)';
+  return 'Schedule(id: $id, userId: $userId, dailyTargetHours: $dailyTargetHours, enabledWindowIds: $enabledWindowIds, weekStartDate: $weekStartDate, aiReasoning: $aiReasoning, isAIGenerated: $isAIGenerated)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $ScheduleCopyWith<$Res>  {
   factory $ScheduleCopyWith(Schedule value, $Res Function(Schedule) _then) = _$ScheduleCopyWithImpl;
 @useResult
 $Res call({
- String id, String userId, double dailyTargetHours, List<String> enabledWindowIds, DateTime? weekStartDate, bool isAIGenerated
+ String id, String userId, double dailyTargetHours, List<String> enabledWindowIds, DateTime? weekStartDate, String? aiReasoning, bool isAIGenerated
 });
 
 
@@ -65,14 +65,15 @@ class _$ScheduleCopyWithImpl<$Res>
 
 /// Create a copy of Schedule
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? dailyTargetHours = null,Object? enabledWindowIds = null,Object? weekStartDate = freezed,Object? isAIGenerated = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? dailyTargetHours = null,Object? enabledWindowIds = null,Object? weekStartDate = freezed,Object? aiReasoning = freezed,Object? isAIGenerated = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,dailyTargetHours: null == dailyTargetHours ? _self.dailyTargetHours : dailyTargetHours // ignore: cast_nullable_to_non_nullable
 as double,enabledWindowIds: null == enabledWindowIds ? _self.enabledWindowIds : enabledWindowIds // ignore: cast_nullable_to_non_nullable
 as List<String>,weekStartDate: freezed == weekStartDate ? _self.weekStartDate : weekStartDate // ignore: cast_nullable_to_non_nullable
-as DateTime?,isAIGenerated: null == isAIGenerated ? _self.isAIGenerated : isAIGenerated // ignore: cast_nullable_to_non_nullable
+as DateTime?,aiReasoning: freezed == aiReasoning ? _self.aiReasoning : aiReasoning // ignore: cast_nullable_to_non_nullable
+as String?,isAIGenerated: null == isAIGenerated ? _self.isAIGenerated : isAIGenerated // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -155,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String userId,  double dailyTargetHours,  List<String> enabledWindowIds,  DateTime? weekStartDate,  bool isAIGenerated)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String userId,  double dailyTargetHours,  List<String> enabledWindowIds,  DateTime? weekStartDate,  String? aiReasoning,  bool isAIGenerated)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Schedule() when $default != null:
-return $default(_that.id,_that.userId,_that.dailyTargetHours,_that.enabledWindowIds,_that.weekStartDate,_that.isAIGenerated);case _:
+return $default(_that.id,_that.userId,_that.dailyTargetHours,_that.enabledWindowIds,_that.weekStartDate,_that.aiReasoning,_that.isAIGenerated);case _:
   return orElse();
 
 }
@@ -176,10 +177,10 @@ return $default(_that.id,_that.userId,_that.dailyTargetHours,_that.enabledWindow
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String userId,  double dailyTargetHours,  List<String> enabledWindowIds,  DateTime? weekStartDate,  bool isAIGenerated)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String userId,  double dailyTargetHours,  List<String> enabledWindowIds,  DateTime? weekStartDate,  String? aiReasoning,  bool isAIGenerated)  $default,) {final _that = this;
 switch (_that) {
 case _Schedule():
-return $default(_that.id,_that.userId,_that.dailyTargetHours,_that.enabledWindowIds,_that.weekStartDate,_that.isAIGenerated);}
+return $default(_that.id,_that.userId,_that.dailyTargetHours,_that.enabledWindowIds,_that.weekStartDate,_that.aiReasoning,_that.isAIGenerated);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -193,10 +194,10 @@ return $default(_that.id,_that.userId,_that.dailyTargetHours,_that.enabledWindow
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String userId,  double dailyTargetHours,  List<String> enabledWindowIds,  DateTime? weekStartDate,  bool isAIGenerated)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String userId,  double dailyTargetHours,  List<String> enabledWindowIds,  DateTime? weekStartDate,  String? aiReasoning,  bool isAIGenerated)?  $default,) {final _that = this;
 switch (_that) {
 case _Schedule() when $default != null:
-return $default(_that.id,_that.userId,_that.dailyTargetHours,_that.enabledWindowIds,_that.weekStartDate,_that.isAIGenerated);case _:
+return $default(_that.id,_that.userId,_that.dailyTargetHours,_that.enabledWindowIds,_that.weekStartDate,_that.aiReasoning,_that.isAIGenerated);case _:
   return null;
 
 }
@@ -208,7 +209,7 @@ return $default(_that.id,_that.userId,_that.dailyTargetHours,_that.enabledWindow
 @JsonSerializable()
 
 class _Schedule extends Schedule {
-  const _Schedule({required this.id, required this.userId, required this.dailyTargetHours, final  List<String> enabledWindowIds = const [], this.weekStartDate, this.isAIGenerated = true}): _enabledWindowIds = enabledWindowIds,super._();
+  const _Schedule({required this.id, required this.userId, required this.dailyTargetHours, final  List<String> enabledWindowIds = const [], this.weekStartDate, this.aiReasoning, this.isAIGenerated = true}): _enabledWindowIds = enabledWindowIds,super._();
   factory _Schedule.fromJson(Map<String, dynamic> json) => _$ScheduleFromJson(json);
 
 @override final  String id;
@@ -222,6 +223,7 @@ class _Schedule extends Schedule {
 }
 
 @override final  DateTime? weekStartDate;
+@override final  String? aiReasoning;
 @override@JsonKey() final  bool isAIGenerated;
 
 /// Create a copy of Schedule
@@ -237,16 +239,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Schedule&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.dailyTargetHours, dailyTargetHours) || other.dailyTargetHours == dailyTargetHours)&&const DeepCollectionEquality().equals(other._enabledWindowIds, _enabledWindowIds)&&(identical(other.weekStartDate, weekStartDate) || other.weekStartDate == weekStartDate)&&(identical(other.isAIGenerated, isAIGenerated) || other.isAIGenerated == isAIGenerated));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Schedule&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.dailyTargetHours, dailyTargetHours) || other.dailyTargetHours == dailyTargetHours)&&const DeepCollectionEquality().equals(other._enabledWindowIds, _enabledWindowIds)&&(identical(other.weekStartDate, weekStartDate) || other.weekStartDate == weekStartDate)&&(identical(other.aiReasoning, aiReasoning) || other.aiReasoning == aiReasoning)&&(identical(other.isAIGenerated, isAIGenerated) || other.isAIGenerated == isAIGenerated));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,userId,dailyTargetHours,const DeepCollectionEquality().hash(_enabledWindowIds),weekStartDate,isAIGenerated);
+int get hashCode => Object.hash(runtimeType,id,userId,dailyTargetHours,const DeepCollectionEquality().hash(_enabledWindowIds),weekStartDate,aiReasoning,isAIGenerated);
 
 @override
 String toString() {
-  return 'Schedule(id: $id, userId: $userId, dailyTargetHours: $dailyTargetHours, enabledWindowIds: $enabledWindowIds, weekStartDate: $weekStartDate, isAIGenerated: $isAIGenerated)';
+  return 'Schedule(id: $id, userId: $userId, dailyTargetHours: $dailyTargetHours, enabledWindowIds: $enabledWindowIds, weekStartDate: $weekStartDate, aiReasoning: $aiReasoning, isAIGenerated: $isAIGenerated)';
 }
 
 
@@ -257,7 +259,7 @@ abstract mixin class _$ScheduleCopyWith<$Res> implements $ScheduleCopyWith<$Res>
   factory _$ScheduleCopyWith(_Schedule value, $Res Function(_Schedule) _then) = __$ScheduleCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String userId, double dailyTargetHours, List<String> enabledWindowIds, DateTime? weekStartDate, bool isAIGenerated
+ String id, String userId, double dailyTargetHours, List<String> enabledWindowIds, DateTime? weekStartDate, String? aiReasoning, bool isAIGenerated
 });
 
 
@@ -274,14 +276,15 @@ class __$ScheduleCopyWithImpl<$Res>
 
 /// Create a copy of Schedule
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? dailyTargetHours = null,Object? enabledWindowIds = null,Object? weekStartDate = freezed,Object? isAIGenerated = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? dailyTargetHours = null,Object? enabledWindowIds = null,Object? weekStartDate = freezed,Object? aiReasoning = freezed,Object? isAIGenerated = null,}) {
   return _then(_Schedule(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,dailyTargetHours: null == dailyTargetHours ? _self.dailyTargetHours : dailyTargetHours // ignore: cast_nullable_to_non_nullable
 as double,enabledWindowIds: null == enabledWindowIds ? _self._enabledWindowIds : enabledWindowIds // ignore: cast_nullable_to_non_nullable
 as List<String>,weekStartDate: freezed == weekStartDate ? _self.weekStartDate : weekStartDate // ignore: cast_nullable_to_non_nullable
-as DateTime?,isAIGenerated: null == isAIGenerated ? _self.isAIGenerated : isAIGenerated // ignore: cast_nullable_to_non_nullable
+as DateTime?,aiReasoning: freezed == aiReasoning ? _self.aiReasoning : aiReasoning // ignore: cast_nullable_to_non_nullable
+as String?,isAIGenerated: null == isAIGenerated ? _self.isAIGenerated : isAIGenerated // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

@@ -5,6 +5,9 @@ final _dateTimeWords = DateFormat('MMM. dd, yyyy HH:mmaaa');
 final _woutYear = DateFormat('EEEE, MMM dd');
 final _onlyTime = DateFormat('h:mm a');
 final _dayOnly = DateFormat('EEEE');
+final _weekdayShort = DateFormat('EEE');
+final _monthShort = DateFormat('MMM');
+final _dayMonthShort = DateFormat('dd MMM');
 final _dateWithDayShort = DateFormat('EEE, dd MMM yyyy');
 final _numericDateShortYear = DateFormat('dd-MM-yy');
 
@@ -37,6 +40,19 @@ extension SuperDate on DateTime {
 
   String get onlyTime => _onlyTime.format(this).toUpperCase();
   String get dayOnly => _dayOnly.format(this).toUpperCase();
+
+  /// Full weekday name, title case — e.g. "Monday".
+  String get weekdayLong => _dayOnly.format(this);
+
+  /// Short weekday name, upper case — e.g. "MON".
+  String get weekdayShort => _weekdayShort.format(this).toUpperCase();
+
+  /// Short month name — e.g. "Jun".
+  String get monthShort => _monthShort.format(this);
+
+  /// Day + short month — e.g. "15 Jun".
+  String get dayMonthShort => _dayMonthShort.format(this);
+
   String get dateWithoutYear => _woutYear.format(this).toUpperCase();
 
   String get date => _date.format(this);

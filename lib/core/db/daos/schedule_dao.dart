@@ -34,4 +34,7 @@ class ScheduleDao extends DatabaseAccessor<AppDatabase>
 
   Future<int> deleteBlock(String id) =>
       (delete(studyBlocks)..where((b) => b.id.equals(id))).go();
+
+  Future<int> deleteBlocksForSchedule(String scheduleId) =>
+      (delete(studyBlocks)..where((b) => b.scheduleId.equals(scheduleId))).go();
 }

@@ -18,6 +18,16 @@ class $SubjectsTable extends Subjects
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
   static const VerificationMeta _codeMeta = const VerificationMeta('code');
   @override
   late final GeneratedColumn<String> code = GeneratedColumn<String>(
@@ -71,6 +81,7 @@ class $SubjectsTable extends Subjects
   @override
   List<GeneratedColumn> get $columns => [
     id,
+    userId,
     code,
     name,
     colorHex,
@@ -93,6 +104,12 @@ class $SubjectsTable extends Subjects
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     } else if (isInserting) {
       context.missing(_idMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
     }
     if (data.containsKey('code')) {
       context.handle(
@@ -148,6 +165,10 @@ class $SubjectsTable extends Subjects
         DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_id'],
+      )!,
       code: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}code'],
@@ -179,6 +200,11 @@ class $SubjectsTable extends Subjects
 
 class SubjectRow extends DataClass implements Insertable<SubjectRow> {
   final String id;
+
+  /// Owning user — subjects are per-account (ADR-014). Defaulted to '' so the
+  /// v3→v4 `addColumn` migration is non-breaking; pre-existing rows orphan
+  /// (match no real uid) rather than leaking across accounts.
+  final String userId;
   final String code;
   final String name;
   final String colorHex;
@@ -186,6 +212,7 @@ class SubjectRow extends DataClass implements Insertable<SubjectRow> {
   final int order;
   const SubjectRow({
     required this.id,
+    required this.userId,
     required this.code,
     required this.name,
     required this.colorHex,
@@ -196,6 +223,7 @@ class SubjectRow extends DataClass implements Insertable<SubjectRow> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
+    map['user_id'] = Variable<String>(userId);
     map['code'] = Variable<String>(code);
     map['name'] = Variable<String>(name);
     map['color_hex'] = Variable<String>(colorHex);
@@ -207,6 +235,7 @@ class SubjectRow extends DataClass implements Insertable<SubjectRow> {
   SubjectsCompanion toCompanion(bool nullToAbsent) {
     return SubjectsCompanion(
       id: Value(id),
+      userId: Value(userId),
       code: Value(code),
       name: Value(name),
       colorHex: Value(colorHex),
@@ -222,6 +251,7 @@ class SubjectRow extends DataClass implements Insertable<SubjectRow> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return SubjectRow(
       id: serializer.fromJson<String>(json['id']),
+      userId: serializer.fromJson<String>(json['userId']),
       code: serializer.fromJson<String>(json['code']),
       name: serializer.fromJson<String>(json['name']),
       colorHex: serializer.fromJson<String>(json['colorHex']),
@@ -234,6 +264,7 @@ class SubjectRow extends DataClass implements Insertable<SubjectRow> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
+      'userId': serializer.toJson<String>(userId),
       'code': serializer.toJson<String>(code),
       'name': serializer.toJson<String>(name),
       'colorHex': serializer.toJson<String>(colorHex),
@@ -244,6 +275,7 @@ class SubjectRow extends DataClass implements Insertable<SubjectRow> {
 
   SubjectRow copyWith({
     String? id,
+    String? userId,
     String? code,
     String? name,
     String? colorHex,
@@ -251,6 +283,7 @@ class SubjectRow extends DataClass implements Insertable<SubjectRow> {
     int? order,
   }) => SubjectRow(
     id: id ?? this.id,
+    userId: userId ?? this.userId,
     code: code ?? this.code,
     name: name ?? this.name,
     colorHex: colorHex ?? this.colorHex,
@@ -260,6 +293,7 @@ class SubjectRow extends DataClass implements Insertable<SubjectRow> {
   SubjectRow copyWithCompanion(SubjectsCompanion data) {
     return SubjectRow(
       id: data.id.present ? data.id.value : this.id,
+      userId: data.userId.present ? data.userId.value : this.userId,
       code: data.code.present ? data.code.value : this.code,
       name: data.name.present ? data.name.value : this.name,
       colorHex: data.colorHex.present ? data.colorHex.value : this.colorHex,
@@ -274,6 +308,7 @@ class SubjectRow extends DataClass implements Insertable<SubjectRow> {
   String toString() {
     return (StringBuffer('SubjectRow(')
           ..write('id: $id, ')
+          ..write('userId: $userId, ')
           ..write('code: $code, ')
           ..write('name: $name, ')
           ..write('colorHex: $colorHex, ')
@@ -285,12 +320,13 @@ class SubjectRow extends DataClass implements Insertable<SubjectRow> {
 
   @override
   int get hashCode =>
-      Object.hash(id, code, name, colorHex, confidenceLevel, order);
+      Object.hash(id, userId, code, name, colorHex, confidenceLevel, order);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is SubjectRow &&
           other.id == this.id &&
+          other.userId == this.userId &&
           other.code == this.code &&
           other.name == this.name &&
           other.colorHex == this.colorHex &&
@@ -300,6 +336,7 @@ class SubjectRow extends DataClass implements Insertable<SubjectRow> {
 
 class SubjectsCompanion extends UpdateCompanion<SubjectRow> {
   final Value<String> id;
+  final Value<String> userId;
   final Value<String> code;
   final Value<String> name;
   final Value<String> colorHex;
@@ -308,6 +345,7 @@ class SubjectsCompanion extends UpdateCompanion<SubjectRow> {
   final Value<int> rowid;
   const SubjectsCompanion({
     this.id = const Value.absent(),
+    this.userId = const Value.absent(),
     this.code = const Value.absent(),
     this.name = const Value.absent(),
     this.colorHex = const Value.absent(),
@@ -317,6 +355,7 @@ class SubjectsCompanion extends UpdateCompanion<SubjectRow> {
   });
   SubjectsCompanion.insert({
     required String id,
+    this.userId = const Value.absent(),
     required String code,
     required String name,
     required String colorHex,
@@ -330,6 +369,7 @@ class SubjectsCompanion extends UpdateCompanion<SubjectRow> {
        confidenceLevel = Value(confidenceLevel);
   static Insertable<SubjectRow> custom({
     Expression<String>? id,
+    Expression<String>? userId,
     Expression<String>? code,
     Expression<String>? name,
     Expression<String>? colorHex,
@@ -339,6 +379,7 @@ class SubjectsCompanion extends UpdateCompanion<SubjectRow> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
       if (code != null) 'code': code,
       if (name != null) 'name': name,
       if (colorHex != null) 'color_hex': colorHex,
@@ -350,6 +391,7 @@ class SubjectsCompanion extends UpdateCompanion<SubjectRow> {
 
   SubjectsCompanion copyWith({
     Value<String>? id,
+    Value<String>? userId,
     Value<String>? code,
     Value<String>? name,
     Value<String>? colorHex,
@@ -359,6 +401,7 @@ class SubjectsCompanion extends UpdateCompanion<SubjectRow> {
   }) {
     return SubjectsCompanion(
       id: id ?? this.id,
+      userId: userId ?? this.userId,
       code: code ?? this.code,
       name: name ?? this.name,
       colorHex: colorHex ?? this.colorHex,
@@ -373,6 +416,9 @@ class SubjectsCompanion extends UpdateCompanion<SubjectRow> {
     final map = <String, Expression>{};
     if (id.present) {
       map['id'] = Variable<String>(id.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
     }
     if (code.present) {
       map['code'] = Variable<String>(code.value);
@@ -399,6 +445,7 @@ class SubjectsCompanion extends UpdateCompanion<SubjectRow> {
   String toString() {
     return (StringBuffer('SubjectsCompanion(')
           ..write('id: $id, ')
+          ..write('userId: $userId, ')
           ..write('code: $code, ')
           ..write('name: $name, ')
           ..write('colorHex: $colorHex, ')
@@ -839,6 +886,16 @@ class $ExamsTable extends Exams with TableInfo<$ExamsTable, ExamRow> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
   static const VerificationMeta _subjectIdMeta = const VerificationMeta(
     'subjectId',
   );
@@ -872,7 +929,7 @@ class $ExamsTable extends Exams with TableInfo<$ExamsTable, ExamRow> {
     requiredDuringInsert: false,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, subjectId, date, label];
+  List<GeneratedColumn> get $columns => [id, userId, subjectId, date, label];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -889,6 +946,12 @@ class $ExamsTable extends Exams with TableInfo<$ExamsTable, ExamRow> {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     } else if (isInserting) {
       context.missing(_idMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
     }
     if (data.containsKey('subject_id')) {
       context.handle(
@@ -925,6 +988,10 @@ class $ExamsTable extends Exams with TableInfo<$ExamsTable, ExamRow> {
         DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_id'],
+      )!,
       subjectId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}subject_id'],
@@ -948,11 +1015,15 @@ class $ExamsTable extends Exams with TableInfo<$ExamsTable, ExamRow> {
 
 class ExamRow extends DataClass implements Insertable<ExamRow> {
   final String id;
+
+  /// Owning user — scoped alongside [Subjects] (ADR-014). See the note there.
+  final String userId;
   final String subjectId;
   final DateTime date;
   final String? label;
   const ExamRow({
     required this.id,
+    required this.userId,
     required this.subjectId,
     required this.date,
     this.label,
@@ -961,6 +1032,7 @@ class ExamRow extends DataClass implements Insertable<ExamRow> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
+    map['user_id'] = Variable<String>(userId);
     map['subject_id'] = Variable<String>(subjectId);
     map['date'] = Variable<DateTime>(date);
     if (!nullToAbsent || label != null) {
@@ -972,6 +1044,7 @@ class ExamRow extends DataClass implements Insertable<ExamRow> {
   ExamsCompanion toCompanion(bool nullToAbsent) {
     return ExamsCompanion(
       id: Value(id),
+      userId: Value(userId),
       subjectId: Value(subjectId),
       date: Value(date),
       label: label == null && nullToAbsent
@@ -987,6 +1060,7 @@ class ExamRow extends DataClass implements Insertable<ExamRow> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ExamRow(
       id: serializer.fromJson<String>(json['id']),
+      userId: serializer.fromJson<String>(json['userId']),
       subjectId: serializer.fromJson<String>(json['subjectId']),
       date: serializer.fromJson<DateTime>(json['date']),
       label: serializer.fromJson<String?>(json['label']),
@@ -997,6 +1071,7 @@ class ExamRow extends DataClass implements Insertable<ExamRow> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
+      'userId': serializer.toJson<String>(userId),
       'subjectId': serializer.toJson<String>(subjectId),
       'date': serializer.toJson<DateTime>(date),
       'label': serializer.toJson<String?>(label),
@@ -1005,11 +1080,13 @@ class ExamRow extends DataClass implements Insertable<ExamRow> {
 
   ExamRow copyWith({
     String? id,
+    String? userId,
     String? subjectId,
     DateTime? date,
     Value<String?> label = const Value.absent(),
   }) => ExamRow(
     id: id ?? this.id,
+    userId: userId ?? this.userId,
     subjectId: subjectId ?? this.subjectId,
     date: date ?? this.date,
     label: label.present ? label.value : this.label,
@@ -1017,6 +1094,7 @@ class ExamRow extends DataClass implements Insertable<ExamRow> {
   ExamRow copyWithCompanion(ExamsCompanion data) {
     return ExamRow(
       id: data.id.present ? data.id.value : this.id,
+      userId: data.userId.present ? data.userId.value : this.userId,
       subjectId: data.subjectId.present ? data.subjectId.value : this.subjectId,
       date: data.date.present ? data.date.value : this.date,
       label: data.label.present ? data.label.value : this.label,
@@ -1027,6 +1105,7 @@ class ExamRow extends DataClass implements Insertable<ExamRow> {
   String toString() {
     return (StringBuffer('ExamRow(')
           ..write('id: $id, ')
+          ..write('userId: $userId, ')
           ..write('subjectId: $subjectId, ')
           ..write('date: $date, ')
           ..write('label: $label')
@@ -1035,12 +1114,13 @@ class ExamRow extends DataClass implements Insertable<ExamRow> {
   }
 
   @override
-  int get hashCode => Object.hash(id, subjectId, date, label);
+  int get hashCode => Object.hash(id, userId, subjectId, date, label);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is ExamRow &&
           other.id == this.id &&
+          other.userId == this.userId &&
           other.subjectId == this.subjectId &&
           other.date == this.date &&
           other.label == this.label);
@@ -1048,12 +1128,14 @@ class ExamRow extends DataClass implements Insertable<ExamRow> {
 
 class ExamsCompanion extends UpdateCompanion<ExamRow> {
   final Value<String> id;
+  final Value<String> userId;
   final Value<String> subjectId;
   final Value<DateTime> date;
   final Value<String?> label;
   final Value<int> rowid;
   const ExamsCompanion({
     this.id = const Value.absent(),
+    this.userId = const Value.absent(),
     this.subjectId = const Value.absent(),
     this.date = const Value.absent(),
     this.label = const Value.absent(),
@@ -1061,6 +1143,7 @@ class ExamsCompanion extends UpdateCompanion<ExamRow> {
   });
   ExamsCompanion.insert({
     required String id,
+    this.userId = const Value.absent(),
     required String subjectId,
     required DateTime date,
     this.label = const Value.absent(),
@@ -1070,6 +1153,7 @@ class ExamsCompanion extends UpdateCompanion<ExamRow> {
        date = Value(date);
   static Insertable<ExamRow> custom({
     Expression<String>? id,
+    Expression<String>? userId,
     Expression<String>? subjectId,
     Expression<DateTime>? date,
     Expression<String>? label,
@@ -1077,6 +1161,7 @@ class ExamsCompanion extends UpdateCompanion<ExamRow> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
       if (subjectId != null) 'subject_id': subjectId,
       if (date != null) 'date': date,
       if (label != null) 'label': label,
@@ -1086,6 +1171,7 @@ class ExamsCompanion extends UpdateCompanion<ExamRow> {
 
   ExamsCompanion copyWith({
     Value<String>? id,
+    Value<String>? userId,
     Value<String>? subjectId,
     Value<DateTime>? date,
     Value<String?>? label,
@@ -1093,6 +1179,7 @@ class ExamsCompanion extends UpdateCompanion<ExamRow> {
   }) {
     return ExamsCompanion(
       id: id ?? this.id,
+      userId: userId ?? this.userId,
       subjectId: subjectId ?? this.subjectId,
       date: date ?? this.date,
       label: label ?? this.label,
@@ -1105,6 +1192,9 @@ class ExamsCompanion extends UpdateCompanion<ExamRow> {
     final map = <String, Expression>{};
     if (id.present) {
       map['id'] = Variable<String>(id.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
     }
     if (subjectId.present) {
       map['subject_id'] = Variable<String>(subjectId.value);
@@ -1125,6 +1215,7 @@ class ExamsCompanion extends UpdateCompanion<ExamRow> {
   String toString() {
     return (StringBuffer('ExamsCompanion(')
           ..write('id: $id, ')
+          ..write('userId: $userId, ')
           ..write('subjectId: $subjectId, ')
           ..write('date: $date, ')
           ..write('label: $label, ')
@@ -1551,6 +1642,17 @@ class $SchedulesTable extends Schedules
         type: DriftSqlType.dateTime,
         requiredDuringInsert: false,
       );
+  static const VerificationMeta _aiReasoningMeta = const VerificationMeta(
+    'aiReasoning',
+  );
+  @override
+  late final GeneratedColumn<String> aiReasoning = GeneratedColumn<String>(
+    'ai_reasoning',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _isAIGeneratedMeta = const VerificationMeta(
     'isAIGenerated',
   );
@@ -1573,6 +1675,7 @@ class $SchedulesTable extends Schedules
     dailyTargetHours,
     enabledWindowIds,
     weekStartDate,
+    aiReasoning,
     isAIGenerated,
   ];
   @override
@@ -1620,6 +1723,15 @@ class $SchedulesTable extends Schedules
         ),
       );
     }
+    if (data.containsKey('ai_reasoning')) {
+      context.handle(
+        _aiReasoningMeta,
+        aiReasoning.isAcceptableOrUnknown(
+          data['ai_reasoning']!,
+          _aiReasoningMeta,
+        ),
+      );
+    }
     if (data.containsKey('is_a_i_generated')) {
       context.handle(
         _isAIGeneratedMeta,
@@ -1660,6 +1772,10 @@ class $SchedulesTable extends Schedules
         DriftSqlType.dateTime,
         data['${effectivePrefix}week_start_date'],
       ),
+      aiReasoning: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ai_reasoning'],
+      ),
       isAIGenerated: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_a_i_generated'],
@@ -1682,6 +1798,7 @@ class ScheduleRow extends DataClass implements Insertable<ScheduleRow> {
   final double dailyTargetHours;
   final List<String> enabledWindowIds;
   final DateTime? weekStartDate;
+  final String? aiReasoning;
   final bool isAIGenerated;
   const ScheduleRow({
     required this.id,
@@ -1689,6 +1806,7 @@ class ScheduleRow extends DataClass implements Insertable<ScheduleRow> {
     required this.dailyTargetHours,
     required this.enabledWindowIds,
     this.weekStartDate,
+    this.aiReasoning,
     required this.isAIGenerated,
   });
   @override
@@ -1705,6 +1823,9 @@ class ScheduleRow extends DataClass implements Insertable<ScheduleRow> {
     if (!nullToAbsent || weekStartDate != null) {
       map['week_start_date'] = Variable<DateTime>(weekStartDate);
     }
+    if (!nullToAbsent || aiReasoning != null) {
+      map['ai_reasoning'] = Variable<String>(aiReasoning);
+    }
     map['is_a_i_generated'] = Variable<bool>(isAIGenerated);
     return map;
   }
@@ -1718,6 +1839,9 @@ class ScheduleRow extends DataClass implements Insertable<ScheduleRow> {
       weekStartDate: weekStartDate == null && nullToAbsent
           ? const Value.absent()
           : Value(weekStartDate),
+      aiReasoning: aiReasoning == null && nullToAbsent
+          ? const Value.absent()
+          : Value(aiReasoning),
       isAIGenerated: Value(isAIGenerated),
     );
   }
@@ -1735,6 +1859,7 @@ class ScheduleRow extends DataClass implements Insertable<ScheduleRow> {
         json['enabledWindowIds'],
       ),
       weekStartDate: serializer.fromJson<DateTime?>(json['weekStartDate']),
+      aiReasoning: serializer.fromJson<String?>(json['aiReasoning']),
       isAIGenerated: serializer.fromJson<bool>(json['isAIGenerated']),
     );
   }
@@ -1747,6 +1872,7 @@ class ScheduleRow extends DataClass implements Insertable<ScheduleRow> {
       'dailyTargetHours': serializer.toJson<double>(dailyTargetHours),
       'enabledWindowIds': serializer.toJson<List<String>>(enabledWindowIds),
       'weekStartDate': serializer.toJson<DateTime?>(weekStartDate),
+      'aiReasoning': serializer.toJson<String?>(aiReasoning),
       'isAIGenerated': serializer.toJson<bool>(isAIGenerated),
     };
   }
@@ -1757,6 +1883,7 @@ class ScheduleRow extends DataClass implements Insertable<ScheduleRow> {
     double? dailyTargetHours,
     List<String>? enabledWindowIds,
     Value<DateTime?> weekStartDate = const Value.absent(),
+    Value<String?> aiReasoning = const Value.absent(),
     bool? isAIGenerated,
   }) => ScheduleRow(
     id: id ?? this.id,
@@ -1766,6 +1893,7 @@ class ScheduleRow extends DataClass implements Insertable<ScheduleRow> {
     weekStartDate: weekStartDate.present
         ? weekStartDate.value
         : this.weekStartDate,
+    aiReasoning: aiReasoning.present ? aiReasoning.value : this.aiReasoning,
     isAIGenerated: isAIGenerated ?? this.isAIGenerated,
   );
   ScheduleRow copyWithCompanion(SchedulesCompanion data) {
@@ -1781,6 +1909,9 @@ class ScheduleRow extends DataClass implements Insertable<ScheduleRow> {
       weekStartDate: data.weekStartDate.present
           ? data.weekStartDate.value
           : this.weekStartDate,
+      aiReasoning: data.aiReasoning.present
+          ? data.aiReasoning.value
+          : this.aiReasoning,
       isAIGenerated: data.isAIGenerated.present
           ? data.isAIGenerated.value
           : this.isAIGenerated,
@@ -1795,6 +1926,7 @@ class ScheduleRow extends DataClass implements Insertable<ScheduleRow> {
           ..write('dailyTargetHours: $dailyTargetHours, ')
           ..write('enabledWindowIds: $enabledWindowIds, ')
           ..write('weekStartDate: $weekStartDate, ')
+          ..write('aiReasoning: $aiReasoning, ')
           ..write('isAIGenerated: $isAIGenerated')
           ..write(')'))
         .toString();
@@ -1807,6 +1939,7 @@ class ScheduleRow extends DataClass implements Insertable<ScheduleRow> {
     dailyTargetHours,
     enabledWindowIds,
     weekStartDate,
+    aiReasoning,
     isAIGenerated,
   );
   @override
@@ -1818,6 +1951,7 @@ class ScheduleRow extends DataClass implements Insertable<ScheduleRow> {
           other.dailyTargetHours == this.dailyTargetHours &&
           other.enabledWindowIds == this.enabledWindowIds &&
           other.weekStartDate == this.weekStartDate &&
+          other.aiReasoning == this.aiReasoning &&
           other.isAIGenerated == this.isAIGenerated);
 }
 
@@ -1827,6 +1961,7 @@ class SchedulesCompanion extends UpdateCompanion<ScheduleRow> {
   final Value<double> dailyTargetHours;
   final Value<List<String>> enabledWindowIds;
   final Value<DateTime?> weekStartDate;
+  final Value<String?> aiReasoning;
   final Value<bool> isAIGenerated;
   final Value<int> rowid;
   const SchedulesCompanion({
@@ -1835,6 +1970,7 @@ class SchedulesCompanion extends UpdateCompanion<ScheduleRow> {
     this.dailyTargetHours = const Value.absent(),
     this.enabledWindowIds = const Value.absent(),
     this.weekStartDate = const Value.absent(),
+    this.aiReasoning = const Value.absent(),
     this.isAIGenerated = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -1844,6 +1980,7 @@ class SchedulesCompanion extends UpdateCompanion<ScheduleRow> {
     required double dailyTargetHours,
     required List<String> enabledWindowIds,
     this.weekStartDate = const Value.absent(),
+    this.aiReasoning = const Value.absent(),
     this.isAIGenerated = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -1856,6 +1993,7 @@ class SchedulesCompanion extends UpdateCompanion<ScheduleRow> {
     Expression<double>? dailyTargetHours,
     Expression<String>? enabledWindowIds,
     Expression<DateTime>? weekStartDate,
+    Expression<String>? aiReasoning,
     Expression<bool>? isAIGenerated,
     Expression<int>? rowid,
   }) {
@@ -1865,6 +2003,7 @@ class SchedulesCompanion extends UpdateCompanion<ScheduleRow> {
       if (dailyTargetHours != null) 'daily_target_hours': dailyTargetHours,
       if (enabledWindowIds != null) 'enabled_window_ids': enabledWindowIds,
       if (weekStartDate != null) 'week_start_date': weekStartDate,
+      if (aiReasoning != null) 'ai_reasoning': aiReasoning,
       if (isAIGenerated != null) 'is_a_i_generated': isAIGenerated,
       if (rowid != null) 'rowid': rowid,
     });
@@ -1876,6 +2015,7 @@ class SchedulesCompanion extends UpdateCompanion<ScheduleRow> {
     Value<double>? dailyTargetHours,
     Value<List<String>>? enabledWindowIds,
     Value<DateTime?>? weekStartDate,
+    Value<String?>? aiReasoning,
     Value<bool>? isAIGenerated,
     Value<int>? rowid,
   }) {
@@ -1885,6 +2025,7 @@ class SchedulesCompanion extends UpdateCompanion<ScheduleRow> {
       dailyTargetHours: dailyTargetHours ?? this.dailyTargetHours,
       enabledWindowIds: enabledWindowIds ?? this.enabledWindowIds,
       weekStartDate: weekStartDate ?? this.weekStartDate,
+      aiReasoning: aiReasoning ?? this.aiReasoning,
       isAIGenerated: isAIGenerated ?? this.isAIGenerated,
       rowid: rowid ?? this.rowid,
     );
@@ -1912,6 +2053,9 @@ class SchedulesCompanion extends UpdateCompanion<ScheduleRow> {
     if (weekStartDate.present) {
       map['week_start_date'] = Variable<DateTime>(weekStartDate.value);
     }
+    if (aiReasoning.present) {
+      map['ai_reasoning'] = Variable<String>(aiReasoning.value);
+    }
     if (isAIGenerated.present) {
       map['is_a_i_generated'] = Variable<bool>(isAIGenerated.value);
     }
@@ -1929,6 +2073,7 @@ class SchedulesCompanion extends UpdateCompanion<ScheduleRow> {
           ..write('dailyTargetHours: $dailyTargetHours, ')
           ..write('enabledWindowIds: $enabledWindowIds, ')
           ..write('weekStartDate: $weekStartDate, ')
+          ..write('aiReasoning: $aiReasoning, ')
           ..write('isAIGenerated: $isAIGenerated, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -10396,6 +10541,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 typedef $$SubjectsTableCreateCompanionBuilder =
     SubjectsCompanion Function({
       required String id,
+      Value<String> userId,
       required String code,
       required String name,
       required String colorHex,
@@ -10406,6 +10552,7 @@ typedef $$SubjectsTableCreateCompanionBuilder =
 typedef $$SubjectsTableUpdateCompanionBuilder =
     SubjectsCompanion Function({
       Value<String> id,
+      Value<String> userId,
       Value<String> code,
       Value<String> name,
       Value<String> colorHex,
@@ -10573,6 +10720,11 @@ class $$SubjectsTableFilterComposer
   });
   ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get userId => $composableBuilder(
+    column: $table.userId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -10791,6 +10943,11 @@ class $$SubjectsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get code => $composableBuilder(
     column: $table.code,
     builder: (column) => ColumnOrderings(column),
@@ -10828,6 +10985,9 @@ class $$SubjectsTableAnnotationComposer
   });
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
 
   GeneratedColumn<String> get code =>
       $composableBuilder(column: $table.code, builder: (column) => column);
@@ -11060,6 +11220,7 @@ class $$SubjectsTableTableManager
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
+                Value<String> userId = const Value.absent(),
                 Value<String> code = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String> colorHex = const Value.absent(),
@@ -11068,6 +11229,7 @@ class $$SubjectsTableTableManager
                 Value<int> rowid = const Value.absent(),
               }) => SubjectsCompanion(
                 id: id,
+                userId: userId,
                 code: code,
                 name: name,
                 colorHex: colorHex,
@@ -11078,6 +11240,7 @@ class $$SubjectsTableTableManager
           createCompanionCallback:
               ({
                 required String id,
+                Value<String> userId = const Value.absent(),
                 required String code,
                 required String name,
                 required String colorHex,
@@ -11086,6 +11249,7 @@ class $$SubjectsTableTableManager
                 Value<int> rowid = const Value.absent(),
               }) => SubjectsCompanion.insert(
                 id: id,
+                userId: userId,
                 code: code,
                 name: name,
                 colorHex: colorHex,
@@ -12034,6 +12198,7 @@ typedef $$TopicsTableProcessedTableManager =
 typedef $$ExamsTableCreateCompanionBuilder =
     ExamsCompanion Function({
       required String id,
+      Value<String> userId,
       required String subjectId,
       required DateTime date,
       Value<String?> label,
@@ -12042,6 +12207,7 @@ typedef $$ExamsTableCreateCompanionBuilder =
 typedef $$ExamsTableUpdateCompanionBuilder =
     ExamsCompanion Function({
       Value<String> id,
+      Value<String> userId,
       Value<String> subjectId,
       Value<DateTime> date,
       Value<String?> label,
@@ -12080,6 +12246,11 @@ class $$ExamsTableFilterComposer extends Composer<_$AppDatabase, $ExamsTable> {
   });
   ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get userId => $composableBuilder(
+    column: $table.userId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -12131,6 +12302,11 @@ class $$ExamsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get date => $composableBuilder(
     column: $table.date,
     builder: (column) => ColumnOrderings(column),
@@ -12176,6 +12352,9 @@ class $$ExamsTableAnnotationComposer
   });
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
 
   GeneratedColumn<DateTime> get date =>
       $composableBuilder(column: $table.date, builder: (column) => column);
@@ -12236,12 +12415,14 @@ class $$ExamsTableTableManager
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
+                Value<String> userId = const Value.absent(),
                 Value<String> subjectId = const Value.absent(),
                 Value<DateTime> date = const Value.absent(),
                 Value<String?> label = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ExamsCompanion(
                 id: id,
+                userId: userId,
                 subjectId: subjectId,
                 date: date,
                 label: label,
@@ -12250,12 +12431,14 @@ class $$ExamsTableTableManager
           createCompanionCallback:
               ({
                 required String id,
+                Value<String> userId = const Value.absent(),
                 required String subjectId,
                 required DateTime date,
                 Value<String?> label = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ExamsCompanion.insert(
                 id: id,
+                userId: userId,
                 subjectId: subjectId,
                 date: date,
                 label: label,
@@ -12533,6 +12716,7 @@ typedef $$SchedulesTableCreateCompanionBuilder =
       required double dailyTargetHours,
       required List<String> enabledWindowIds,
       Value<DateTime?> weekStartDate,
+      Value<String?> aiReasoning,
       Value<bool> isAIGenerated,
       Value<int> rowid,
     });
@@ -12543,6 +12727,7 @@ typedef $$SchedulesTableUpdateCompanionBuilder =
       Value<double> dailyTargetHours,
       Value<List<String>> enabledWindowIds,
       Value<DateTime?> weekStartDate,
+      Value<String?> aiReasoning,
       Value<bool> isAIGenerated,
       Value<int> rowid,
     });
@@ -12602,6 +12787,11 @@ class $$SchedulesTableFilterComposer
 
   ColumnFilters<DateTime> get weekStartDate => $composableBuilder(
     column: $table.weekStartDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get aiReasoning => $composableBuilder(
+    column: $table.aiReasoning,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -12670,6 +12860,11 @@ class $$SchedulesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get aiReasoning => $composableBuilder(
+    column: $table.aiReasoning,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get isAIGenerated => $composableBuilder(
     column: $table.isAIGenerated,
     builder: (column) => ColumnOrderings(column),
@@ -12704,6 +12899,11 @@ class $$SchedulesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get weekStartDate => $composableBuilder(
     column: $table.weekStartDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get aiReasoning => $composableBuilder(
+    column: $table.aiReasoning,
     builder: (column) => column,
   );
 
@@ -12771,6 +12971,7 @@ class $$SchedulesTableTableManager
                 Value<double> dailyTargetHours = const Value.absent(),
                 Value<List<String>> enabledWindowIds = const Value.absent(),
                 Value<DateTime?> weekStartDate = const Value.absent(),
+                Value<String?> aiReasoning = const Value.absent(),
                 Value<bool> isAIGenerated = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SchedulesCompanion(
@@ -12779,6 +12980,7 @@ class $$SchedulesTableTableManager
                 dailyTargetHours: dailyTargetHours,
                 enabledWindowIds: enabledWindowIds,
                 weekStartDate: weekStartDate,
+                aiReasoning: aiReasoning,
                 isAIGenerated: isAIGenerated,
                 rowid: rowid,
               ),
@@ -12789,6 +12991,7 @@ class $$SchedulesTableTableManager
                 required double dailyTargetHours,
                 required List<String> enabledWindowIds,
                 Value<DateTime?> weekStartDate = const Value.absent(),
+                Value<String?> aiReasoning = const Value.absent(),
                 Value<bool> isAIGenerated = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SchedulesCompanion.insert(
@@ -12797,6 +13000,7 @@ class $$SchedulesTableTableManager
                 dailyTargetHours: dailyTargetHours,
                 enabledWindowIds: enabledWindowIds,
                 weekStartDate: weekStartDate,
+                aiReasoning: aiReasoning,
                 isAIGenerated: isAIGenerated,
                 rowid: rowid,
               ),

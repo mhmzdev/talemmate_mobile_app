@@ -23,6 +23,7 @@ class Schedules extends Table {
   RealColumn get dailyTargetHours => real()();
   TextColumn get enabledWindowIds => text().map(const StringListConverter())();
   DateTimeColumn get weekStartDate => dateTime().nullable()();
+  TextColumn get aiReasoning => text().nullable()();
   BoolColumn get isAIGenerated => boolean().withDefault(const Constant(true))();
 
   @override

@@ -20,6 +20,7 @@ class _InitListener extends StatelessWidget {
           if (uid != null) {
             LibraryCubit.c(context).initUid(uid);
             ChatCubit.c(context).initUid(uid);
+            PlanCubit.c(context).initUid(uid);
           }
           final data = state.userData;
           final isLoggedIn = data != null;

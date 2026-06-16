@@ -20,4 +20,7 @@ class SystemPrompts {
 
   /// Library text-extraction prompt (`assets/library_extraction_sys_prompt.md`).
   static Future<String> library() => _load(Assets.libraryExtractionSysPrompt);
+
+  /// Weekly study-plan generation prompt (`assets/plan_sys_prompt.md`).
+  static Future<String> plan() => _load(Assets.planSysPrompt);
 }

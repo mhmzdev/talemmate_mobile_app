@@ -14,7 +14,6 @@ class _SearchBar extends StatelessWidget {
       name: _FormKeys.search,
       placeholder: 'Search notes, slides, photos…',
       prefixIcon: LucideIcons.search,
-      suffixIcon: LucideIcons.list_filter,
       textInputAction: .search,
       onChanged: (v) => state.setQuery(v ?? ''),
     );

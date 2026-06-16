@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:taleemmate/blocs/user/cubit.dart';
 import 'package:taleemmate/blocs/library/cubit.dart';
 import 'package:taleemmate/blocs/chat/cubit.dart';
+import 'package:taleemmate/blocs/plan/cubit.dart';
 import 'package:taleemmate/configs/configs.dart';
 import 'package:taleemmate/router/routes.dart';
 import 'package:taleemmate/ui/widgets/core/buttons/app_back_button.dart';

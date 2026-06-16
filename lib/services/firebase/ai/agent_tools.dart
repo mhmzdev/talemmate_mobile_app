@@ -65,4 +65,56 @@ class AgentTools {
     },
     optionalProperties: ['kickerQuestion'],
   );
+
+  /// Structured-output schema for weekly study-plan generation (see
+  /// [plan_sys_prompt.md]). Mirrors `WeekPlan` → `DayPlan` → `StudyBlock`,
+  /// omitting the fields the app fills itself (id / scheduleId / dayOfWeek /
+  /// status / isAIGenerated / topicId). Fed to `GenerationConfig.responseSchema`
+  /// so Gemini always returns parseable JSON.
+  Schema get planSchema => Schema.object(
+    properties: {
+      'aiReasoning': Schema.string(
+        description:
+            "One short paragraph explaining the week's strategy, in the "
+            "student's language (Urdu / English / Roman Urdu).",
+      ),
+      'days': Schema.array(
+        description:
+            'Up to 7 day entries covering the week range. Days with no study '
+            'are allowed to be omitted.',
+        items: Schema.object(
+          properties: {
+            'date': Schema.string(description: 'ISO-8601 date (yyyy-MM-dd).'),
+            'blocks': Schema.array(
+              items: Schema.object(
+                properties: {
+                  'startTime': Schema.string(
+                    description: '24h HH:mm, inside an enabled window.',
+                  ),
+                  'durationMinutes': Schema.integer(
+                    description: 'Block length, 20–90.',
+                  ),
+                  'subjectId': Schema.string(
+                    description: 'One of the provided subject ids.',
+                  ),
+                  'title': Schema.string(
+                    description: 'Concise topic/goal for the block.',
+                  ),
+                  'activities': Schema.string(
+                    description: 'Short method line, e.g. "Read + summarize".',
+                  ),
+                  'aiInsight': Schema.string(
+                    nullable: true,
+                    description:
+                        'Optional gold note for a high-impact block.',
+                  ),
+                },
+                optionalProperties: ['aiInsight'],
+              ),
+            ),
+          },
+        ),
+      ),
+    },
+  );
 }

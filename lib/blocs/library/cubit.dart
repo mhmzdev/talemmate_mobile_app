@@ -27,6 +27,16 @@ class LibraryCubit extends Cubit<LibraryState> {
   /// Session uid lifecycle (ADR-014) — driven by the auth-transition listeners.
   void initUid(String uid) => emit(state.copyWith(userId: uid));
 
+  /// The loaded [Subject] for [id], or null if unknown — used by surfaces that
+  /// only hold a `subjectId` (study blocks, conversations) to resolve a name
+  /// and brand colour.
+  Subject? subjectById(String id) {
+    for (final s in state.subjects) {
+      if (s.id == id) return s;
+    }
+    return null;
+  }
+
   /// Clears the uid plus all loaded materials/subjects on logout.
   void resetUid() => emit(LibraryState.def());
 
@@ -38,7 +48,7 @@ class LibraryCubit extends Cubit<LibraryState> {
     emit(state.copyWith(load: state.load.toLoading()));
     try {
       final rawItems = await _repo.materials(uid);
-      final rawSubs = await _repo.subjects();
+      final rawSubs = await _repo.subjects(uid);
       final items = rawItems.map(LibraryItem.fromJson).toList();
       final subs = rawSubs.map(Subject.fromJson).toList();
       emit(

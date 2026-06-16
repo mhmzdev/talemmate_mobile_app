@@ -12,6 +12,14 @@ class _RegisterListener extends StatelessWidget {
           UIFlash.error(context, state.register.errorMessage);
         }
         if (state.register.isSuccess) {
+          // Seed the session uid for the app-wide modules (ADR-014) before
+          // routing into onboarding.
+          final uid = state.user?.uid;
+          if (uid != null) {
+            LibraryCubit.c(context).initUid(uid);
+            ChatCubit.c(context).initUid(uid);
+            PlanCubit.c(context).initUid(uid);
+          }
           AppRoutes.onboarding.pushReplace(context);
         }
       },

@@ -3,10 +3,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:taleemmate/configs/configs.dart';
 import 'package:taleemmate/router/routes.dart';
 import 'package:taleemmate/ui/widgets/core/screen/screen.dart';
+import 'package:taleemmate/ui/widgets/core/button/button.dart';
+import 'package:taleemmate/blocs/plan/cubit.dart';
+import 'package:taleemmate/blocs/user/cubit.dart';
+import 'package:taleemmate/utils/flash.dart';
 
+part 'listeners/_generate.dart';
 part '_state.dart';
 
 class StepwiseLoaderScreen extends StatelessWidget {
@@ -40,6 +47,7 @@ class _Body extends StatelessWidget {
     state.startSequenceIfNeeded(context);
 
     return Screen(
+      padding: Space.h.t24,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -47,7 +55,9 @@ class _Body extends StatelessWidget {
             Space.y.t32,
             Text(
               'STEP 4 OF 4 · PERSONALISING',
-              style: AppText.l1b.cl(AppTheme.c.subText).copyWith(letterSpacing: 1.2),
+              style: AppText.l1b
+                  .cl(AppTheme.c.subText)
+                  .copyWith(letterSpacing: 1.2),
             ),
             Space.y.t12,
             Text('Finishing setup', style: AppText.h1),
@@ -57,12 +67,24 @@ class _Body extends StatelessWidget {
               style: AppText.b1.cl(AppTheme.c.subText),
             ),
             Space.y.t32,
-            for (int i = 0; i < _stepLabels.length; i++) ...[
-              _StepRow(label: _stepLabels[i], stepState: state.stepStates[i]),
+            ..._stepLabels.asMap().entries.expand(
+              (e) => [
+                _StepRow(label: e.value, stepState: state.stepStates[e.key]),
+                Space.y.t24,
+              ],
+            ),
+            const Spacer(),
+            if (state.failed) ...[
+              AppButton(
+                label: 'Try again',
+                onTap: () => state.retry(context),
+                mainAxisSize: .max,
+                size: .large,
+              ),
               Space.y.t16,
             ],
-            const Spacer(),
             const _LoaderFooter(),
+            const _GenerateListener(),
           ],
         ),
       ),
@@ -85,7 +107,11 @@ class _StepRow extends StatelessWidget {
           width: 24,
           height: 24,
           child: switch (stepState) {
-            2 => const Icon(Icons.check_circle, color: Color(0xFF4CAF50), size: 24),
+            2 => Icon(
+              Icons.check_circle,
+              color: AppColors.success,
+              size: SpaceToken.t24,
+            ),
             1 => const SizedBox(
                 width: 20,
                 height: 20,
@@ -115,7 +141,7 @@ class _StepRow extends StatelessWidget {
               if (stepState == 1)
                 Text(
                   'Working on it...',
-                  style: AppText.b2.cl(const Color(0xFFE09A2B)),
+                  style: AppText.b2.cl(AppTheme.c.accent),
                 ),
             ],
           ),

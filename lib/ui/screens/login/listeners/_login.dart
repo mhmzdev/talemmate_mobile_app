@@ -18,6 +18,7 @@ class _LoginListener extends StatelessWidget {
           if (uid != null) {
             LibraryCubit.c(context).initUid(uid);
             ChatCubit.c(context).initUid(uid);
+            PlanCubit.c(context).initUid(uid);
           }
           final done = state.userData?.isOnboardingComplete ?? false;
           (done ? AppRoutes.home : AppRoutes.onboarding).pushReplace(context);

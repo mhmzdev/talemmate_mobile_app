@@ -6,6 +6,11 @@ import '../converters.dart';
 @DataClassName('SubjectRow')
 class Subjects extends Table {
   TextColumn get id => text()();
+
+  /// Owning user — subjects are per-account (ADR-014). Defaulted to '' so the
+  /// v3→v4 `addColumn` migration is non-breaking; pre-existing rows orphan
+  /// (match no real uid) rather than leaking across accounts.
+  TextColumn get userId => text().withDefault(const Constant(''))();
   TextColumn get code => text()();
   TextColumn get name => text()();
   TextColumn get colorHex => text()();
@@ -33,6 +38,9 @@ class Topics extends Table {
 @DataClassName('ExamRow')
 class Exams extends Table {
   TextColumn get id => text()();
+
+  /// Owning user — scoped alongside [Subjects] (ADR-014). See the note there.
+  TextColumn get userId => text().withDefault(const Constant(''))();
   TextColumn get subjectId => text().references(Subjects, #id)();
   DateTimeColumn get date => dateTime()();
   TextColumn get label => text().nullable()();

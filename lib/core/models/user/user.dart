@@ -19,4 +19,7 @@ sealed class UserData with _$UserData {
       _$UserDataFromJson(json);
 
   String get initials => fullName.substring(0, 2).toUpperCase();
+
+  /// First word of [fullName] (the given name), trimmed.
+  String get firstName => fullName.trim().split(RegExp(r'\s+')).first.trim();
 }

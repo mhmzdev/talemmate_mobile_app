@@ -97,7 +97,6 @@ class _AddMaterialSheetState extends State<_AddMaterialSheet> {
               ? 'Add to library'
               : 'Add ${_picked.length} to library',
           mainAxisSize: .max,
-          size: .large,
           onTap: _saving ? null : _confirm,
         ),
         AppButton(

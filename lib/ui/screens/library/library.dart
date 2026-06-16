@@ -40,6 +40,7 @@ part 'widgets/_add_material_tile.dart';
 part 'widgets/_add_material_sheet.dart';
 part 'widgets/_material_actions_sheet.dart';
 part 'widgets/_library_skeleton.dart';
+part 'widgets/_empty_state.dart';
 
 class LibraryScreen extends StatelessWidget {
   const LibraryScreen({super.key});
@@ -77,17 +78,26 @@ class _BodyState extends State<_Body> {
     App.init(context);
     final screenState = _ScreenState.s(context, true);
 
+    // Hide the floating "+" while the library is empty — the empty state owns
+    // the single add CTA, so two add buttons never show at once.
+    final libraryCubit = LibraryCubit.c(context, true);
+    final libraryState = libraryCubit.state;
+    final hasMaterials =
+        (libraryState.load.data ?? const <LibraryItem>[]).isNotEmpty;
+
     return Screen(
       formKey: screenState.formKey,
       initialFormValue: _FormData.initialValues(),
       keyboardHandler: true,
-      floatingActionButton: AppButton(
-        icon: LucideIcons.plus,
-        size: .large,
-        padding: Space.a.t20,
-        margin: Space.b.t60 + Space.b.t12,
-        onTap: () => _AddMaterialSheet.show(context),
-      ),
+      floatingActionButton: hasMaterials
+          ? AppButton(
+              icon: LucideIcons.plus,
+              size: .large,
+              padding: Space.a.t20,
+              margin: Space.b.t60 + Space.b.t12,
+              onTap: () => _AddMaterialSheet.show(context),
+            )
+          : null,
       child: SafeArea(
         // Extraction runs in the background via MaterialCubit; re-read the list
         // whenever an item's processing settles so its status badge updates.
@@ -121,6 +131,26 @@ class _BodyState extends State<_Body> {
                 return const SingleChildScrollView(
                   physics: NeverScrollableScrollPhysics(),
                   child: _LibrarySkeleton(),
+                );
+              }
+
+              // No materials yet (and not a load failure) → dedicated empty
+              // state: title + a single add CTA, vertically centred in the
+              // space below the header. No search/filters.
+              if (items.isEmpty && !state.load.isFailed) {
+                return RefreshIndicator(
+                  onRefresh: () => LibraryCubit.c(context).load(),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) => SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: const Center(child: _EmptyState()),
+                      ),
+                    ),
+                  ),
                 );
               }
 
@@ -214,14 +244,13 @@ class _Content extends StatelessWidget {
       );
     }
 
+    // Truly-empty is handled upstream; here items exist but none match the
+    // active search / subject filter.
     if (sections.isEmpty) {
-      final message = items.isEmpty
-          ? 'No materials yet — add from onboarding or the button below.'
-          : 'No materials match your search.';
       return Padding(
         padding: Space.v.t32,
         child: Text(
-          message,
+          'No materials match your search.',
           style: AppText.b2.cl(AppTheme.c.subText),
           textAlign: .center,
         ),

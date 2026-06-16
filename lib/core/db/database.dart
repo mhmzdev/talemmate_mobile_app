@@ -90,7 +90,7 @@ class AppDatabase extends _$AppDatabase {
   static final AppDatabase ins = AppDatabase();
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -98,6 +98,14 @@ class AppDatabase extends _$AppDatabase {
     onUpgrade: (m, from, to) async {
       // v2: extracted-text storage for library materials (text extraction).
       if (from < 2) await m.createTable(materialTexts);
+      // v3: persisted "why this week" reasoning string on the schedule row.
+      if (from < 3) await m.addColumn(schedules, schedules.aiReasoning);
+      // v4: per-account scoping for subjects + exams (ADR-014). Existing rows
+      // default to '' and orphan, rather than leaking across accounts.
+      if (from < 4) {
+        await m.addColumn(subjects, subjects.userId);
+        await m.addColumn(exams, exams.userId);
+      }
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
@@ -123,6 +131,7 @@ class AppDatabase extends _$AppDatabase {
           (s) => subjectDao.upsertSubject(
             SubjectsCompanion(
               id: Value(s.id),
+              userId: Value(data.userId),
               code: Value(s.code),
               name: Value(s.name),
               colorHex: Value(s.colorHex),
@@ -138,6 +147,7 @@ class AppDatabase extends _$AppDatabase {
           (e) => subjectDao.upsertExam(
             ExamsCompanion(
               id: Value(e.id),
+              userId: Value(data.userId),
               subjectId: Value(e.subjectId),
               date: Value(e.date),
               label: Value(e.label),
@@ -155,6 +165,7 @@ class AppDatabase extends _$AppDatabase {
             dailyTargetHours: Value(schedule.dailyTargetHours),
             enabledWindowIds: Value(schedule.enabledWindowIds),
             weekStartDate: Value(schedule.weekStartDate),
+            aiReasoning: Value(schedule.aiReasoning),
             isAIGenerated: Value(schedule.isAIGenerated),
           ),
         );
@@ -181,6 +192,15 @@ class AppDatabase extends _$AppDatabase {
       );
     });
   }
+
+  /// Removes a material and its extracted text in one transaction. The
+  /// `material_texts.itemId` FK means the child text row must be deleted first —
+  /// once an item is indexed, deleting only the item raises a foreign-key
+  /// constraint failure (SQLite error 787).
+  Future<void> deleteLibraryItem(String id) => transaction(() async {
+    await materialTextsDao.deleteForItem(id);
+    await libraryDao.deleteItem(id);
+  });
 
   /// Persists a single library material (a `LibraryItem.toJson()` map) added
   /// outside onboarding (the Library "Add" path). Lives here — not in the repo
@@ -363,6 +383,121 @@ class AppDatabase extends _$AppDatabase {
     'showCitationsOnEveryReply': r.showCitationsOnEveryReply,
     'scope': r.scope.name,
     'reasoningDepth': r.reasoningDepth.name,
+  };
+
+  // --- Study-plan persistence --------------------------------------------
+  // Map-only surface so `PlanRepo` stays model-free (ADR-013): row↔Map and
+  // `StudyBlock.fromJson` conversion live here, not in the repo.
+
+  /// The user's schedule row as a `Schedule.toJson()`-shaped map, or null.
+  Future<Map<String, dynamic>?> scheduleForUser(String userId) async {
+    final row = await scheduleDao.findByUser(userId);
+    if (row == null) return null;
+    return _scheduleToMap(row);
+  }
+
+  /// Persists the "why this week" reasoning paragraph onto the schedule row.
+  Future<void> updateScheduleReasoning(
+    String scheduleId,
+    String reasoning,
+  ) async {
+    await (update(schedules)..where((s) => s.id.equals(scheduleId))).write(
+      SchedulesCompanion(aiReasoning: Value(reasoning)),
+    );
+  }
+
+  /// Replaces all of a schedule's study blocks in one transaction — the
+  /// generation pass deletes the prior week and writes the fresh one. Each map
+  /// is a `StudyBlock.toJson()`-shaped payload.
+  Future<void> replaceStudyBlocks(
+    String scheduleId,
+    List<Map<String, dynamic>> blocks,
+  ) async {
+    await transaction(() async {
+      await scheduleDao.deleteBlocksForSchedule(scheduleId);
+      for (final json in blocks) {
+        final b = StudyBlock.fromJson(json);
+        await scheduleDao.upsertBlock(
+          StudyBlocksCompanion(
+            id: Value(b.id),
+            scheduleId: Value(b.scheduleId),
+            dayOfWeek: Value(b.dayOfWeek),
+            date: Value(b.date),
+            startTime: Value(b.startTime),
+            durationMinutes: Value(b.durationMinutes),
+            subjectId: Value(b.subjectId),
+            topicId: Value(b.topicId),
+            title: Value(b.title),
+            activities: Value(b.activities),
+            status: Value(b.status),
+            aiInsight: Value(b.aiInsight),
+            isAIGenerated: Value(b.isAIGenerated),
+          ),
+        );
+      }
+    });
+  }
+
+  /// Live block list for a schedule (by date, then start time), as
+  /// `StudyBlock.toJson()`-shaped maps.
+  Stream<List<Map<String, dynamic>>> watchStudyBlocks(String scheduleId) =>
+      scheduleDao
+          .watchBlocksForSchedule(scheduleId)
+          .map((rows) => rows.map(_studyBlockToMap).toList());
+
+  /// A user's subjects, as `Subject.toJson()`-shaped maps (ADR-014 — scoped per
+  /// account so one user's subjects never bleed into another's plan/library).
+  Future<List<Map<String, dynamic>>> subjectsForUser(String userId) async {
+    final rows = await subjectDao.getByUser(userId);
+    return rows.map(_subjectToMap).toList();
+  }
+
+  /// A user's exams, soonest first, as `Exam.toJson()`-shaped maps (ADR-014).
+  Future<List<Map<String, dynamic>>> examsForUser(String userId) async {
+    final rows = await subjectDao.getExamsByUser(userId);
+    return rows.map(_examToMap).toList();
+  }
+
+  Map<String, dynamic> _scheduleToMap(ScheduleRow r) => {
+    'id': r.id,
+    'userId': r.userId,
+    'dailyTargetHours': r.dailyTargetHours,
+    'enabledWindowIds': r.enabledWindowIds,
+    'weekStartDate': r.weekStartDate?.toIso8601String(),
+    'aiReasoning': r.aiReasoning,
+    'isAIGenerated': r.isAIGenerated,
+  };
+
+  Map<String, dynamic> _studyBlockToMap(StudyBlockRow r) => {
+    'id': r.id,
+    'scheduleId': r.scheduleId,
+    'dayOfWeek': r.dayOfWeek,
+    'date': r.date.toIso8601String(),
+    'startTime': r.startTime,
+    'durationMinutes': r.durationMinutes,
+    'subjectId': r.subjectId,
+    'topicId': r.topicId,
+    'title': r.title,
+    'activities': r.activities,
+    'status': r.status.name,
+    'aiInsight': r.aiInsight,
+    'isAIGenerated': r.isAIGenerated,
+  };
+
+  Map<String, dynamic> _subjectToMap(SubjectRow r) => {
+    'id': r.id,
+    'code': r.code,
+    'name': r.name,
+    'colorHex': r.colorHex,
+    'confidenceLevel': r.confidenceLevel,
+    'order': r.order,
+  };
+
+  Map<String, dynamic> _examToMap(ExamRow r) => {
+    'id': r.id,
+    'subjectId': r.subjectId,
+    'date': r.date.toIso8601String(),
+    'label': r.label,
   };
 
   static QueryExecutor _openConnection() => driftDatabase(name: 'taleemmate');
