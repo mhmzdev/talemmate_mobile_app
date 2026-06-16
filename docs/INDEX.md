@@ -59,6 +59,14 @@ For the one-page orientation, see [CLAUDE.md](../CLAUDE.md) or [ARCHITECTURE.md]
 
 ---
 
+## Testing
+
+| Document | Read this when… |
+|---|---|
+| [TESTING.md](TESTING.md) | You're writing unit or widget tests — the stack, folder layout, repo test seam, and the harness patterns / gotchas |
+
+---
+
 ## Execution Plans
 
 Short-lived task breakdowns for larger features live in [exec-plans/](exec-plans/).

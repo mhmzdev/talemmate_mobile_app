@@ -40,6 +40,7 @@ hygen screen new <name> --formData true --formKeys "email,password" --widgets "h
 | `lib/ui/screens/<name>/static/_form_data.dart` | Only if `--formData true` |
 | `lib/ui/screens/<name>/widgets/_body.dart` | Yes |
 | `lib/ui/screens/<name>/widgets/_<widget>.dart` | One per widget name |
+| `test/screens/<name>/<name>_test.dart` | Yes — a runnable widget-test stub (`renders` + TODOs). Skipped if it already exists. See [docs/TESTING.md](../TESTING.md). |
 
 Also patches `lib/router/router.dart` (import + route entry) and `lib/router/routes.dart` (constant).
 

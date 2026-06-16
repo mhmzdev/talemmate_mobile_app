@@ -86,15 +86,16 @@ Full detail lives in **[docs/INDEX.md](docs/INDEX.md)**.
 | Which screens exist + user flows | [docs/screens/FLOWS.md](docs/screens/FLOWS.md) |
 | Shared widgets + form components | [docs/widgets/CATALOGUE.md](docs/widgets/CATALOGUE.md) |
 | Hygen generators + build_runner | [docs/tooling/HYGEN.md](docs/tooling/HYGEN.md) |
+| Writing unit + widget tests | [docs/TESTING.md](docs/TESTING.md) |
 | Firebase services + error handling | [docs/architecture/FIREBASE.md](docs/architecture/FIREBASE.md) |
 | Why we made key decisions | [docs/architecture/DECISIONS.md](docs/architecture/DECISIONS.md) |
 
 ## Skills
 
 - `/design` — design tokens, layout patterns, component usage
-- `/building_forms` — form construction with flutter_form_builder
-- `/write_unit_test` — cubit unit tests
-- `/write_widget_test` — screen widget tests
+- `/building-forms` — form construction with flutter_form_builder
+- `/write-unit-test` — cubit + service unit tests (mocktail; see [docs/TESTING.md](docs/TESTING.md))
+- `/write-widget-test` — screen widget tests (mocktail; see [docs/TESTING.md](docs/TESTING.md))
 - `/research-codebase` — documents how a slice of the codebase works today (writes to `docs/research/`)
 - `/create-plan` — interactive multi-phase implementation plan (writes to `docs/exec-plans/backlog/`)
 
