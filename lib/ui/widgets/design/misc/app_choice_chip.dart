@@ -18,13 +18,17 @@ class AppChoiceChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     App.init(context);
+
+    final unSelectedBg = AppTheme.isDark
+        ? AppTheme.c.specBackground
+        : AppTheme.c.subBackground;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: AppProps.medium,
         padding: Space.sym(SpaceToken.t12, SpaceToken.t08),
         decoration: BoxDecoration(
-          color: selected ? AppTheme.c.text : AppTheme.c.subBackground,
+          color: selected ? AppTheme.c.text : unSelectedBg,
           borderRadius: 20.radius(),
           border: Border.all(
             color: selected ? AppTheme.c.text : AppTheme.c.border,

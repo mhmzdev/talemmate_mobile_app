@@ -25,7 +25,9 @@ class _AiBubble extends StatelessWidget {
         child: Container(
           padding: Space.a.t16,
           decoration: BoxDecoration(
-            color: AppTheme.c.subBackground,
+            color: AppTheme.isDark
+                ? AppTheme.c.specBackground
+                : AppTheme.c.subBackground,
             borderRadius: 16.radius(),
             border: Border.all(color: AppTheme.c.border),
           ),
@@ -60,7 +62,6 @@ class _AiBubble extends StatelessWidget {
                 Space.y.t12,
                 Wrap(
                   spacing: SpaceToken.t08,
-                  runSpacing: SpaceToken.t08,
                   children: message.followUpPoints
                       .map((f) => _FollowUpChip(point: f))
                       .toList(),

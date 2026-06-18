@@ -63,6 +63,8 @@ class _Glance extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    App.init(context);
+
     return Padding(
       padding: Space.sym(SpaceToken.t12, SpaceToken.t04),
       child: Column(

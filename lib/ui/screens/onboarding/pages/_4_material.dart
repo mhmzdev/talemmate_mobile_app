@@ -36,20 +36,11 @@ class _StepMaterial extends StatelessWidget {
 
                   // Attach picked material to a subject (so the Library can
                   // group it). Defaults to the first subject.
-                  Row(
-                    mainAxisAlignment: .spaceBetween,
-                    children: [
-                      Text(
-                        'ADD TO SUBJECT',
-                        style: AppText.l1b
-                            .cl(AppTheme.c.subText)
-                            .copyWith(letterSpacing: 1.2),
-                      ),
-                      Text(
-                        'Required',
-                        style: AppText.b2.cl(AppTheme.c.subText),
-                      ),
-                    ],
+                  Text(
+                    'ADD TO SUBJECT',
+                    style: AppText.l1b
+                        .cl(AppTheme.c.subText)
+                        .copyWith(letterSpacing: 1.2),
                   ),
                   Space.y.t08,
                   SubjectChips(
@@ -58,8 +49,7 @@ class _StepMaterial extends StatelessWidget {
                         .toList(),
                     selectedId: state.materialSubjectId,
                     onSelect: state.selectMaterialSubject,
-                    emptyMessage:
-                        'No subjects added yet — go back to step 2.',
+                    emptyMessage: 'No subjects added yet — go back to step 2.',
                   ),
                   Space.y.t16,
 
@@ -167,7 +157,6 @@ class _StepMaterial extends StatelessWidget {
             label: 'Finish setup',
             onTap: () => state.finish(context),
             mainAxisSize: .max,
-            size: .large,
           ),
           Space.y.t08,
           Text(

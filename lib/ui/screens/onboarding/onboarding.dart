@@ -1,5 +1,5 @@
 // ignore: unused_import
-import 'package:taleemmate/services/fault/faults.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 import 'dart:async'; // used by _state.dart part (Timer)
 
@@ -42,7 +42,6 @@ import 'package:taleemmate/ui/widgets/design/modals/app_modal_base.dart';
 import 'package:taleemmate/ui/widgets/headless/keep_alive_page_view.dart';
 import 'package:taleemmate/utils/flash.dart';
 part 'listeners/_logout.dart';
-
 
 part 'models/_subject_draft.dart';
 part 'models/_exam_draft.dart';
@@ -105,6 +104,7 @@ class _Body extends StatelessWidget {
       keyboardHandler: true,
       padding: Space.v.t20,
       canPop: false,
+      resizeToAvoidBottomInset: true,
       onBackPressed: () {
         if (state.currentStep > 0) {
           state.prevPage();

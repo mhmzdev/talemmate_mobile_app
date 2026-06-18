@@ -42,6 +42,11 @@ class _ProfileHeader extends StatelessWidget {
               ],
             ),
           ),
+          Space.x.t12,
+          AppIconButton(
+            icon: LucideIcons.x,
+            onTap: () => ''.pop(context),
+          ),
         ],
       ),
     );

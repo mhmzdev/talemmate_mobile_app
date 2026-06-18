@@ -161,14 +161,22 @@ class _StepAboutYou extends StatelessWidget {
               ),
             ),
             Space.y.t12,
-            AppButton(
-              label: 'Continue',
-              onTap: () {
-                if (state.isStep1Valid) state.nextPage();
+            KeyboardVisibilityBuilder(
+              builder: (context, visible) {
+                return AnimatedSwitcher(
+                  duration: AppProps.medium,
+                  child: visible
+                      ? const SizedBox.shrink()
+                      : AppButton(
+                          label: 'Continue',
+                          onTap: () {
+                            if (state.isStep1Valid) state.nextPage();
+                          },
+                          state: state.isStep1Valid ? .def : .disabled,
+                          mainAxisSize: .max,
+                        ),
+                );
               },
-              state: state.isStep1Valid ? .def : .disabled,
-              mainAxisSize: .max,
-              size: .large,
             ),
           ],
         ),

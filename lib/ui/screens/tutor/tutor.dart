@@ -96,7 +96,9 @@ class _BodyState extends State<_Body> {
                 ),
                 if (hasActive) const _Composer(),
                 // Clear the floating bottom bar so the composer stays visible.
-                SizedBox(height: screenState.bottomBarHeight),
+                SizedBox(
+                  height: screenState.bottomBarHeight,
+                ),
               ],
             );
           },

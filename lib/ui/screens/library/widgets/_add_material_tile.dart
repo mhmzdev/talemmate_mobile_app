@@ -15,7 +15,9 @@ class _AddMaterialTile extends StatelessWidget {
       child: Container(
         padding: Space.a.t16,
         decoration: BoxDecoration(
-          color: AppTheme.c.subBackground,
+          color: AppTheme.isDark
+              ? AppTheme.c.specBackground
+              : AppTheme.c.subBackground,
           borderRadius: 14.radius(),
           border: Border.all(color: AppTheme.c.border),
         ),

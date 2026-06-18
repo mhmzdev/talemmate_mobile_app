@@ -11,6 +11,7 @@ class _Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    App.init(context);
     return Padding(
       padding: Space.only(SpaceToken.t24, SpaceToken.t24, null, SpaceToken.t24),
       child: Column(
@@ -62,6 +63,7 @@ class _IconSlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    App.init(context);
     return SizedBox(
       width: SpaceToken.t24,
       child: icon == null
@@ -92,6 +94,7 @@ class _SettingRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    App.init(context);
     return GestureDetector(
       behavior: .opaque,
       onTap: onTap,
@@ -143,13 +146,17 @@ class _SettingToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    App.init(context);
     return Container(
       decoration: _rowDivider(last),
       padding: Space.v.t12,
       child: Row(
         crossAxisAlignment: .start,
         children: [
-          Padding(padding: Space.t.t04, child: _IconSlot(icon: icon)),
+          Padding(
+            padding: Space.t.t04,
+            child: _IconSlot(icon: icon),
+          ),
           Space.x.t12,
           Expanded(
             child: Column(
@@ -188,6 +195,7 @@ class _AppSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    App.init(context);
     return GestureDetector(
       onTap: () => onChanged(!value),
       child: AnimatedContainer(
@@ -229,11 +237,10 @@ class _AppSwitch extends StatelessWidget {
 class _ThemeSelector extends StatelessWidget {
   const _ThemeSelector();
 
-  static const _options = ['auto', 'light', 'dark'];
-
   @override
   Widget build(BuildContext context) {
-    final state = _ScreenState.s(context, true);
+    App.init(context);
+    final appState = AppProvider.s(context, true);
 
     return Container(
       decoration: _rowDivider(false),
@@ -252,17 +259,21 @@ class _ThemeSelector extends StatelessWidget {
           Container(
             padding: Space.a.t04,
             decoration: BoxDecoration(
-              color: AppTheme.c.subBackground,
+              color: AppTheme.isDark
+                  ? AppTheme.c.primary
+                  : AppTheme.c.subBackground,
               borderRadius: 10.radius(),
             ),
             child: Row(
-              children: _options
+              children: ThemeMode.values
                   .map(
                     (t) => Expanded(
                       child: _ThemeSegment(
-                        label: t,
-                        selected: state.theme == t,
-                        onTap: () => state.setTheme(t),
+                        label: t.name.titleCase,
+                        selected: appState.themeMode == t,
+                        onTap: () {
+                          appState.setTheme(t);
+                        },
                       ),
                     ),
                   )
@@ -292,7 +303,7 @@ class _ThemeSegment extends StatelessWidget {
       behavior: .opaque,
       onTap: onTap,
       child: AnimatedContainer(
-        duration: AppProps.medium,
+        duration: AppProps.fast,
         padding: Space.v.t08,
         decoration: BoxDecoration(
           color: selected ? AppTheme.c.specBackground : Colors.transparent,

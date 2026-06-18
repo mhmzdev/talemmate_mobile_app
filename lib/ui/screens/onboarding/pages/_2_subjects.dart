@@ -56,7 +56,6 @@ class _StepSubjects extends StatelessWidget {
             label: 'Continue',
             onTap: state.nextPage,
             mainAxisSize: .max,
-            size: .large,
             state: state.subjects.isEmpty ? .disabled : .def,
           ),
         ],

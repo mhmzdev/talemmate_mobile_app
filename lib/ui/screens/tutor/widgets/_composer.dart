@@ -37,7 +37,9 @@ class _Composer extends StatelessWidget {
             child: Container(
               padding: Space.sym(SpaceToken.t16, SpaceToken.t04),
               decoration: BoxDecoration(
-                color: AppTheme.c.subBackground,
+                color: AppTheme.isDark
+                    ? AppTheme.c.specBackground
+                    : AppTheme.c.subBackground,
                 borderRadius: 24.radius(),
                 border: Border.all(color: AppTheme.c.border),
               ),

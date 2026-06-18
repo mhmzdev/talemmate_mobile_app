@@ -79,7 +79,7 @@ class _StepSchedule extends StatelessWidget {
                   Space.y.t16,
 
                   Text(
-                    'UPCOMING EXAMS',
+                    'UPCOMING EXAMS (optional)',
                     style: AppText.l1b
                         .cl(AppTheme.c.subText)
                         .copyWith(letterSpacing: 1.2),
@@ -108,7 +108,6 @@ class _StepSchedule extends StatelessWidget {
             },
             state: state.isStep3Valid ? .def : .disabled,
             mainAxisSize: .max,
-            size: .large,
           ),
         ],
       ),

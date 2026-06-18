@@ -107,7 +107,6 @@ class _AddExamModalState extends State<_AddExamModal> {
           AppFormDateInput(
             name: _ExamFormKeys.date,
             initialValue: _date,
-            // Exams can only be today or later — never in the past.
             firstDate: _today,
             dateFormat: DateFormat('dd MMM yyyy'),
             lastDate: _today.add(const Duration(days: 365)),
@@ -135,7 +134,7 @@ class _AddExamModalState extends State<_AddExamModal> {
                   icon: LucideIcons.plus,
                   label: 'Add exam',
                   onTap: _submit,
-                  size: .large,
+                  state: _subjectId == null ? .disabled : .def,
                 ),
               ),
             ],

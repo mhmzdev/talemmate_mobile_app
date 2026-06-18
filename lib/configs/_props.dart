@@ -21,6 +21,9 @@ abstract class AppProps {
     bottom: Radius.circular(radiusMd),
   );
 
+  static Color bgColor() =>
+      AppTheme.isDark ? AppColorsLight.primary : AppTheme.c.subBackground;
+
   // ── Decorations ────────────────────────────────────────────────────────────
   // Functions, not getters — getters capture the theme value at first call and
   // won't update when the user switches themes at runtime.

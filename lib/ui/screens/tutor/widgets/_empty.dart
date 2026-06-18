@@ -8,7 +8,10 @@ class _Empty extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     App.init(context);
-    final hasHistory = ChatCubit.c(context, true).state.conversations.isNotEmpty;
+    final hasHistory = ChatCubit.c(
+      context,
+      true,
+    ).state.conversations.isNotEmpty;
 
     return Center(
       child: Padding(
@@ -43,6 +46,7 @@ class _Empty extends StatelessWidget {
             ),
             Space.y.t24,
             AppButton(
+              padding: Space.a.t16,
               label: 'Choose a subject',
               icon: LucideIcons.plus,
               onTap: () => _SubjectPicker.show(context),

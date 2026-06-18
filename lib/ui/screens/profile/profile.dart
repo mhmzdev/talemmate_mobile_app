@@ -6,9 +6,10 @@ import 'package:taleemmate/blocs/library/cubit.dart';
 import 'package:taleemmate/blocs/chat/cubit.dart';
 import 'package:taleemmate/blocs/plan/cubit.dart';
 import 'package:taleemmate/configs/configs.dart';
+import 'package:taleemmate/providers/app.dart';
 import 'package:taleemmate/router/routes.dart';
-import 'package:taleemmate/ui/widgets/core/buttons/app_back_button.dart';
 import 'package:taleemmate/ui/widgets/core/button/button.dart';
+import 'package:taleemmate/ui/widgets/core/buttons/app_icon_button.dart';
 import 'package:taleemmate/ui/widgets/core/screen/screen.dart';
 import 'package:taleemmate/ui/widgets/design/alerts/app_alert_base.dart';
 import 'package:taleemmate/ui/widgets/design/misc/app_ai_pill.dart';
@@ -53,11 +54,6 @@ class _Body extends StatelessWidget {
           child: Column(
             crossAxisAlignment: .stretch,
             children: [
-              Padding(
-                padding: Space.h.t12,
-                child: const Align(alignment: .centerLeft, child: AppBackButton()),
-              ),
-
               const _ProfileHeader(),
               Space.y.t08,
               const _GlanceCard(),

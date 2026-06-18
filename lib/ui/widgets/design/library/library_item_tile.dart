@@ -83,7 +83,9 @@ class LibraryItemTile extends StatelessWidget {
       child: Container(
         padding: Space.a.t12,
         decoration: BoxDecoration(
-          color: AppTheme.c.subBackground,
+          color: AppTheme.isDark
+              ? AppTheme.c.specBackground
+              : AppTheme.c.subBackground,
           borderRadius: 10.radius(),
           border: Border.all(color: AppTheme.c.border),
         ),
@@ -122,8 +124,7 @@ class LibraryItemTile extends StatelessWidget {
                         .entries
                         .expand(
                           (e) => [
-                            if (e.key != 0)
-                              Text(' · ', style: metaStyle),
+                            if (e.key != 0) Text(' · ', style: metaStyle),
                             e.value,
                           ],
                         )

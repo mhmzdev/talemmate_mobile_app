@@ -16,8 +16,6 @@ class _ScreenState extends ChangeNotifier {
   bool dailyCheckin = true;
   bool examCountdown = true;
 
-  // Appearance — 'auto' | 'light' | 'dark'
-  String theme = 'auto';
   bool duaCard = true;
   bool hijri = true;
 
@@ -35,7 +33,6 @@ class _ScreenState extends ChangeNotifier {
   void toggleHijri(bool v) => _set(() => hijri = v);
   void toggleUrduRendering(bool v) => _set(() => urduRendering = v);
   void toggleCloudBackup(bool v) => _set(() => cloudBackup = v);
-  void setTheme(String t) => _set(() => theme = t);
 
   void _set(VoidCallback change) {
     change();
