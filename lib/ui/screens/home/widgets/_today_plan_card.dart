@@ -22,6 +22,10 @@ class _TodayPlanCard extends StatelessWidget {
         ? 'All blocks done — great work today.'
         : '$remaining ${remaining == 1 ? 'block' : 'blocks'} left to go today.';
 
+    // The block to start/reschedule (now, else next upcoming). Null once every
+    // block today is done — then we point the student at what's next instead.
+    final target = _rescheduleTarget(blocks);
+
     return Container(
       padding: Space.a.t16,
       decoration: BoxDecoration(
@@ -54,28 +58,85 @@ class _TodayPlanCard extends StatelessWidget {
           Space.y.t20,
           ...blocks.map((b) => _TodayBlockRow(block: b)),
           Space.y.t12,
-          Row(
-            children: [
-              Expanded(
-                child: AppButton(
-                  label: 'Begin next block',
-                  icon: LucideIcons.arrow_right,
-                  mainAxisSize: .max,
-                  onTap: () => AppRoutes.plan.pushReplace(context),
+          if (target != null)
+            Row(
+              children: [
+                Expanded(
+                  child: AppButton(
+                    label: 'Begin next block',
+                    icon: LucideIcons.arrow_right,
+                    mainAxisSize: .max,
+                    onTap: () =>
+                        AppRoutes.focus.push(context, arguments: target),
+                  ),
                 ),
+                Space.x.t08,
+                AppIconButton(
+                  key: const ValueKey('home_reschedule_clock'),
+                  icon: LucideIcons.clock,
+                  onTap: () {
+                    final subject = LibraryCubit.c(
+                      context,
+                    ).subjectById(target.subjectId);
+                    showRescheduleSheet(
+                      context,
+                      target,
+                      subjectName: subject?.name,
+                    );
+                  },
+                ),
+              ],
+            )
+          else
+            // Everything today is done — look ahead to the next planned day.
+            AppButton(
+              label: 'See what\'s next',
+              icon: LucideIcons.arrow_right,
+              style: .creamy,
+              mainAxisSize: .max,
+              onTap: () => AppRoutes.plan.pushReplace(
+                context,
+                arguments: _nextPlannedDate(context, today)?.toIso8601String(),
               ),
-              Space.x.t08,
-              AppIconButton(
-                icon: LucideIcons.clock,
-                // Reschedule is a later (Focus) plan — placeholder no-op.
-                onTap: () {},
-              ),
-            ],
-          ),
+            ),
         ],
       ),
     );
   }
+}
+
+/// The next day (after [today]) in the watched week that has any blocks, or
+/// null when the rest of the week is empty. Used to pre-select that day on the
+/// Plan screen when today is fully done.
+DateTime? _nextPlannedDate(BuildContext context, DayPlan today) {
+  final week = PlanCubit.c(context).week;
+  if (week == null) return null;
+  for (final d in week.days) {
+    if (d.date.isAfter(today.date) && d.blocks.isNotEmpty) return d.date;
+  }
+  return null;
+}
+
+/// The block a Home action (reschedule / begin) should target: the block that
+/// is happening "now", else the next "upcoming" one (earliest start), else null
+/// when everything today is already done.
+StudyBlock? _rescheduleTarget(List<StudyBlock> blocks) {
+  StudyBlock? nowBlock;
+  StudyBlock? nextUpcoming;
+  for (final b in blocks) {
+    switch (b.effectiveStatus()) {
+      case BlockStatus.now:
+        nowBlock ??= b;
+      case BlockStatus.upcoming:
+        if (nextUpcoming == null ||
+            b.startDateTime.isBefore(nextUpcoming.startDateTime)) {
+          nextUpcoming = b;
+        }
+      case BlockStatus.done:
+        break;
+    }
+  }
+  return nowBlock ?? nextUpcoming;
 }
 
 /// One block row inside [_TodayPlanCard].

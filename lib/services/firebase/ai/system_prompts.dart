@@ -23,4 +23,8 @@ class SystemPrompts {
 
   /// Weekly study-plan generation prompt (`assets/plan_sys_prompt.md`).
   static Future<String> plan() => _load(Assets.planSysPrompt);
+
+  /// Narrow "Why this plan" rewrite prompt
+  /// (`assets/plan_reason_sys_prompt.md`), used after a block reschedule.
+  static Future<String> reason() => _load(Assets.planReasonSysPrompt);
 }

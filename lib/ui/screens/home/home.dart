@@ -21,8 +21,10 @@ import 'package:taleemmate/ui/widgets/design/misc/app_avatar.dart';
 import 'package:taleemmate/ui/widgets/design/library/library_item_tile.dart';
 import 'package:taleemmate/ui/widgets/design/misc/app_edge_card.dart';
 import 'package:taleemmate/ui/widgets/design/plan/ai_reasoning_card.dart';
+import 'package:taleemmate/ui/widgets/design/modals/app_modal_base.dart';
 import 'package:taleemmate/ui/widgets/design/plan/plan_placeholder.dart';
 import 'package:taleemmate/ui/widgets/design/plan/plan_visuals.dart';
+import 'package:taleemmate/ui/widgets/headless/app_touch.dart';
 
 part '_state.dart';
 part 'widgets/_recently_added.dart';
@@ -31,6 +33,7 @@ part 'widgets/_daily_reminder.dart';
 
 part 'widgets/_today_plan_card.dart';
 part 'widgets/_why_this_plan_card.dart';
+part 'widgets/_reschedule_sheet.dart';
 
 part 'widgets/_header.dart';
 

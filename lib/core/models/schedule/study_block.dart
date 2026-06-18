@@ -30,10 +30,13 @@ sealed class StudyBlock with _$StudyBlock {
 }
 
 extension StudyBlockStatus on StudyBlock {
-  /// Effective display status derived purely from device time vs the block's
-  /// window (`date` + `startTime` + `durationMinutes`). The stored `status` is
-  /// reserved for the future Focus/execution plan; UIs should read this.
+  /// Effective display status. A **manual** completion (stored `status == done`,
+  /// written by the Focus session's "Mark block done") is authoritative and
+  /// sticks regardless of the clock. Otherwise the status is derived from device
+  /// time vs the block's window (`date` + `startTime` + `durationMinutes`).
+  /// UIs should read this, not the raw stored value.
   BlockStatus effectiveStatus([DateTime? now]) {
+    if (status == BlockStatus.done) return BlockStatus.done;
     final clock = now ?? DateTime.now();
     final start = startDateTime;
     final end = start.add(Duration(minutes: durationMinutes));

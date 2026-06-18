@@ -45,6 +45,7 @@ class Assets {
   static const String chatSysPrompt = 'assets/chat_sys_prompt.md';
   static const String libraryExtractionSysPrompt =
       'assets/library_extraction_sys_prompt.md';
+  static const String planReasonSysPrompt = 'assets/plan_reason_sys_prompt.md';
   static const String planSysPrompt = 'assets/plan_sys_prompt.md';
   static const String quizSysPrompt = 'assets/quiz_sys_prompt.md';
 
@@ -52,6 +53,7 @@ class Assets {
   static List<String> get values => [
     chatSysPrompt,
     libraryExtractionSysPrompt,
+    planReasonSysPrompt,
     planSysPrompt,
     quizSysPrompt,
   ];

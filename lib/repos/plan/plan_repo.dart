@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:firebase_ai/firebase_ai.dart';
 import 'package:taleemmate/core/constants/study_windows.dart';
 import 'package:taleemmate/core/db/database.dart';
@@ -17,10 +18,15 @@ part 'plan_data_provider.dart';
 /// public methods take/return `Map`/`List<Map>`/primitives only — `PlanCubit`
 /// does the `WeekPlan.fromJson` / `StudyBlock.fromJson` conversion.
 class PlanRepo {
-  static final PlanRepo _instance = PlanRepo._();
+  static PlanRepo _instance = PlanRepo._();
   PlanRepo._();
 
   static PlanRepo get ins => _instance;
+
+  /// Swaps the singleton for a mock in tests (see docs/TESTING.md). Never call
+  /// from production code.
+  @visibleForTesting
+  static set ins(PlanRepo repo) => _instance = repo;
 
   /// --- repo functions --- ///
 
@@ -42,4 +48,21 @@ class PlanRepo {
   /// A user's exams, as `Exam.toJson()`-shaped maps — used to mark exam days.
   Future<List<Map<String, dynamic>>> exams(String userId) =>
       _PlanProvider.exams(userId);
+
+  /// Applies a single-block edit. [patch] carries `id` plus any of
+  /// `startTime` (HH:mm), `durationMinutes` (int), `date` (ISO-8601 string),
+  /// `status` (`BlockStatus.name`). Unspecified fields are left untouched.
+  Future<void> updateBlock(Map<String, dynamic> patch) =>
+      _PlanProvider.updateBlock(patch);
+
+  /// Records one completed study session. [metric] carries `userId`, `date`
+  /// (ISO-8601 string), `durationMinutes` (int), `topicIds` (`List<String>`).
+  Future<void> recordSession(Map<String, dynamic> metric) =>
+      _PlanProvider.recordSession(metric);
+
+  /// Rewrites the "Why this plan" reasoning after a reschedule and persists it
+  /// onto the schedule row. Returns the fresh paragraph. Throws a [Fault] on
+  /// failure (the caller keeps the prior reasoning).
+  Future<String> updateReasoning(String userId) =>
+      _PlanProvider.updateReasoning(userId);
 }

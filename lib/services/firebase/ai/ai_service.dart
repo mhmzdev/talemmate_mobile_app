@@ -29,6 +29,8 @@ class AiService {
 
   GenerativeModel? _planner;
 
+  GenerativeModel? _reasoner;
+
   /// Lazily builds the extraction model, sourcing its system instruction from
   /// [SystemPrompts] (kept out of code so the prompt is editable).
   Future<GenerativeModel> _extractorModel() async {
@@ -76,6 +78,19 @@ class AiService {
         generationConfig: GenerationConfig(
           responseMimeType: 'application/json',
           responseSchema: AgentTools.ins.planSchema,
+        ),
+      );
+
+  /// Narrow reasoning rewriter: JSON-only output ([AgentTools.reasonSchema])
+  /// producing a single fresh "Why this plan" paragraph after a reschedule.
+  /// Reuses the Flash plan tier — built once and reused with its bundled prompt.
+  GenerativeModel reasonModel(String systemPrompt) =>
+      _reasoner ??= FirebaseAI.googleAI().generativeModel(
+        model: _planModel,
+        systemInstruction: Content.system(systemPrompt),
+        generationConfig: GenerationConfig(
+          responseMimeType: 'application/json',
+          responseSchema: AgentTools.ins.reasonSchema,
         ),
       );
 }

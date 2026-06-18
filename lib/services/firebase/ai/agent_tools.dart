@@ -117,4 +117,17 @@ class AgentTools {
       ),
     },
   );
+
+  /// Structured-output schema for the narrow "Why this plan" reasoning rewrite
+  /// (see [plan_reason_sys_prompt.md]). A single short paragraph that replaces
+  /// `Schedule.aiReasoning` after a block is rescheduled — no day/block payload.
+  Schema get reasonSchema => Schema.object(
+    properties: {
+      'aiReasoning': Schema.string(
+        description:
+            'One short paragraph: why the plan still works after the change, '
+            "in the student's language (Urdu / English / Roman Urdu).",
+      ),
+    },
+  );
 }

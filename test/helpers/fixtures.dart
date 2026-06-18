@@ -2,6 +2,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:taleemmate/blocs/quotes/cubit.dart';
 import 'package:taleemmate/blocs/user/cubit.dart';
 import 'package:taleemmate/core/models/quotes/quote.dart';
+import 'package:taleemmate/core/models/schedule/study_block.dart';
 import 'package:taleemmate/core/models/user/user.dart';
 import 'package:taleemmate/services/fault/faults.dart';
 
@@ -36,6 +37,48 @@ class TestQuote {
     a: 'Lao Tzu',
     date: '2026-06-16',
   );
+}
+
+class TestBlock {
+  static const scheduleId = 'test-schedule';
+
+  /// A study block fixture. `date` defaults to a fixed day so reschedule
+  /// computations (snooze/skip) are deterministic.
+  static StudyBlock sample({
+    String id = 'block-1',
+    String startTime = '08:30',
+    int durationMinutes = 60,
+    String subjectId = 'subj-maths',
+    String? topicId,
+    String title = 'Quadratic equations — practice',
+    String activities = 'Read + 5 questions',
+    BlockStatus status = BlockStatus.upcoming,
+    DateTime? date,
+    String? aiInsight,
+  }) => StudyBlock(
+    id: id,
+    scheduleId: scheduleId,
+    dayOfWeek: 1,
+    date: date ?? DateTime(2026, 6, 18),
+    startTime: startTime,
+    durationMinutes: durationMinutes,
+    subjectId: subjectId,
+    topicId: topicId,
+    title: title,
+    activities: activities,
+    status: status,
+    aiInsight: aiInsight,
+  );
+
+  static Map<String, dynamic> rawSchedule({String userId = TestUser.uid}) => {
+    'id': scheduleId,
+    'userId': userId,
+    'dailyTargetHours': 2.0,
+    'enabledWindowIds': <String>[],
+    'weekStartDate': null,
+    'aiReasoning': 'Original reasoning.',
+    'isAIGenerated': true,
+  };
 }
 
 /// A Firebase [User] mock with `.uid` stubbed — the only field cubits read.

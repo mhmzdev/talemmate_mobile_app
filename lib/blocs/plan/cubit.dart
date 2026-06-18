@@ -124,6 +124,88 @@ class PlanCubit extends Cubit<PlanState> {
   bool _sameDay(DateTime a, DateTime b) =>
       a.year == b.year && a.month == b.month && a.day == b.day;
 
+  // --- reschedule actions (Focus plan) -----------------------------------
+
+  /// Snooze: start this block 30 minutes later.
+  Future<void> snoozeBlock(StudyBlock b) =>
+      _reschedule(b, startTime: b.startTime.clockPlusMinutes(30));
+
+  /// Move to tonight: slot it into the fixed after-Isha window (20:30).
+  Future<void> moveToTonight(StudyBlock b) => _reschedule(b, startTime: '20:30');
+
+  /// Shorten to 30 min — leaves already-short (≤30) blocks untouched.
+  Future<void> shortenBlock(StudyBlock b) => _reschedule(
+    b,
+    durationMinutes: b.durationMinutes <= 30 ? b.durationMinutes : 30,
+  );
+
+  /// Skip today: fold the block into tomorrow's plan.
+  Future<void> skipBlock(StudyBlock b) =>
+      _reschedule(b, date: b.date.add(const Duration(days: 1)));
+
+  /// Commits a single-block edit (streams to Home via `watchBlocks`), then
+  /// refreshes the "Why this plan" reasoning. The move never depends on the AI
+  /// call succeeding.
+  Future<void> _reschedule(
+    StudyBlock b, {
+    String? startTime,
+    int? durationMinutes,
+    DateTime? date,
+  }) async {
+    try {
+      await PlanRepo.ins.updateBlock({
+        'id': b.id,
+        'startTime': ?startTime,
+        'durationMinutes': ?durationMinutes,
+        if (date != null) 'date': date.toIso8601String(),
+      });
+      await _refreshReasoning();
+    } on Fault catch (e) {
+      emit(state.copyWith(reasoning: state.reasoning.toFailed(fault: e)));
+    }
+  }
+
+  /// Marks [b] done and records a [SessionMetric] for it.
+  Future<void> markBlockDone(StudyBlock b) async {
+    await PlanRepo.ins.updateBlock({
+      'id': b.id,
+      'status': BlockStatus.done.name,
+    });
+    final userId = _watchingUserId;
+    if (userId == null) return;
+    await PlanRepo.ins.recordSession({
+      'userId': userId,
+      'date': DateTime.now().toIso8601String(),
+      'durationMinutes': b.durationMinutes,
+      'topicIds': [?b.topicId],
+    });
+  }
+
+  /// Rewrites + persists the reasoning paragraph, mirroring it into the live
+  /// `schedule`/`week` so the "Why this plan" card updates without a re-watch.
+  /// On failure the prior reasoning stays put — the block move still stands.
+  Future<void> _refreshReasoning() async {
+    final userId = _watchingUserId;
+    if (userId == null) return;
+    emit(state.copyWith(reasoning: state.reasoning.toLoading()));
+    try {
+      final text = await PlanRepo.ins.updateReasoning(userId);
+      final week = state.week.data;
+      emit(
+        state.copyWith(
+          reasoning: state.reasoning.toSuccess(data: text),
+          schedule: state.schedule?.copyWith(aiReasoning: text),
+          week: week == null
+              ? state.week
+              : state.week.toSuccess(data: week.copyWith(aiReasoning: text)),
+        ),
+      );
+    } on Fault catch (e) {
+      // Keep prior reasoning — the move still stands.
+      emit(state.copyWith(reasoning: state.reasoning.toFailed(fault: e)));
+    }
+  }
+
   // --- convenience getters for the UI ------------------------------------
 
   WeekPlan? get week => state.week.data;

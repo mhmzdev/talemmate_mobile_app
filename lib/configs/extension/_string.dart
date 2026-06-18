@@ -51,4 +51,18 @@ extension SuperString<T> on String {
       NavigationHistoryObserver().top?.settings.name == this;
 
   String get splitError => split(': ').lastOrNull ?? 'Unknown error';
+
+  /// Adds [minutes] to a `"HH:mm"` clock string, rolling hours over a 24h day
+  /// (e.g. `"23:50".clockPlusMinutes(30) == "00:20"`). Non-numeric parts fall
+  /// back to 0.
+  String clockPlusMinutes(int minutes) {
+    final parts = split(':');
+    final h = parts.isNotEmpty ? int.tryParse(parts[0]) ?? 0 : 0;
+    final m = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
+    final total = (h * 60 + m + minutes) % (24 * 60);
+    final norm = total < 0 ? total + 24 * 60 : total;
+    final hh = (norm ~/ 60).toString().padLeft(2, '0');
+    final mm = (norm % 60).toString().padLeft(2, '0');
+    return '$hh:$mm';
+  }
 }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:taleemmate/core/db/converters.dart';
@@ -436,6 +438,55 @@ class AppDatabase extends _$AppDatabase {
         );
       }
     });
+  }
+
+  /// Targeted single-block update — writes only the supplied columns onto the
+  /// existing row (a partial UPDATE, mirroring [updateScheduleReasoning]).
+  /// `upsertBlock`/`insertOnConflictUpdate` can't be used here: its INSERT
+  /// branch needs every NOT NULL column, which a partial companion lacks. Used
+  /// by the reschedule actions (move/snooze/shorten/skip) and "mark block done".
+  /// [status], when given, is a `BlockStatus.name` string — mapped to the enum
+  /// here so the repo layer stays model-free (ADR-013).
+  Future<void> updateStudyBlock(
+    String id, {
+    String? startTime,
+    int? durationMinutes,
+    DateTime? date,
+    String? status,
+  }) async {
+    await (update(studyBlocks)..where((b) => b.id.equals(id))).write(
+      StudyBlocksCompanion(
+        startTime: startTime == null
+            ? const Value.absent()
+            : Value(startTime),
+        durationMinutes: durationMinutes == null
+            ? const Value.absent()
+            : Value(durationMinutes),
+        date: date == null ? const Value.absent() : Value(date),
+        status: status == null
+            ? const Value.absent()
+            : Value(BlockStatus.values.byName(status)),
+      ),
+    );
+  }
+
+  /// Records one completed study session. [topicIds] is JSON-encoded into the
+  /// single `topicIds` text column. Mirrors `replaceStudyBlocks`' AppDatabase-
+  /// level wrapper style so the repo never touches a DAO directly.
+  Future<void> recordSessionMetric({
+    required String userId,
+    required DateTime date,
+    required int durationMinutes,
+    required List<String> topicIds,
+  }) async {
+    await progressDao.insertSessionMetric(
+      SessionMetricsCompanion.insert(
+        userId: userId,
+        date: date,
+        durationMinutes: durationMinutes,
+        topicIds: jsonEncode(topicIds),
+      ),
+    );
   }
 
   /// Live block list for a schedule (by date, then start time), as

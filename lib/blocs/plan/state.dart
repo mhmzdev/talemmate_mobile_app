@@ -5,6 +5,7 @@ class PlanState extends Equatable {
   // --- nested states --- //
   final BlocState<WeekPlan> generate;
   final BlocState<WeekPlan> week;
+  final BlocState<String> reasoning;
 
   // --- state data --- //
   final Schedule? schedule;
@@ -12,6 +13,7 @@ class PlanState extends Equatable {
   const PlanState({
     required this.generate,
     required this.week,
+    required this.reasoning,
     this.schedule,
   });
 
@@ -19,16 +21,19 @@ class PlanState extends Equatable {
     : // root-def-constructor
       generate = BlocState(),
       week = BlocState(),
+      reasoning = BlocState(),
       schedule = null;
 
   PlanState copyWith({
     BlocState<WeekPlan>? generate,
     BlocState<WeekPlan>? week,
+    BlocState<String>? reasoning,
     Schedule? schedule,
   }) {
     return PlanState(
       generate: generate ?? this.generate,
       week: week ?? this.week,
+      reasoning: reasoning ?? this.reasoning,
       schedule: schedule ?? this.schedule,
     );
   }
@@ -38,6 +43,7 @@ class PlanState extends Equatable {
     // root-state-props
     generate,
     week,
+    reasoning,
     schedule,
   ];
 }

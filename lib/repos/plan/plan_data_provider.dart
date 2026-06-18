@@ -22,6 +22,88 @@ class _PlanProvider {
     }
   }
 
+  /// See [PlanRepo.updateBlock]. Parses the patch and writes only the changed
+  /// columns. `status` arrives as a `BlockStatus.name`; `date` as ISO-8601.
+  static Future<void> updateBlock(Map<String, dynamic> patch) async {
+    try {
+      final id = patch['id'] as String;
+      final dateStr = patch['date'] as String?;
+      await AppDatabase.ins.updateStudyBlock(
+        id,
+        startTime: patch['startTime'] as String?,
+        durationMinutes: (patch['durationMinutes'] as num?)?.toInt(),
+        date: dateStr == null ? null : DateTime.parse(dateStr),
+        status: patch['status'] as String?,
+      );
+    } on Fault {
+      rethrow;
+    } catch (e, st) {
+      throw UnknownFault('Couldn\'t update the block. Please try again.', st);
+    }
+  }
+
+  /// See [PlanRepo.recordSession].
+  static Future<void> recordSession(Map<String, dynamic> metric) async {
+    try {
+      final dateStr = metric['date'] as String?;
+      await AppDatabase.ins.recordSessionMetric(
+        userId: metric['userId'] as String,
+        date: dateStr == null ? DateTime.now() : DateTime.parse(dateStr),
+        durationMinutes: (metric['durationMinutes'] as num?)?.toInt() ?? 0,
+        topicIds:
+            (metric['topicIds'] as List?)?.whereType<String>().toList() ??
+            const <String>[],
+      );
+    } on Fault {
+      rethrow;
+    } catch (e, st) {
+      throw UnknownFault('Couldn\'t record the session.', st);
+    }
+  }
+
+  /// See [PlanRepo.updateReasoning]. Loads the current plan context, asks the
+  /// narrow reasoning model for a fresh paragraph, persists it, and returns it.
+  static Future<String> updateReasoning(String userId) async {
+    try {
+      final schedule = await AppDatabase.ins.scheduleForUser(userId);
+      if (schedule == null) {
+        throw UnknownFault(
+          'No schedule found. Please finish onboarding first.',
+          StackTrace.current,
+        );
+      }
+      final scheduleId = schedule['id'] as String;
+      final subjects = await AppDatabase.ins.subjectsForUser(userId);
+      final exams = await AppDatabase.ins.examsForUser(userId);
+      final blocks = await AppDatabase.ins.watchStudyBlocks(scheduleId).first;
+
+      final turn = _reasonTurn(
+        subjects: subjects,
+        exams: exams,
+        blocks: blocks,
+        today: DateTime.now(),
+      );
+      final model = AiService.ins.reasonModel(await SystemPrompts.reason());
+      final res = await model.generateContent([Content.text(turn)]);
+
+      final decoded = _decode(res.text);
+      final reasoning = (decoded['aiReasoning'] as String?)?.trim();
+      if (reasoning == null || reasoning.isEmpty) {
+        throw const FormatException('Empty reasoning response');
+      }
+      await AppDatabase.ins.updateScheduleReasoning(scheduleId, reasoning);
+      return reasoning;
+    } on Fault {
+      rethrow;
+    } on FirebaseAIException catch (e, st) {
+      throw AiFault.fromAiException(e, st);
+    } on FormatException catch (e, st) {
+      throw UnknownFault('Couldn\'t refresh the reasoning.', st);
+    } catch (e, st) {
+      throw UnknownFault('Couldn\'t refresh the reasoning.', st);
+    }
+  }
+
   /// See [PlanRepo.generate].
   static Future<Map<String, dynamic>> generate(String userId) async {
     try {
@@ -186,6 +268,62 @@ TODAY: ${day(today)}
 RANGE: ${day(today)} to ${day(rangeEnd)} (7 days inclusive).
 
 Produce the week plan as JSON exactly per the provided schema.''';
+  }
+
+  /// Compact user turn for the reasoning rewrite — the nearest exam plus a
+  /// short summary of the remaining blocks. The cubit has already committed the
+  /// move, so [blocks] reflects the post-change week.
+  static String _reasonTurn({
+    required List<Map<String, dynamic>> subjects,
+    required List<Map<String, dynamic>> exams,
+    required List<Map<String, dynamic>> blocks,
+    required DateTime today,
+  }) {
+    String day(DateTime d) => d.toIso8601String().split('T').first;
+
+    final names = {for (final s in subjects) s['id'] as String: s['name']};
+
+    final upcoming = exams
+        .map((e) => (e, DateTime.tryParse(e['date'] as String? ?? '')))
+        .where((p) => p.$2 != null && !p.$2!.isBefore(today))
+        .toList()
+      ..sort((a, b) => a.$2!.compareTo(b.$2!));
+    final nearestExam = upcoming.isEmpty
+        ? '(none)'
+        : () {
+            final (e, date) = upcoming.first;
+            return '${names[e['subjectId']] ?? 'a subject'} on ${day(date!)} '
+                '(${date.difference(today).inDays} days away)';
+          }();
+
+    final future = blocks
+        .map((b) => (b, DateTime.tryParse(b['date'] as String? ?? '')))
+        .where((p) => p.$2 != null && !p.$2!.isBefore(today))
+        .toList()
+      ..sort((a, b) => a.$2!.compareTo(b.$2!));
+    final blockLines = future.isEmpty
+        ? '(none remaining)'
+        : future
+              .take(20)
+              .map((p) {
+                final b = p.$1;
+                return '- ${day(p.$2!)} ${b['startTime']} · '
+                    '${names[b['subjectId']] ?? 'Study'} · '
+                    '${b['durationMinutes']}min · ${b['title']}';
+              })
+              .join('\n');
+
+    return '''
+TODAY: ${day(today)}
+
+NEAREST EXAM: $nearestExam
+
+THE CHANGE: The student just rescheduled one of their study blocks.
+
+CURRENT BLOCKS (what's still planned):
+$blockLines
+
+Rewrite the "Why this plan" paragraph so it still reads true after the change.''';
   }
 
   static Map<String, dynamic> _decode(String? text) {

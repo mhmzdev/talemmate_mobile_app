@@ -9,7 +9,11 @@ class _WhyThisPlanCard extends StatelessWidget {
   Widget build(BuildContext context) {
     App.init(context);
 
-    final cubit = PlanCubit.c(context);
+    // listen: true so the card rebuilds on every PlanState emit (the const
+    // widget would otherwise be skipped by its parent) — needed to surface the
+    // reasoning loading/refresh as it happens.
+    final cubit = PlanCubit.c(context, true);
+    final reasoningState = cubit.state.reasoning;
     final reasoning = cubit.week?.aiReasoning;
     if (reasoning == null || reasoning.trim().isEmpty) {
       return const SizedBox.shrink();
@@ -36,6 +40,7 @@ class _WhyThisPlanCard extends StatelessWidget {
     return AiReasoningCard(
       pillText: 'Why this plan',
       reasoning: reasoning,
+      loading: reasoningState.isLoading,
       footer: chips.isEmpty
           ? null
           : Wrap(

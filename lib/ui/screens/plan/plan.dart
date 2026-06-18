@@ -49,8 +49,13 @@ class _PlanScreenState extends State<PlanScreen> {
   Widget build(BuildContext context) {
     App.init(context);
 
+    // Optional pre-selected day, passed as an ISO-8601 string when arriving
+    // from Home's "See what's next" (today fully done → jump to the next day).
+    final arg = ModalRoute.of(context)?.settings.arguments;
+    final initialDate = arg is String ? DateTime.tryParse(arg) : null;
+
     return ChangeNotifierProvider<_ScreenState>(
-      create: (_) => _ScreenState(),
+      create: (_) => _ScreenState(initialDate: initialDate),
       child: const _Body(),
     );
   }
@@ -121,10 +126,17 @@ class _PlanContent extends StatelessWidget {
       );
     }
 
-    // Selected day defaults to today, else the first day of the week.
+    // Selected day priority: an explicit tap, else a pre-seeded initialDate
+    // (from Home's "See what's next"), else today, else the first day.
+    final ss = _ScreenState.s(context, true);
     final todayIndex = week.days.indexWhere((d) => d.isToday);
-    final selected = _ScreenState.s(context, true).selectedDayIndex;
-    var index = selected ?? (todayIndex < 0 ? 0 : todayIndex);
+    int? initialIndex;
+    if (ss.selectedDayIndex == null && ss.initialDate != null) {
+      final i = week.days.indexWhere((d) => _sameDay(d.date, ss.initialDate!));
+      if (i >= 0) initialIndex = i;
+    }
+    var index =
+        ss.selectedDayIndex ?? initialIndex ?? (todayIndex < 0 ? 0 : todayIndex);
     if (index < 0 || index >= week.days.length) index = 0;
     final day = week.days[index];
 
@@ -161,3 +173,6 @@ class _PlanContent extends StatelessWidget {
     if (userId != null) PlanCubit.c(context).watchForUser(userId);
   }
 }
+
+bool _sameDay(DateTime a, DateTime b) =>
+    a.year == b.year && a.month == b.month && a.day == b.day;

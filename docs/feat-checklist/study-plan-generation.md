@@ -82,7 +82,7 @@
 |---|---|---|---|
 | 4.1 | Home "Today's plan" card | Eyebrow + "done of total" (2 of 5), "N blocks left to go today.", progress meter (done/total), today's block rows | ✅ |
 | 4.2 | Block row | Status dot (check / thick ring / open ring), title (strikethrough when done), subject swatch + activities + duration, start time | ✅ |
-| 4.3 | "Begin next block" CTA | Stub → routes to the Plan tab (Focus is a later plan); reschedule clock icon is a no-op placeholder | ✅ |
+| 4.3 | "Begin next block" CTA + reschedule clock | Now wired — "Begin next block" → Focus Session for the now/next block; clock → Reschedule sheet. See [focus-session-and-reschedule](focus-session-and-reschedule.md) | ✅ |
 | 4.4 | Home "Why this plan" card | Gold left edge, `AppAiPill('Why this plan')`, reasoning paragraph, footer chips (nearest exam "Exam in 3d" + "3.5h available") | ✅ |
 | 4.5 | Plan week strip | 7 days (today + 6) with weekday + date + block-count dots; tap selects the day | ✅ |
 | 4.6 | Exam marker | Red dot on the day with an exam (Fri 19); persists on the selected cell | ✅ |
@@ -127,11 +127,13 @@
 - **System prompt lives in `SystemPrompts`** — `plan()` → `plan_sys_prompt.md`,
   cached in the shared `_cache`. Schema lives in `AgentTools.planSchema`. Model
   in `AiService.planModel` (built once, reused). Don't `rootBundle` inline.
-- **`effectiveStatus` is display-only** — derived from device time vs
-  `date`+`startTime`+`durationMinutes` (`StudyBlockStatus` extension on
-  `StudyBlock`). The **stored** `status` is always written `upcoming` and is
-  reserved for the future Focus/execution plan. UIs must read `effectiveStatus`,
-  never the stored value.
+- **`effectiveStatus` drives display** — a **manual** completion (stored
+  `status == done`, written by the Focus session's "Mark block done") is now
+  authoritative and sticks regardless of the clock; otherwise status is derived
+  from device time vs `date`+`startTime`+`durationMinutes` (`StudyBlockStatus`
+  extension). Generation still stamps blocks `upcoming`. UIs read
+  `effectiveStatus`, never the raw stored value. (Updated by the Focus feature —
+  see [focus-session-and-reschedule](focus-session-and-reschedule.md).)
 - **Blocks generated as `upcoming`, `isAIGenerated: true`, `topicId: null`** —
   the repo stamps `id` (uuid), `scheduleId`, `dayOfWeek` (`date.weekday`), parsed
   `date`. Unknown `subjectId`s are dropped (never persisted).
@@ -161,10 +163,12 @@
 
 ## By-design gaps 🚧 (not implemented — don't treat as bugs)
 
-- **No Focus / execution screen** — no in-block timer, "mark block done", or live
-  status transitions. "Begin next block" routes to the Plan tab; the reschedule
-  clock icon is a no-op placeholder. Block `status` is display-only here.
-- **No reschedule / snooze** sheet and no AI re-plan pass.
+- ~~**No Focus / execution screen**~~ — **shipped**: Focus Session screen with a
+  timer ring + "Mark block done" (writes `status: done` + a `SessionMetric`).
+  `effectiveStatus` now honours a manual `done`. See
+  [focus-session-and-reschedule](focus-session-and-reschedule.md).
+- ~~**No reschedule / snooze**~~ — **shipped**: Reschedule/Snooze sheet with four
+  deterministic edits + a narrow AI reasoning rewrite. Still no full AI re-plan.
 - **No per-block goals checklist** (no model backing in v1).
 - **One generation at onboarding** — no regeneration triggers (daily
   roll-forward, post-quiz). Manual re-generate exists in the repo but isn't wired
