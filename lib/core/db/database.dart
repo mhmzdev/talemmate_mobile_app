@@ -496,6 +496,145 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
+  // --- Progress persistence ----------------------------------------------
+  // Map-only surface so `ProgressRepo` stays model-free (ADR-013): row↔Map
+  // conversion lives here, not in the repo. The split `predictedScoreMin/Max`
+  // columns are rebuilt into a nested `predictedScoreRange` so the map matches
+  // `ProgressMetric.toJson()`; `topicIds` JSON is decoded for session metrics.
+
+  /// Live readiness metrics for a user, as `ProgressMetric.toJson()`-shaped maps.
+  Stream<List<Map<String, dynamic>>> watchProgressMetrics(String userId) =>
+      progressDao
+          .watchByUser(userId)
+          .map((rows) => rows.map(_progressMetricToMap).toList());
+
+  /// The user's study streak as a `StudyStreak.toJson()`-shaped map, or null.
+  Future<Map<String, dynamic>?> studyStreakForUser(String userId) async {
+    final row = await progressDao.streakForUser(userId);
+    return row == null ? null : _studyStreakToMap(row);
+  }
+
+  /// A user's daily quiz scores (oldest first), as `DailyScore.toJson()` maps.
+  Future<List<Map<String, dynamic>>> dailyScoresForUser(
+    String userId, {
+    DateTime? since,
+  }) async {
+    final rows = await progressDao.scoresForUser(userId, since: since);
+    return rows.map(_dailyScoreToMap).toList();
+  }
+
+  /// A user's session metrics (oldest first), as `SessionMetric.toJson()` maps.
+  Future<List<Map<String, dynamic>>> sessionMetricsForUser(
+    String userId, {
+    DateTime? since,
+  }) async {
+    final rows = await progressDao.sessionMetricsForUser(userId, since: since);
+    return rows.map(_sessionMetricToMap).toList();
+  }
+
+  /// A user's raw quiz attempts (newest first), as `QuizAttempt.toJson()` maps —
+  /// the source for the "N quizzes · N questions" counters.
+  Future<List<Map<String, dynamic>>> quizAttemptsForUser(String userId) async {
+    final rows = await quizDao.attemptsForUser(userId);
+    return rows.map(_quizAttemptToMap).toList();
+  }
+
+  /// Inserts one daily quiz score row (one per completed quiz).
+  Future<void> recordDailyScore({
+    required String userId,
+    required DateTime date,
+    required int score,
+    String? topicId,
+  }) => progressDao.insertDailyScore(
+    DailyScoresCompanion.insert(
+      userId: userId,
+      date: date,
+      score: score,
+      topicId: Value(topicId),
+    ),
+  );
+
+  /// Upserts the user's single study-streak row.
+  Future<void> upsertStudyStreak({
+    required String userId,
+    required int dayCount,
+    required DateTime lastStudiedDate,
+    required DateTime startDate,
+  }) => progressDao.upsertStreak(
+    StudyStreaksCompanion.insert(
+      userId: userId,
+      dayCount: dayCount,
+      lastStudiedDate: lastStudiedDate,
+      startDate: startDate,
+    ),
+  );
+
+  /// Upserts one per-subject readiness metric. [m] carries flat keys: `userId`,
+  /// `subjectId`, `readinessScore`, optional `predictedScoreMin/Max`,
+  /// `weeklyGain`, `aiInsight`; `lastUpdatedAt` defaults to now when absent.
+  Future<void> upsertProgressMetric(Map<String, dynamic> m) {
+    final updatedRaw = m['lastUpdatedAt'];
+    final updatedAt = updatedRaw is DateTime
+        ? updatedRaw
+        : updatedRaw is String
+        ? DateTime.parse(updatedRaw)
+        : DateTime.now();
+    return progressDao.upsertMetric(
+      ProgressMetricsCompanion.insert(
+        userId: m['userId'] as String,
+        subjectId: m['subjectId'] as String,
+        readinessScore: (m['readinessScore'] as num?)?.toInt() ?? 0,
+        lastUpdatedAt: updatedAt,
+        predictedScoreMin: Value((m['predictedScoreMin'] as num?)?.toInt()),
+        predictedScoreMax: Value((m['predictedScoreMax'] as num?)?.toInt()),
+        weeklyGain: Value((m['weeklyGain'] as num?)?.toInt()),
+        aiInsight: Value(m['aiInsight'] as String?),
+      ),
+    );
+  }
+
+  Map<String, dynamic> _progressMetricToMap(ProgressMetricRow r) => {
+    'userId': r.userId,
+    'subjectId': r.subjectId,
+    'readinessScore': r.readinessScore,
+    'lastUpdatedAt': r.lastUpdatedAt.toIso8601String(),
+    'predictedScoreRange': r.predictedScoreMin == null && r.predictedScoreMax == null
+        ? null
+        : {'min': r.predictedScoreMin ?? 0, 'max': r.predictedScoreMax ?? 0},
+    'weeklyGain': r.weeklyGain,
+    'aiInsight': r.aiInsight,
+  };
+
+  Map<String, dynamic> _studyStreakToMap(StudyStreakRow r) => {
+    'userId': r.userId,
+    'dayCount': r.dayCount,
+    'lastStudiedDate': r.lastStudiedDate.toIso8601String(),
+    'startDate': r.startDate.toIso8601String(),
+  };
+
+  Map<String, dynamic> _dailyScoreToMap(DailyScoreRow r) => {
+    'date': r.date.toIso8601String(),
+    'score': r.score,
+    'topicId': r.topicId,
+  };
+
+  Map<String, dynamic> _sessionMetricToMap(SessionMetricRow r) => {
+    'userId': r.userId,
+    'date': r.date.toIso8601String(),
+    'durationMinutes': r.durationMinutes,
+    'topicIds': (jsonDecode(r.topicIds) as List).whereType<String>().toList(),
+  };
+
+  Map<String, dynamic> _quizAttemptToMap(QuizAttemptRow r) => {
+    'id': r.id,
+    'quizId': r.quizId,
+    'userId': r.userId,
+    'questionId': r.questionId,
+    'timestamp': r.timestamp.toIso8601String(),
+    'selectedAnswerIndex': r.selectedAnswerIndex,
+    'isCorrect': r.isCorrect,
+  };
+
   /// Live block list for a schedule (by date, then start time), as
   /// `StudyBlock.toJson()`-shaped maps.
   Stream<List<Map<String, dynamic>>> watchStudyBlocks(String scheduleId) =>

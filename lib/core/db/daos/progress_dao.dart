@@ -25,6 +25,17 @@ class ProgressDao extends DatabaseAccessor<AppDatabase>
     return (query..orderBy([(d) => OrderingTerm.asc(d.date)])).get();
   }
 
+  Future<List<SessionMetricRow>> sessionMetricsForUser(
+    String userId, {
+    DateTime? since,
+  }) {
+    final query = select(sessionMetrics)..where((s) => s.userId.equals(userId));
+    if (since != null) {
+      query.where((s) => s.date.isBiggerOrEqualValue(since));
+    }
+    return (query..orderBy([(s) => OrderingTerm.asc(s.date)])).get();
+  }
+
   Future<void> upsertMetric(ProgressMetricsCompanion companion) =>
       into(progressMetrics).insertOnConflictUpdate(companion);
 
