@@ -30,7 +30,7 @@ extension SuperContext on BuildContext {
     bottom: MediaQueryData.fromView(View.of(this)).viewInsets.bottom,
   );
 
-  // bool get isLoggedIn => userData != null;
+  bool get isLoggedIn => userData != null;
 
-  // UserData? get userData => UserCubit.c(this, true).state.userData;
+  UserData? get userData => UserCubit.c(this, true).state.userData;
 }

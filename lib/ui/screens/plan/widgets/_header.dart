@@ -9,13 +9,13 @@ class _PlanHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     App.init(context);
 
-    final user = UserCubit.c(context, true).state.userData;
+    final user = context.userData;
     final start = DateTime.now();
     final end = start.add(const Duration(days: 6));
 
     return AppCoreHeader(
       greeting: 'Assalam-o-alaikum,',
-      name: user?.firstName,
+      name: user?.fullName,
       subtitle: 'Week of ${start.dayMonthShort} → ${end.dayMonthShort}',
       trailing: AppAvatar(
         initials: user?.initials ?? '?',

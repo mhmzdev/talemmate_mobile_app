@@ -20,6 +20,7 @@ import 'package:taleemmate/ui/widgets/design/alerts/app_alert_base.dart';
 import 'package:taleemmate/ui/widgets/design/library/library_item_tile.dart';
 import 'package:taleemmate/ui/widgets/design/library/subject_chips.dart';
 import 'package:taleemmate/ui/widgets/design/misc/app_ai_pill.dart';
+import 'package:taleemmate/ui/widgets/design/misc/app_avatar.dart';
 import 'package:taleemmate/ui/widgets/design/misc/app_choice_chip.dart';
 import 'package:taleemmate/ui/widgets/design/modals/app_modal_base.dart';
 import 'package:taleemmate/ui/widgets/forms/forms.dart';

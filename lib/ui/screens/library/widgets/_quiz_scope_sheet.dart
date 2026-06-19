@@ -156,7 +156,9 @@ class _ScopeRow extends StatelessWidget {
       child: Container(
         padding: Space.a.t12,
         decoration: BoxDecoration(
-          color: AppTheme.c.subBackground,
+          color: AppTheme.isDark
+              ? AppTheme.c.specBackground
+              : AppTheme.c.subBackground,
           borderRadius: 12.radius(),
           border: Border.all(
             color: selected ? AppTheme.c.accent : AppTheme.c.border,
@@ -166,8 +168,8 @@ class _ScopeRow extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: 22,
-              height: 22,
+              width: SpaceToken.t28,
+              height: SpaceToken.t28,
               alignment: .center,
               decoration: BoxDecoration(
                 color: selected ? AppTheme.c.accent : Colors.transparent,
@@ -187,8 +189,8 @@ class _ScopeRow extends StatelessWidget {
             ),
             Space.x.t12,
             Container(
-              width: 32,
-              height: 32,
+              width: SpaceToken.t32 + SpaceToken.t16,
+              height: SpaceToken.t32 + SpaceToken.t12,
               alignment: .center,
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.15),

@@ -12,19 +12,30 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     App.init(context);
     final noun = count == 1 ? 'document' : 'documents';
+    final user = context.userData;
 
     return Padding(
       padding: Space.sym(SpaceToken.t24, SpaceToken.t12),
-      child: Column(
-        crossAxisAlignment: .start,
+      child: Row(
         children: [
-          Text('Library', style: AppText.h1),
-          Space.y.t04,
-          Text(
-            '$count $noun · ${totalSize.readableSize}',
-            style: AppText.b2
-                .cl(AppTheme.c.subText)
-                .copyWith(letterSpacing: 0.4),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: .start,
+              children: [
+                Text('Library', style: AppText.h1),
+                Space.y.t04,
+                Text(
+                  '$count $noun · ${totalSize.readableSize}',
+                  style: AppText.b2
+                      .cl(AppTheme.c.subText)
+                      .copyWith(letterSpacing: 0.4),
+                ),
+              ],
+            ),
+          ),
+          AppAvatar(
+            initials: user?.initials ?? '?',
+            onTap: () => AppRoutes.profile.push(context),
           ),
         ],
       ),

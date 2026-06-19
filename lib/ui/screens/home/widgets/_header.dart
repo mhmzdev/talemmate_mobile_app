@@ -10,11 +10,11 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     App.init(context);
 
-    final user = UserCubit.c(context, true).state.userData;
+    final user = context.userData;
 
     return AppCoreHeader(
       greeting: 'Assalam-o-alaikum,',
-      name: user?.firstName,
+      name: user?.fullName,
       subtitle: DateTime.now().dateWithoutYear,
       trailing: AppAvatar(
         initials: user?.initials ?? '?',
