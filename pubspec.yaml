@@ -90,6 +90,7 @@ dependencies:
   shimmer: 3.0.0
   flutter_svg: 2.2.3
   top_snackbar_flutter: 3.3.0
+  fl_chart: ^1.0.0
 
   # file handling
   file_picker: 10.3.10
@@ -174,6 +175,7 @@ flutter:
     - assets/plan_reason_sys_prompt.md
     - assets/quiz_sys_prompt.md
     - assets/library_extraction_sys_prompt.md
+    - assets/progress_sys_prompt.md
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

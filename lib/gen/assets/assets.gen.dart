@@ -47,6 +47,7 @@ class Assets {
       'assets/library_extraction_sys_prompt.md';
   static const String planReasonSysPrompt = 'assets/plan_reason_sys_prompt.md';
   static const String planSysPrompt = 'assets/plan_sys_prompt.md';
+  static const String progressSysPrompt = 'assets/progress_sys_prompt.md';
   static const String quizSysPrompt = 'assets/quiz_sys_prompt.md';
 
   /// List of all assets
@@ -55,6 +56,7 @@ class Assets {
     libraryExtractionSysPrompt,
     planReasonSysPrompt,
     planSysPrompt,
+    progressSysPrompt,
     quizSysPrompt,
   ];
 }

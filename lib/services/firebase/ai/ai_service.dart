@@ -27,6 +27,10 @@ class AiService {
   /// structured generation from a focus session or library material.
   static const _quizModel = 'gemini-2.5-flash';
 
+  /// Exam-readiness assessor tier — Flash is fast enough for a periodic,
+  /// structured readiness pass on tab open.
+  static const _progressModel = 'gemini-2.5-flash';
+
   GenerativeModel? _extractor;
 
   GenerativeModel? _chat;
@@ -36,6 +40,8 @@ class AiService {
   GenerativeModel? _reasoner;
 
   GenerativeModel? _quiz;
+
+  GenerativeModel? _progress;
 
   /// Lazily builds the extraction model, sourcing its system instruction from
   /// [SystemPrompts] (kept out of code so the prompt is editable).
@@ -110,6 +116,19 @@ class AiService {
         generationConfig: GenerationConfig(
           responseMimeType: 'application/json',
           responseSchema: AgentTools.ins.quizSchema,
+        ),
+      );
+
+  /// Structured exam-readiness assessor: JSON-only output
+  /// ([AgentTools.progressSchema]) with the supplied [systemPrompt] as its
+  /// system instruction. Built once and reused with its bundled prompt.
+  GenerativeModel progressModel(String systemPrompt) =>
+      _progress ??= FirebaseAI.googleAI().generativeModel(
+        model: _progressModel,
+        systemInstruction: Content.system(systemPrompt),
+        generationConfig: GenerationConfig(
+          responseMimeType: 'application/json',
+          responseSchema: AgentTools.ins.progressSchema,
         ),
       );
 }

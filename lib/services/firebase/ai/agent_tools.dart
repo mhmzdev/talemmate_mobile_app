@@ -173,4 +173,47 @@ class AgentTools {
     },
     optionalProperties: ['sourceLabel'],
   );
+
+  /// Structured-output schema for the exam-readiness assessment (see
+  /// [progress_sys_prompt.md]). One entry per subject (readiness + predicted
+  /// band + momentum + a per-subject note) plus one global study insight. Maps
+  /// onto `ProgressMetric` (per subject) and the cubit-held `studyInsight`. Fed
+  /// to `GenerationConfig.responseSchema` so Gemini always returns parseable
+  /// JSON.
+  Schema get progressSchema => Schema.object(
+    properties: {
+      'subjects': Schema.array(
+        description: 'One entry per input subject, keyed by its exact id.',
+        items: Schema.object(
+          properties: {
+            'subjectId': Schema.string(
+              description: 'One of the provided subject ids.',
+            ),
+            'readinessScore': Schema.integer(
+              description: '0–100 estimate of exam preparedness.',
+            ),
+            'predictedScoreMin': Schema.integer(
+              description: 'Low end of the predicted exam score band (0–100).',
+            ),
+            'predictedScoreMax': Schema.integer(
+              description: 'High end of the predicted exam score band (0–100).',
+            ),
+            'weeklyGain': Schema.integer(
+              description: 'Signed week-over-week momentum, roughly -10..+10.',
+            ),
+            'aiInsight': Schema.string(
+              description:
+                  'One short, concrete, encouraging per-subject note in the '
+                  "student's language.",
+            ),
+          },
+        ),
+      ),
+      'studyInsight': Schema.string(
+        description:
+            'One short global study-pattern / retention insight in the '
+            "student's language.",
+      ),
+    },
+  );
 }

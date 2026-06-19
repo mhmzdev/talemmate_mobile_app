@@ -4,6 +4,7 @@ import 'package:taleemmate/blocs/chat/cubit.dart';
 import 'package:taleemmate/blocs/library/cubit.dart';
 import 'package:taleemmate/blocs/plan/cubit.dart';
 import 'package:taleemmate/repos/plan/plan_repo.dart';
+import 'package:taleemmate/repos/progress/progress_repo.dart';
 import 'package:taleemmate/repos/quiz/quiz_repo.dart';
 import 'package:taleemmate/repos/quotes/quotes_repo.dart';
 import 'package:taleemmate/repos/user/user_repo.dart';
@@ -26,6 +27,8 @@ class MockQuotesRepo extends Mock implements QuotesRepo {}
 class MockPlanRepo extends Mock implements PlanRepo {}
 
 class MockQuizRepo extends Mock implements QuizRepo {}
+
+class MockProgressRepo extends Mock implements ProgressRepo {}
 
 // ---------------------------------------------------------------------------
 // Firebase Auth user mock — cubits only ever read `.uid`. Use

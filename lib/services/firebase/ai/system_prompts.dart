@@ -30,4 +30,7 @@ class SystemPrompts {
 
   /// Single-answer MCQ quiz generation prompt (`assets/quiz_sys_prompt.md`).
   static Future<String> quiz() => _load(Assets.quizSysPrompt);
+
+  /// Exam-readiness assessment prompt (`assets/progress_sys_prompt.md`).
+  static Future<String> progress() => _load(Assets.progressSysPrompt);
 }

@@ -1,9 +1,12 @@
 import 'package:mocktail/mocktail.dart';
+import 'package:taleemmate/blocs/progress/cubit.dart';
+import 'package:taleemmate/blocs/progress/progress_dashboard.dart';
 import 'package:taleemmate/blocs/quiz/cubit.dart';
 import 'package:taleemmate/blocs/quotes/cubit.dart';
 import 'package:taleemmate/blocs/user/cubit.dart';
 import 'package:taleemmate/core/models/quiz/quiz.dart';
 import 'package:taleemmate/core/models/quotes/quote.dart';
+import 'package:taleemmate/core/models/progress/score_range.dart';
 import 'package:taleemmate/core/models/schedule/study_block.dart';
 import 'package:taleemmate/core/models/user/user.dart';
 import 'package:taleemmate/services/fault/faults.dart';
@@ -129,6 +132,151 @@ class TestQuiz {
   static Quiz sample() => Quiz.fromJson(rawJson());
 }
 
+class TestProgress {
+  /// A `ProgressRepo.dashboardData` map — the deterministic snapshot. Defaults
+  /// to two subjects, a 3-day streak, three quiz scores and two sessions.
+  static Map<String, dynamic> rawDashboardData({
+    bool empty = false,
+    String userId = TestUser.uid,
+  }) {
+    if (empty) {
+      return {
+        'streak': null,
+        'dailyScores': const [],
+        'sessionMetrics': const [],
+        'subjects': const [],
+        'exams': const [],
+        'quizCount': 0,
+        'questionCount': 0,
+      };
+    }
+    final now = DateTime(2026, 6, 19);
+    String day(int back) =>
+        now.subtract(Duration(days: back)).toIso8601String();
+    return {
+      'streak': {
+        'userId': userId,
+        'dayCount': 3,
+        'lastStudiedDate': day(0),
+        'startDate': day(2),
+      },
+      'dailyScores': [
+        {'date': day(2), 'score': 60, 'topicId': null},
+        {'date': day(1), 'score': 72, 'topicId': null},
+        {'date': day(0), 'score': 80, 'topicId': null},
+      ],
+      'sessionMetrics': [
+        {
+          'userId': userId,
+          'date': day(1),
+          'durationMinutes': 40,
+          'topicIds': const <String>[],
+        },
+        {
+          'userId': userId,
+          'date': day(0),
+          'durationMinutes': 50,
+          'topicIds': const <String>[],
+        },
+      ],
+      'subjects': [
+        {
+          'id': 'subj-maths',
+          'code': 'MATH',
+          'name': 'Mathematics',
+          'colorHex': '#4F7A5C',
+          'confidenceLevel': 0.6,
+          'order': 0,
+        },
+        {
+          'id': 'subj-physics',
+          'code': 'PHY',
+          'name': 'Physics',
+          'colorHex': '#A35C5C',
+          'confidenceLevel': 0.3,
+          'order': 1,
+        },
+      ],
+      'exams': [
+        {
+          'id': 'exam-1',
+          'subjectId': 'subj-physics',
+          'date': now.add(const Duration(days: 5)).toIso8601String(),
+          'label': 'Midterm',
+        },
+      ],
+      'quizCount': 3,
+      'questionCount': 24,
+    };
+  }
+
+  /// A `ProgressMetric.toJson()`-shaped map per subject — what the metrics watch
+  /// emits. [updatedAt] controls staleness in cubit tests.
+  static List<Map<String, dynamic>> rawMetrics({
+    String userId = TestUser.uid,
+    DateTime? updatedAt,
+  }) {
+    final at = (updatedAt ?? DateTime(2026, 6, 19)).toIso8601String();
+    return [
+      {
+        'userId': userId,
+        'subjectId': 'subj-maths',
+        'readinessScore': 68,
+        'lastUpdatedAt': at,
+        'predictedScoreRange': {'min': 62, 'max': 74},
+        'weeklyGain': 6,
+        'aiInsight': 'Keep drilling quadratic equations.',
+      },
+      {
+        'userId': userId,
+        'subjectId': 'subj-physics',
+        'readinessScore': 42,
+        'lastUpdatedAt': at,
+        'predictedScoreRange': {'min': 35, 'max': 50},
+        'weeklyGain': -3,
+        'aiInsight': 'Revisit kinematics basics.',
+      },
+    ];
+  }
+
+  /// A populated dashboard view-model for widget tests.
+  static ProgressDashboard dashboard() => const ProgressDashboard(
+    hero: MasterySubject(
+      subjectId: 'subj-physics',
+      name: 'Physics',
+      readinessScore: 42,
+      weeklyGain: -3,
+      predictedRange: ScoreRange(min: 35, max: 50),
+      aiInsight: 'Revisit kinematics basics.',
+    ),
+    subjects: [
+      MasterySubject(
+        subjectId: 'subj-maths',
+        name: 'Mathematics',
+        readinessScore: 68,
+        weeklyGain: 6,
+        predictedRange: ScoreRange(min: 62, max: 74),
+        aiInsight: 'Keep drilling quadratic equations.',
+      ),
+      MasterySubject(
+        subjectId: 'subj-physics',
+        name: 'Physics',
+        readinessScore: 42,
+        weeklyGain: -3,
+        predictedRange: ScoreRange(min: 35, max: 50),
+        aiInsight: 'Revisit kinematics basics.',
+      ),
+    ],
+    dailyScores: [60, 72, 80],
+    streakDays: 3,
+    weekHours: 1.5,
+    avgSessionMinutes: 45,
+    quizCount: 3,
+    questionCount: 24,
+    studyInsight: 'You retain best in the morning.',
+  );
+}
+
 /// A Firebase [User] mock with `.uid` stubbed — the only field cubits read.
 MockFirebaseUser fakeFirebaseUser({String uid = TestUser.uid}) {
   final user = MockFirebaseUser();
@@ -180,4 +328,17 @@ extension QuotesStateX on QuotesState {
 extension QuizStateX on QuizState {
   QuizState generateSuccess([Quiz? quiz]) =>
       copyWith(generate: generate.toSuccess(data: quiz ?? TestQuiz.sample()));
+}
+
+extension ProgressStateX on ProgressState {
+  ProgressState dashboardSuccess([ProgressDashboard? data]) => copyWith(
+    dashboard: dashboard.toSuccess(data: data ?? TestProgress.dashboard()),
+  );
+
+  ProgressState dashboardEmpty() => copyWith(
+    dashboard: dashboard.toSuccess(data: const ProgressDashboard()),
+  );
+
+  ProgressState dashboardFailed([String message = 'Couldn\'t load progress']) =>
+      copyWith(dashboard: dashboard.toFailed(fault: testFault(message)));
 }
