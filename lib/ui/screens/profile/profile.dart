@@ -47,6 +47,7 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     App.init(context);
     final state = _ScreenState.s(context, true);
+    final appProvider = AppProvider.s(context, true);
 
     return Screen(
       belowBuilders: const [_LogoutListener()],
@@ -149,11 +150,11 @@ class _Body extends StatelessWidget {
                 children: [
                   const _ThemeSelector(),
                   _SettingToggle(
-                    icon: LucideIcons.quote,
-                    label: 'Daily du\'a card',
-                    sub: 'Show a verse on Home each morning.',
-                    value: state.duaCard,
-                    onChanged: state.toggleDuaCard,
+                    icon: LucideIcons.book_open_text,
+                    label: 'Daily quote card',
+                    sub: 'Show an inspiring quote on Home each day.',
+                    value: appProvider.dailyQuoteCard,
+                    onChanged: appProvider.setDailyQuoteCard,
                   ),
                   _SettingToggle(
                     icon: LucideIcons.calendar,

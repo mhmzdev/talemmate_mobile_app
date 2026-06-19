@@ -11,6 +11,7 @@ final themeMap = {
 enum Cache {
   theme,
   firstOpen,
+  dailyQuoteCard,
 }
 
 extension ThemeModeX on ThemeMode {
@@ -26,6 +27,7 @@ class AppProvider extends ChangeNotifier {
   var themeMode = ThemeMode.light;
   var key = const Key('app');
   var firstOpen = false;
+  var dailyQuoteCard = true;
 
   late SharedPreferences _cache;
 
@@ -42,6 +44,9 @@ class AppProvider extends ChangeNotifier {
     final hasOpened = _cache.get(Cache.firstOpen.toString());
     firstOpen = hasOpened == null;
 
+    final cachedDailyQuoteCard = _cache.getBool(Cache.dailyQuoteCard.toString());
+    if (cachedDailyQuoteCard != null) dailyQuoteCard = cachedDailyQuoteCard;
+
     notifyListeners();
   }
 
@@ -53,6 +58,13 @@ class AppProvider extends ChangeNotifier {
       Cache.theme.toString(),
       newTheme.toString().split('.').last,
     );
+  }
+
+  void setDailyQuoteCard(bool v) {
+    if (dailyQuoteCard == v) return;
+    dailyQuoteCard = v;
+    notifyListeners();
+    _cache.setBool(Cache.dailyQuoteCard.toString(), v);
   }
 
   void setFirstOpen() {

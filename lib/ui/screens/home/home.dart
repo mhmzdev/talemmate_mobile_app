@@ -25,12 +25,13 @@ import 'package:taleemmate/ui/widgets/design/modals/app_modal_base.dart';
 import 'package:taleemmate/ui/widgets/design/plan/plan_placeholder.dart';
 import 'package:taleemmate/ui/widgets/design/plan/plan_visuals.dart';
 import 'package:taleemmate/ui/widgets/design/progress/app_meter.dart';
+import 'package:taleemmate/providers/app.dart';
 import 'package:taleemmate/ui/widgets/headless/app_touch.dart';
 
 part '_state.dart';
 part 'widgets/_recently_added.dart';
 part 'widgets/_tutor_card.dart';
-part 'widgets/_daily_reminder.dart';
+part 'widgets/_daily_quote_card.dart';
 
 part 'widgets/_today_plan_card.dart';
 part 'widgets/_why_this_plan_card.dart';
@@ -51,7 +52,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
 
     final quotesCubit = QuotesCubit.c(context);
-    if (quotesCubit.state.today.data == null) {
+    if (!quotesCubit.state.today.isLoading &&
+        quotesCubit.state.today.data == null) {
       quotesCubit.today();
     }
 
@@ -104,11 +106,17 @@ class _Body extends StatelessWidget {
                       ),
                     ),
                     Space.y.t24,
-                    Padding(padding: Space.h.t20, child: const _RecentlyAdded()),
+                    Padding(
+                      padding: Space.h.t20,
+                      child: const _RecentlyAdded(),
+                    ),
                     Space.y.t24,
                     Padding(padding: Space.h.t20, child: const _TutorCard()),
                     Space.y.t24,
-                    Padding(padding: Space.h.t20, child: const _DailyReminder()),
+                    Padding(
+                      padding: Space.h.t20,
+                      child: const _DailyQuoteCard(),
+                    ),
                   ],
                 ),
               ),

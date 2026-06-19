@@ -1,13 +1,14 @@
 part of '../home.dart';
 
-/// Home daily reminder — the day's quote with a gold accent bar. Hidden until a
-/// quote is loaded ([QuotesCubit]).
-class _DailyReminder extends StatelessWidget {
-  const _DailyReminder();
+class _DailyQuoteCard extends StatelessWidget {
+  const _DailyQuoteCard();
 
   @override
   Widget build(BuildContext context) {
     App.init(context);
+
+    final visible = AppProvider.s(context, true).dailyQuoteCard;
+    if (!visible) return const SizedBox.shrink();
 
     final quote = QuotesCubit.c(context, true).state.today.data;
     if (quote == null) return const SizedBox.shrink();
@@ -29,7 +30,7 @@ class _DailyReminder extends StatelessWidget {
               crossAxisAlignment: .start,
               children: [
                 Text(
-                  '“${quote.q}”',
+                  '"${quote.q}"',
                   style: AppText.h3
                       .cl(AppTheme.c.text)
                       .fra()
