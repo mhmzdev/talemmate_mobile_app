@@ -1,10 +1,11 @@
 ---
 title: "Progress Feature — readiness, mastery, quiz history, streak & AI insight"
-status: active
+status: completed
 created: 2026-06-19
+completed: 2026-06-19
 ---
 
-🚧 ACTIVE — All five phases implemented; `flutter analyze` clean + unit/widget tests passing. Pending manual driver verification on the emulator.
+✅ COMPLETED — All five phases shipped; `flutter analyze` clean, 71 unit/widget tests passing, and driver-verified on the emulator (live Progress render, AI readiness pass, quiz-completion → DailyScore + streak bump).
 
 # Progress Feature — Implementation Plan
 
