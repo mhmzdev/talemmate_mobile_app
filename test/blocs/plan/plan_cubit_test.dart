@@ -3,6 +3,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:taleemmate/blocs/plan/cubit.dart';
 import 'package:taleemmate/core/models/schedule/study_block.dart';
 import 'package:taleemmate/repos/plan/plan_repo.dart';
+import 'package:taleemmate/repos/progress/progress_repo.dart';
 
 import '../../helpers/fixtures.dart';
 import '../../helpers/mocks.dart';
@@ -133,10 +134,17 @@ void main() {
   });
 
   group('markBlockDone', () {
+    late MockProgressRepo progressRepo;
+
     setUp(() {
       stubWatch();
+      progressRepo = MockProgressRepo();
+      ProgressRepo.ins = progressRepo;
       when(() => repo.updateBlock(any())).thenAnswer((_) async {});
       when(() => repo.recordSession(any())).thenAnswer((_) async {});
+      when(
+        () => progressRepo.recordStudyActivity(userId: any(named: 'userId')),
+      ).thenAnswer((_) async {});
     });
 
     test('writes status:done and records a session with the block '
@@ -172,6 +180,17 @@ void main() {
           verify(() => repo.recordSession(captureAny())).captured.single
               as Map<String, dynamic>;
       expect(metric['topicIds'], isEmpty);
+    });
+
+    test('also bumps the study streak for the user', () async {
+      await record((c) async {
+        await c.watchForUser(TestUser.uid);
+        await c.markBlockDone(TestBlock.sample());
+      });
+
+      verify(
+        () => progressRepo.recordStudyActivity(userId: TestUser.uid),
+      ).called(1);
     });
   });
 }

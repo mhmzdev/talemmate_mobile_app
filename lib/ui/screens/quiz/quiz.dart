@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taleemmate/configs/configs.dart';
 import 'package:taleemmate/router/routes.dart';
 import 'package:taleemmate/blocs/quiz/cubit.dart';
+import 'package:taleemmate/blocs/progress/cubit.dart';
 import 'package:taleemmate/blocs/user/cubit.dart';
 import 'package:taleemmate/core/models/quiz/quiz.dart';
 import 'package:taleemmate/core/models/quiz/quiz_question.dart';

@@ -7,6 +7,7 @@ import 'package:taleemmate/core/models/schedule/study_block.dart';
 import 'package:taleemmate/core/models/schedule/week_plan.dart';
 import 'package:taleemmate/core/models/subject/exam.dart';
 import 'package:taleemmate/repos/plan/plan_repo.dart';
+import 'package:taleemmate/repos/progress/progress_repo.dart';
 import 'package:taleemmate/services/fault/faults.dart';
 
 import 'package:flutter/material.dart';
@@ -179,6 +180,13 @@ class PlanCubit extends Cubit<PlanState> {
       'durationMinutes': b.durationMinutes,
       'topicIds': [?b.topicId],
     });
+    // Completing a focus block counts toward today's study streak (same-day
+    // no-op if a quiz already counted today). Best-effort — never block the UI.
+    try {
+      await ProgressRepo.ins.recordStudyActivity(userId: userId);
+    } on Fault {
+      // Streak is non-critical — a failure must not undo "mark done".
+    }
   }
 
   /// Rewrites + persists the reasoning paragraph, mirroring it into the live

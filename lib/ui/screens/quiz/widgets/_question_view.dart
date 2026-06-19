@@ -142,13 +142,29 @@ class _QuestionView extends StatelessWidget {
                   icon: LucideIcons.arrow_right,
                   mainAxisSize: .max,
                   state: st.revealed ? .def : .disabled,
-                  onTap: st.revealed ? () => st.next(total) : null,
+                  onTap: st.revealed ? () => _finish(context, total) : null,
                 ),
               ),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  /// Advances; on the taking→results transition, records the quiz result
+  /// (a `DailyScore` + streak bump) best-effort so the Progress tab reflects it.
+  void _finish(BuildContext context, int total) {
+    final st = _ScreenState.s(context);
+    st.next(total);
+    if (st.phase != QuizPhase.results) return;
+    final uid = st.userId;
+    if (uid == null) return;
+    ProgressCubit.c(context).recordQuizResult(
+      userId: uid,
+      subjectId: quiz.subjectId,
+      score: st.score(quiz.questions),
+      total: quiz.questions.length,
     );
   }
 

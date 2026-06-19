@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:taleemmate/blocs/progress/cubit.dart';
 import 'package:taleemmate/blocs/quiz/cubit.dart';
 import 'package:taleemmate/blocs/user/cubit.dart';
+import 'package:taleemmate/repos/progress/progress_repo.dart';
 import 'package:taleemmate/repos/quiz/quiz_repo.dart';
 import 'package:taleemmate/router/routes.dart';
 import 'package:taleemmate/ui/screens/quiz/quiz.dart';
@@ -43,6 +45,20 @@ void main() {
     repo = MockQuizRepo();
     QuizRepo.ins = repo;
     when(() => repo.recordAnswer(any())).thenAnswer((_) async {});
+
+    // Finishing a quiz records the result through ProgressCubit → ProgressRepo;
+    // stub the seam so the results transition doesn't touch the database.
+    final progressRepo = MockProgressRepo();
+    ProgressRepo.ins = progressRepo;
+    when(
+      () => progressRepo.recordQuizScore(
+        userId: any(named: 'userId'),
+        subjectId: any(named: 'subjectId'),
+        score: any(named: 'score'),
+        total: any(named: 'total'),
+        date: any(named: 'date'),
+      ),
+    ).thenAnswer((_) async {});
   });
 
   Future<void> pumpQuiz(WidgetTester tester) async {
@@ -53,12 +69,15 @@ void main() {
     addTearDown(userCubit.close);
     final quizCubit = QuizCubit();
     addTearDown(quizCubit.close);
+    final progressCubit = ProgressCubit();
+    addTearDown(progressCubit.close);
 
     await tester.pumpWidget(
       MultiBlocProvider(
         providers: [
           BlocProvider<UserCubit>.value(value: userCubit),
           BlocProvider<QuizCubit>.value(value: quizCubit),
+          BlocProvider<ProgressCubit>.value(value: progressCubit),
         ],
         child: MaterialApp(
           theme: ThemeData(brightness: Brightness.light),

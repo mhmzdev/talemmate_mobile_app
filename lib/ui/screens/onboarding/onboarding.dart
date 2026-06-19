@@ -22,6 +22,7 @@ import 'package:taleemmate/blocs/user/cubit.dart';
 import 'package:taleemmate/blocs/library/cubit.dart';
 import 'package:taleemmate/blocs/chat/cubit.dart';
 import 'package:taleemmate/blocs/plan/cubit.dart';
+import 'package:taleemmate/blocs/progress/cubit.dart';
 import 'package:taleemmate/blocs/material/cubit.dart';
 import 'package:taleemmate/blocs/onboarding/cubit.dart';
 import 'package:taleemmate/core/models/onboarding/onboarding_data.dart';
