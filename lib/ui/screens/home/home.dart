@@ -24,6 +24,7 @@ import 'package:taleemmate/ui/widgets/design/plan/ai_reasoning_card.dart';
 import 'package:taleemmate/ui/widgets/design/modals/app_modal_base.dart';
 import 'package:taleemmate/ui/widgets/design/plan/plan_placeholder.dart';
 import 'package:taleemmate/ui/widgets/design/plan/plan_visuals.dart';
+import 'package:taleemmate/ui/widgets/design/progress/app_meter.dart';
 import 'package:taleemmate/ui/widgets/headless/app_touch.dart';
 
 part '_state.dart';
@@ -85,27 +86,34 @@ class _Body extends StatelessWidget {
       keyboardHandler: true,
       child: SafeArea(
         bottom: false,
-        child: SingleChildScrollView(
-          padding: Space.b.t100 + Space.b.t60,
-          child: Column(
-            crossAxisAlignment: .stretch,
-            children: [
-              const _Header(),
-              Space.y.t08,
-              BlocBuilder<PlanCubit, PlanState>(
-                builder: (context, state) => Padding(
-                  padding: Space.h.t20,
-                  child: _HomePlanContent(state: state),
+        child: Column(
+          crossAxisAlignment: .stretch,
+          children: [
+            const _Header(),
+            Space.y.t08,
+            Expanded(
+              child: SingleChildScrollView(
+                padding: Space.b.t100 + Space.b.t60,
+                child: Column(
+                  crossAxisAlignment: .stretch,
+                  children: [
+                    BlocBuilder<PlanCubit, PlanState>(
+                      builder: (context, state) => Padding(
+                        padding: Space.h.t20,
+                        child: _HomePlanContent(state: state),
+                      ),
+                    ),
+                    Space.y.t24,
+                    Padding(padding: Space.h.t20, child: const _RecentlyAdded()),
+                    Space.y.t24,
+                    Padding(padding: Space.h.t20, child: const _TutorCard()),
+                    Space.y.t24,
+                    Padding(padding: Space.h.t20, child: const _DailyReminder()),
+                  ],
                 ),
               ),
-              Space.y.t24,
-              Padding(padding: Space.h.t20, child: const _RecentlyAdded()),
-              Space.y.t24,
-              Padding(padding: Space.h.t20, child: const _TutorCard()),
-              Space.y.t24,
-              Padding(padding: Space.h.t20, child: const _DailyReminder()),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

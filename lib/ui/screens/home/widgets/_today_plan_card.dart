@@ -54,7 +54,7 @@ class _TodayPlanCard extends StatelessWidget {
           Space.y.t08,
           Text(summary, style: AppText.h2.cl(AppTheme.c.subText)),
           Space.y.t16,
-          _Meter(fraction: total == 0 ? 0 : done / total),
+          AppMeter(fraction: total == 0 ? 0 : done / total),
           Space.y.t20,
           ...blocks.map((b) => _TodayBlockRow(block: b)),
           Space.y.t12,
@@ -275,31 +275,6 @@ class _StatusDot extends StatelessWidget {
         border: Border.all(
           color: isNow ? AppTheme.c.primary : AppTheme.c.border,
           width: isNow ? 2.5 : 1.5,
-        ),
-      ),
-    );
-  }
-}
-
-/// Thin rounded progress meter.
-class _Meter extends StatelessWidget {
-  const _Meter({required this.fraction});
-
-  final double fraction;
-
-  @override
-  Widget build(BuildContext context) {
-    App.init(context);
-
-    return ClipRRect(
-      borderRadius: 999.radius(),
-      child: Container(
-        height: 6,
-        color: AppTheme.c.border,
-        child: FractionallySizedBox(
-          alignment: Alignment.centerLeft,
-          widthFactor: fraction.clamp(0.0, 1.0),
-          child: Container(color: AppTheme.c.primary),
         ),
       ),
     );
