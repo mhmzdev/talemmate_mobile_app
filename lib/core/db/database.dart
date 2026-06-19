@@ -14,6 +14,8 @@ import 'package:taleemmate/core/db/tables/subjects_table.dart';
 import 'package:taleemmate/core/db/tables/tutor_table.dart';
 import 'package:taleemmate/core/models/library/library_item.dart';
 import 'package:taleemmate/core/models/onboarding/onboarding_data.dart';
+import 'package:taleemmate/core/models/quiz/quiz.dart';
+import 'package:taleemmate/core/models/quiz/quiz_attempt.dart';
 import 'package:taleemmate/core/models/quiz/quiz_question.dart';
 import 'package:taleemmate/core/models/schedule/study_block.dart';
 import 'package:taleemmate/core/models/settings/appearance_preferences.dart';
@@ -92,7 +94,7 @@ class AppDatabase extends _$AppDatabase {
   static final AppDatabase ins = AppDatabase();
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -107,6 +109,11 @@ class AppDatabase extends _$AppDatabase {
       if (from < 4) {
         await m.addColumn(subjects, subjects.userId);
         await m.addColumn(exams, exams.userId);
+      }
+      // v5: per-question explanation + citation for inline quiz feedback.
+      if (from < 5) {
+        await m.addColumn(quizQuestions, quizQuestions.explanation);
+        await m.addColumn(quizQuestions, quizQuestions.citation);
       }
     },
     beforeOpen: (details) async {
@@ -549,6 +556,138 @@ class AppDatabase extends _$AppDatabase {
     'subjectId': r.subjectId,
     'date': r.date.toIso8601String(),
     'label': r.label,
+  };
+
+  // --- Quiz persistence --------------------------------------------------
+  // Map-only surface so `QuizRepo` stays model-free (ADR-013): row↔Map and
+  // `Quiz.fromJson` / `QuizQuestion.fromJson` / `QuizAttempt.fromJson`
+  // conversion live here, not in the repo. NB: the `QuizQuestions.content`
+  // column is exposed under the model's `text` key — reconciled in the map,
+  // not via a column rename (no destructive migration).
+
+  /// A single subject row as a `Subject.toJson()`-shaped map, or null — used to
+  /// resolve the subject name + confidence for a quiz generation turn.
+  Future<Map<String, dynamic>?> subjectById(String id) async {
+    final row = await (select(
+      subjects,
+    )..where((s) => s.id.equals(id))).getSingleOrNull();
+    return row == null ? null : _subjectToMap(row);
+  }
+
+  /// A single topic's name as a thin map `{id, subjectId, name}`, or null.
+  Future<Map<String, dynamic>?> topicById(String id) async {
+    final row = await (select(
+      topics,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
+    if (row == null) return null;
+    return {'id': row.id, 'subjectId': row.subjectId, 'name': row.name};
+  }
+
+  /// Extracted text for one library item paired with its display name, as a map
+  /// `{itemId, name, content}`, or null when the item has no indexed text — the
+  /// single-material grounding source for a quiz.
+  Future<Map<String, dynamic>?> materialTextForItem(String itemId) async {
+    final text = await materialTextsDao.forItem(itemId);
+    if (text == null) return null;
+    final item = await (select(
+      libraryItems,
+    )..where((i) => i.id.equals(itemId))).getSingleOrNull();
+    return {
+      'itemId': text.itemId,
+      'name': item?.name ?? 'Material',
+      'content': text.content,
+    };
+  }
+
+  /// A persisted quiz with its ordered questions as a `Quiz.toJson()`-shaped map
+  /// (nested `questions`), or null. Kept thin — used for reload.
+  Future<Map<String, dynamic>?> quizById(String quizId) async {
+    final quiz = await quizDao.findById(quizId);
+    if (quiz == null) return null;
+    final questions = await quizDao.questionsForQuiz(quizId);
+    return _quizToMap(quiz, questions);
+  }
+
+  /// Persists a quiz and its questions in one transaction. [quiz] is a
+  /// `Quiz.toJson()`-shaped map (without nested questions needed); [questions]
+  /// are `QuizQuestion.toJson()`-shaped maps (the `text` key maps to the
+  /// `content` column). `fromJson` happens here so the repo stays model-free.
+  Future<void> replaceQuizQuestions(
+    Map<String, dynamic> quiz,
+    List<Map<String, dynamic>> questions,
+  ) async {
+    final q = Quiz.fromJson(quiz);
+    await transaction(() async {
+      await quizDao.upsertQuiz(
+        QuizzesCompanion(
+          id: Value(q.id),
+          subjectId: Value(q.subjectId),
+          topicId: Value(q.topicId),
+          currentQuestionIndex: Value(q.currentQuestionIndex),
+          sourceLabel: Value(q.sourceLabel),
+          isAIGenerated: Value(q.isAIGenerated),
+        ),
+      );
+      for (final json in questions) {
+        final question = QuizQuestion.fromJson(json);
+        await quizDao.upsertQuestion(
+          QuizQuestionsCompanion(
+            id: Value(question.id),
+            quizId: Value(question.quizId),
+            index: Value(question.index),
+            content: Value(question.text),
+            type: Value(question.type),
+            markValue: Value(question.markValue),
+            options: Value(question.options),
+            correctAnswerIndex: Value(question.correctAnswerIndex),
+            timeLimit: Value(question.timeLimit),
+            explanation: Value(question.explanation),
+            citation: Value(question.citation),
+          ),
+        );
+      }
+    });
+  }
+
+  /// Records one answered question as a `QuizAttempt` from a
+  /// `QuizAttempt.toJson()`-shaped map.
+  Future<void> insertQuizAttempt(Map<String, dynamic> attempt) async {
+    final a = QuizAttempt.fromJson(attempt);
+    await quizDao.insertAttempt(
+      QuizAttemptsCompanion(
+        id: Value(a.id),
+        quizId: Value(a.quizId),
+        userId: Value(a.userId),
+        questionId: Value(a.questionId),
+        timestamp: Value(a.timestamp),
+        selectedAnswerIndex: Value(a.selectedAnswerIndex),
+        isCorrect: Value(a.isCorrect),
+      ),
+    );
+  }
+
+  Map<String, dynamic> _quizToMap(QuizRow r, List<QuizQuestionRow> qs) => {
+    'id': r.id,
+    'subjectId': r.subjectId,
+    'topicId': r.topicId,
+    'currentQuestionIndex': r.currentQuestionIndex,
+    'sourceLabel': r.sourceLabel,
+    'isAIGenerated': r.isAIGenerated,
+    'questions': qs.map(_quizQuestionToMap).toList(),
+  };
+
+  Map<String, dynamic> _quizQuestionToMap(QuizQuestionRow r) => {
+    'id': r.id,
+    'quizId': r.quizId,
+    'index': r.index,
+    'text': r.content,
+    'type': r.type.name,
+    'markValue': r.markValue,
+    'options': r.options,
+    'correctAnswerIndex': r.correctAnswerIndex,
+    'timeLimit': r.timeLimit,
+    'explanation': r.explanation,
+    'citation': r.citation,
   };
 
   static QueryExecutor _openConnection() => driftDatabase(name: 'taleemmate');

@@ -29,6 +29,8 @@ class QuizQuestions extends Table {
   TextColumn get options => text().map(const StringListConverter())();
   IntColumn get correctAnswerIndex => integer().nullable()();
   IntColumn get timeLimit => integer().nullable()();
+  TextColumn get explanation => text().nullable()();
+  TextColumn get citation => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};

@@ -19,6 +19,8 @@ sealed class QuizQuestion with _$QuizQuestion {
     @Default([]) List<String> options,
     int? correctAnswerIndex,
     int? timeLimit,
+    String? explanation,
+    String? citation,
   }) = _QuizQuestion;
 
   factory QuizQuestion.fromJson(Map<String, Object?> json) =>

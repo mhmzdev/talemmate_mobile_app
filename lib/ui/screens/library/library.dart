@@ -12,6 +12,7 @@ import 'package:taleemmate/blocs/material/cubit.dart';
 import 'package:taleemmate/configs/configs.dart';
 import 'package:taleemmate/core/models/library/library_item.dart';
 import 'package:taleemmate/core/models/subject/subject.dart';
+import 'package:taleemmate/router/routes.dart';
 import 'package:taleemmate/services/material_picker/material_picker.dart';
 import 'package:taleemmate/ui/widgets/core/button/button.dart';
 import 'package:taleemmate/ui/widgets/core/screen/screen.dart';
@@ -29,6 +30,8 @@ part 'static/_form_data.dart';
 part 'static/_form_keys.dart';
 
 part '_state.dart';
+part 'widgets/_quiz_scope_sheet.dart';
+
 part 'widgets/_material_status.dart';
 
 part 'utils.dart';

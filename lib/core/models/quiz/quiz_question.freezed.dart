@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$QuizQuestion {
 
- String get id; String get quizId; int get index; String get text; QuestionType get type; int get markValue; List<String> get options; int? get correctAnswerIndex; int? get timeLimit;
+ String get id; String get quizId; int get index; String get text; QuestionType get type; int get markValue; List<String> get options; int? get correctAnswerIndex; int? get timeLimit; String? get explanation; String? get citation;
 /// Create a copy of QuizQuestion
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $QuizQuestionCopyWith<QuizQuestion> get copyWith => _$QuizQuestionCopyWithImpl<Q
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is QuizQuestion&&(identical(other.id, id) || other.id == id)&&(identical(other.quizId, quizId) || other.quizId == quizId)&&(identical(other.index, index) || other.index == index)&&(identical(other.text, text) || other.text == text)&&(identical(other.type, type) || other.type == type)&&(identical(other.markValue, markValue) || other.markValue == markValue)&&const DeepCollectionEquality().equals(other.options, options)&&(identical(other.correctAnswerIndex, correctAnswerIndex) || other.correctAnswerIndex == correctAnswerIndex)&&(identical(other.timeLimit, timeLimit) || other.timeLimit == timeLimit));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is QuizQuestion&&(identical(other.id, id) || other.id == id)&&(identical(other.quizId, quizId) || other.quizId == quizId)&&(identical(other.index, index) || other.index == index)&&(identical(other.text, text) || other.text == text)&&(identical(other.type, type) || other.type == type)&&(identical(other.markValue, markValue) || other.markValue == markValue)&&const DeepCollectionEquality().equals(other.options, options)&&(identical(other.correctAnswerIndex, correctAnswerIndex) || other.correctAnswerIndex == correctAnswerIndex)&&(identical(other.timeLimit, timeLimit) || other.timeLimit == timeLimit)&&(identical(other.explanation, explanation) || other.explanation == explanation)&&(identical(other.citation, citation) || other.citation == citation));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,quizId,index,text,type,markValue,const DeepCollectionEquality().hash(options),correctAnswerIndex,timeLimit);
+int get hashCode => Object.hash(runtimeType,id,quizId,index,text,type,markValue,const DeepCollectionEquality().hash(options),correctAnswerIndex,timeLimit,explanation,citation);
 
 @override
 String toString() {
-  return 'QuizQuestion(id: $id, quizId: $quizId, index: $index, text: $text, type: $type, markValue: $markValue, options: $options, correctAnswerIndex: $correctAnswerIndex, timeLimit: $timeLimit)';
+  return 'QuizQuestion(id: $id, quizId: $quizId, index: $index, text: $text, type: $type, markValue: $markValue, options: $options, correctAnswerIndex: $correctAnswerIndex, timeLimit: $timeLimit, explanation: $explanation, citation: $citation)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $QuizQuestionCopyWith<$Res>  {
   factory $QuizQuestionCopyWith(QuizQuestion value, $Res Function(QuizQuestion) _then) = _$QuizQuestionCopyWithImpl;
 @useResult
 $Res call({
- String id, String quizId, int index, String text, QuestionType type, int markValue, List<String> options, int? correctAnswerIndex, int? timeLimit
+ String id, String quizId, int index, String text, QuestionType type, int markValue, List<String> options, int? correctAnswerIndex, int? timeLimit, String? explanation, String? citation
 });
 
 
@@ -65,7 +65,7 @@ class _$QuizQuestionCopyWithImpl<$Res>
 
 /// Create a copy of QuizQuestion
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? quizId = null,Object? index = null,Object? text = null,Object? type = null,Object? markValue = null,Object? options = null,Object? correctAnswerIndex = freezed,Object? timeLimit = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? quizId = null,Object? index = null,Object? text = null,Object? type = null,Object? markValue = null,Object? options = null,Object? correctAnswerIndex = freezed,Object? timeLimit = freezed,Object? explanation = freezed,Object? citation = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,quizId: null == quizId ? _self.quizId : quizId // ignore: cast_nullable_to_non_nullable
@@ -76,7 +76,9 @@ as QuestionType,markValue: null == markValue ? _self.markValue : markValue // ig
 as int,options: null == options ? _self.options : options // ignore: cast_nullable_to_non_nullable
 as List<String>,correctAnswerIndex: freezed == correctAnswerIndex ? _self.correctAnswerIndex : correctAnswerIndex // ignore: cast_nullable_to_non_nullable
 as int?,timeLimit: freezed == timeLimit ? _self.timeLimit : timeLimit // ignore: cast_nullable_to_non_nullable
-as int?,
+as int?,explanation: freezed == explanation ? _self.explanation : explanation // ignore: cast_nullable_to_non_nullable
+as String?,citation: freezed == citation ? _self.citation : citation // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -158,10 +160,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String quizId,  int index,  String text,  QuestionType type,  int markValue,  List<String> options,  int? correctAnswerIndex,  int? timeLimit)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String quizId,  int index,  String text,  QuestionType type,  int markValue,  List<String> options,  int? correctAnswerIndex,  int? timeLimit,  String? explanation,  String? citation)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _QuizQuestion() when $default != null:
-return $default(_that.id,_that.quizId,_that.index,_that.text,_that.type,_that.markValue,_that.options,_that.correctAnswerIndex,_that.timeLimit);case _:
+return $default(_that.id,_that.quizId,_that.index,_that.text,_that.type,_that.markValue,_that.options,_that.correctAnswerIndex,_that.timeLimit,_that.explanation,_that.citation);case _:
   return orElse();
 
 }
@@ -179,10 +181,10 @@ return $default(_that.id,_that.quizId,_that.index,_that.text,_that.type,_that.ma
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String quizId,  int index,  String text,  QuestionType type,  int markValue,  List<String> options,  int? correctAnswerIndex,  int? timeLimit)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String quizId,  int index,  String text,  QuestionType type,  int markValue,  List<String> options,  int? correctAnswerIndex,  int? timeLimit,  String? explanation,  String? citation)  $default,) {final _that = this;
 switch (_that) {
 case _QuizQuestion():
-return $default(_that.id,_that.quizId,_that.index,_that.text,_that.type,_that.markValue,_that.options,_that.correctAnswerIndex,_that.timeLimit);}
+return $default(_that.id,_that.quizId,_that.index,_that.text,_that.type,_that.markValue,_that.options,_that.correctAnswerIndex,_that.timeLimit,_that.explanation,_that.citation);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -196,10 +198,10 @@ return $default(_that.id,_that.quizId,_that.index,_that.text,_that.type,_that.ma
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String quizId,  int index,  String text,  QuestionType type,  int markValue,  List<String> options,  int? correctAnswerIndex,  int? timeLimit)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String quizId,  int index,  String text,  QuestionType type,  int markValue,  List<String> options,  int? correctAnswerIndex,  int? timeLimit,  String? explanation,  String? citation)?  $default,) {final _that = this;
 switch (_that) {
 case _QuizQuestion() when $default != null:
-return $default(_that.id,_that.quizId,_that.index,_that.text,_that.type,_that.markValue,_that.options,_that.correctAnswerIndex,_that.timeLimit);case _:
+return $default(_that.id,_that.quizId,_that.index,_that.text,_that.type,_that.markValue,_that.options,_that.correctAnswerIndex,_that.timeLimit,_that.explanation,_that.citation);case _:
   return null;
 
 }
@@ -211,7 +213,7 @@ return $default(_that.id,_that.quizId,_that.index,_that.text,_that.type,_that.ma
 @JsonSerializable()
 
 class _QuizQuestion extends QuizQuestion {
-  const _QuizQuestion({required this.id, required this.quizId, required this.index, required this.text, required this.type, required this.markValue, final  List<String> options = const [], this.correctAnswerIndex, this.timeLimit}): _options = options,super._();
+  const _QuizQuestion({required this.id, required this.quizId, required this.index, required this.text, required this.type, required this.markValue, final  List<String> options = const [], this.correctAnswerIndex, this.timeLimit, this.explanation, this.citation}): _options = options,super._();
   factory _QuizQuestion.fromJson(Map<String, dynamic> json) => _$QuizQuestionFromJson(json);
 
 @override final  String id;
@@ -229,6 +231,8 @@ class _QuizQuestion extends QuizQuestion {
 
 @override final  int? correctAnswerIndex;
 @override final  int? timeLimit;
+@override final  String? explanation;
+@override final  String? citation;
 
 /// Create a copy of QuizQuestion
 /// with the given fields replaced by the non-null parameter values.
@@ -243,16 +247,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _QuizQuestion&&(identical(other.id, id) || other.id == id)&&(identical(other.quizId, quizId) || other.quizId == quizId)&&(identical(other.index, index) || other.index == index)&&(identical(other.text, text) || other.text == text)&&(identical(other.type, type) || other.type == type)&&(identical(other.markValue, markValue) || other.markValue == markValue)&&const DeepCollectionEquality().equals(other._options, _options)&&(identical(other.correctAnswerIndex, correctAnswerIndex) || other.correctAnswerIndex == correctAnswerIndex)&&(identical(other.timeLimit, timeLimit) || other.timeLimit == timeLimit));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _QuizQuestion&&(identical(other.id, id) || other.id == id)&&(identical(other.quizId, quizId) || other.quizId == quizId)&&(identical(other.index, index) || other.index == index)&&(identical(other.text, text) || other.text == text)&&(identical(other.type, type) || other.type == type)&&(identical(other.markValue, markValue) || other.markValue == markValue)&&const DeepCollectionEquality().equals(other._options, _options)&&(identical(other.correctAnswerIndex, correctAnswerIndex) || other.correctAnswerIndex == correctAnswerIndex)&&(identical(other.timeLimit, timeLimit) || other.timeLimit == timeLimit)&&(identical(other.explanation, explanation) || other.explanation == explanation)&&(identical(other.citation, citation) || other.citation == citation));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,quizId,index,text,type,markValue,const DeepCollectionEquality().hash(_options),correctAnswerIndex,timeLimit);
+int get hashCode => Object.hash(runtimeType,id,quizId,index,text,type,markValue,const DeepCollectionEquality().hash(_options),correctAnswerIndex,timeLimit,explanation,citation);
 
 @override
 String toString() {
-  return 'QuizQuestion(id: $id, quizId: $quizId, index: $index, text: $text, type: $type, markValue: $markValue, options: $options, correctAnswerIndex: $correctAnswerIndex, timeLimit: $timeLimit)';
+  return 'QuizQuestion(id: $id, quizId: $quizId, index: $index, text: $text, type: $type, markValue: $markValue, options: $options, correctAnswerIndex: $correctAnswerIndex, timeLimit: $timeLimit, explanation: $explanation, citation: $citation)';
 }
 
 
@@ -263,7 +267,7 @@ abstract mixin class _$QuizQuestionCopyWith<$Res> implements $QuizQuestionCopyWi
   factory _$QuizQuestionCopyWith(_QuizQuestion value, $Res Function(_QuizQuestion) _then) = __$QuizQuestionCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String quizId, int index, String text, QuestionType type, int markValue, List<String> options, int? correctAnswerIndex, int? timeLimit
+ String id, String quizId, int index, String text, QuestionType type, int markValue, List<String> options, int? correctAnswerIndex, int? timeLimit, String? explanation, String? citation
 });
 
 
@@ -280,7 +284,7 @@ class __$QuizQuestionCopyWithImpl<$Res>
 
 /// Create a copy of QuizQuestion
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? quizId = null,Object? index = null,Object? text = null,Object? type = null,Object? markValue = null,Object? options = null,Object? correctAnswerIndex = freezed,Object? timeLimit = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? quizId = null,Object? index = null,Object? text = null,Object? type = null,Object? markValue = null,Object? options = null,Object? correctAnswerIndex = freezed,Object? timeLimit = freezed,Object? explanation = freezed,Object? citation = freezed,}) {
   return _then(_QuizQuestion(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,quizId: null == quizId ? _self.quizId : quizId // ignore: cast_nullable_to_non_nullable
@@ -291,7 +295,9 @@ as QuestionType,markValue: null == markValue ? _self.markValue : markValue // ig
 as int,options: null == options ? _self._options : options // ignore: cast_nullable_to_non_nullable
 as List<String>,correctAnswerIndex: freezed == correctAnswerIndex ? _self.correctAnswerIndex : correctAnswerIndex // ignore: cast_nullable_to_non_nullable
 as int?,timeLimit: freezed == timeLimit ? _self.timeLimit : timeLimit // ignore: cast_nullable_to_non_nullable
-as int?,
+as int?,explanation: freezed == explanation ? _self.explanation : explanation // ignore: cast_nullable_to_non_nullable
+as String?,citation: freezed == citation ? _self.citation : citation // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

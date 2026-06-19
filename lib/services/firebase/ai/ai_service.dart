@@ -23,6 +23,10 @@ class AiService {
   /// structured generation at onboarding.
   static const _planModel = 'gemini-2.5-flash';
 
+  /// Single-answer MCQ quiz generator tier — Flash handles a one-shot,
+  /// structured generation from a focus session or library material.
+  static const _quizModel = 'gemini-2.5-flash';
+
   GenerativeModel? _extractor;
 
   GenerativeModel? _chat;
@@ -30,6 +34,8 @@ class AiService {
   GenerativeModel? _planner;
 
   GenerativeModel? _reasoner;
+
+  GenerativeModel? _quiz;
 
   /// Lazily builds the extraction model, sourcing its system instruction from
   /// [SystemPrompts] (kept out of code so the prompt is editable).
@@ -91,6 +97,19 @@ class AiService {
         generationConfig: GenerationConfig(
           responseMimeType: 'application/json',
           responseSchema: AgentTools.ins.reasonSchema,
+        ),
+      );
+
+  /// Structured single-answer MCQ generator: JSON-only output
+  /// ([AgentTools.quizSchema]) with the supplied [systemPrompt] as its system
+  /// instruction. Built once and reused — the prompt is a stable bundled asset.
+  GenerativeModel quizModel(String systemPrompt) =>
+      _quiz ??= FirebaseAI.googleAI().generativeModel(
+        model: _quizModel,
+        systemInstruction: Content.system(systemPrompt),
+        generationConfig: GenerationConfig(
+          responseMimeType: 'application/json',
+          responseSchema: AgentTools.ins.quizSchema,
         ),
       );
 }

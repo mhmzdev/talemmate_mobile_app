@@ -4442,6 +4442,28 @@ class $QuizQuestionsTable extends QuizQuestions
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _explanationMeta = const VerificationMeta(
+    'explanation',
+  );
+  @override
+  late final GeneratedColumn<String> explanation = GeneratedColumn<String>(
+    'explanation',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _citationMeta = const VerificationMeta(
+    'citation',
+  );
+  @override
+  late final GeneratedColumn<String> citation = GeneratedColumn<String>(
+    'citation',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -4453,6 +4475,8 @@ class $QuizQuestionsTable extends QuizQuestions
     options,
     correctAnswerIndex,
     timeLimit,
+    explanation,
+    citation,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -4518,6 +4542,21 @@ class $QuizQuestionsTable extends QuizQuestions
         timeLimit.isAcceptableOrUnknown(data['time_limit']!, _timeLimitMeta),
       );
     }
+    if (data.containsKey('explanation')) {
+      context.handle(
+        _explanationMeta,
+        explanation.isAcceptableOrUnknown(
+          data['explanation']!,
+          _explanationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('citation')) {
+      context.handle(
+        _citationMeta,
+        citation.isAcceptableOrUnknown(data['citation']!, _citationMeta),
+      );
+    }
     return context;
   }
 
@@ -4567,6 +4606,14 @@ class $QuizQuestionsTable extends QuizQuestions
         DriftSqlType.int,
         data['${effectivePrefix}time_limit'],
       ),
+      explanation: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}explanation'],
+      ),
+      citation: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}citation'],
+      ),
     );
   }
 
@@ -4591,6 +4638,8 @@ class QuizQuestionRow extends DataClass implements Insertable<QuizQuestionRow> {
   final List<String> options;
   final int? correctAnswerIndex;
   final int? timeLimit;
+  final String? explanation;
+  final String? citation;
   const QuizQuestionRow({
     required this.id,
     required this.quizId,
@@ -4601,6 +4650,8 @@ class QuizQuestionRow extends DataClass implements Insertable<QuizQuestionRow> {
     required this.options,
     this.correctAnswerIndex,
     this.timeLimit,
+    this.explanation,
+    this.citation,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -4626,6 +4677,12 @@ class QuizQuestionRow extends DataClass implements Insertable<QuizQuestionRow> {
     if (!nullToAbsent || timeLimit != null) {
       map['time_limit'] = Variable<int>(timeLimit);
     }
+    if (!nullToAbsent || explanation != null) {
+      map['explanation'] = Variable<String>(explanation);
+    }
+    if (!nullToAbsent || citation != null) {
+      map['citation'] = Variable<String>(citation);
+    }
     return map;
   }
 
@@ -4644,6 +4701,12 @@ class QuizQuestionRow extends DataClass implements Insertable<QuizQuestionRow> {
       timeLimit: timeLimit == null && nullToAbsent
           ? const Value.absent()
           : Value(timeLimit),
+      explanation: explanation == null && nullToAbsent
+          ? const Value.absent()
+          : Value(explanation),
+      citation: citation == null && nullToAbsent
+          ? const Value.absent()
+          : Value(citation),
     );
   }
 
@@ -4662,6 +4725,8 @@ class QuizQuestionRow extends DataClass implements Insertable<QuizQuestionRow> {
       options: serializer.fromJson<List<String>>(json['options']),
       correctAnswerIndex: serializer.fromJson<int?>(json['correctAnswerIndex']),
       timeLimit: serializer.fromJson<int?>(json['timeLimit']),
+      explanation: serializer.fromJson<String?>(json['explanation']),
+      citation: serializer.fromJson<String?>(json['citation']),
     );
   }
   @override
@@ -4677,6 +4742,8 @@ class QuizQuestionRow extends DataClass implements Insertable<QuizQuestionRow> {
       'options': serializer.toJson<List<String>>(options),
       'correctAnswerIndex': serializer.toJson<int?>(correctAnswerIndex),
       'timeLimit': serializer.toJson<int?>(timeLimit),
+      'explanation': serializer.toJson<String?>(explanation),
+      'citation': serializer.toJson<String?>(citation),
     };
   }
 
@@ -4690,6 +4757,8 @@ class QuizQuestionRow extends DataClass implements Insertable<QuizQuestionRow> {
     List<String>? options,
     Value<int?> correctAnswerIndex = const Value.absent(),
     Value<int?> timeLimit = const Value.absent(),
+    Value<String?> explanation = const Value.absent(),
+    Value<String?> citation = const Value.absent(),
   }) => QuizQuestionRow(
     id: id ?? this.id,
     quizId: quizId ?? this.quizId,
@@ -4702,6 +4771,8 @@ class QuizQuestionRow extends DataClass implements Insertable<QuizQuestionRow> {
         ? correctAnswerIndex.value
         : this.correctAnswerIndex,
     timeLimit: timeLimit.present ? timeLimit.value : this.timeLimit,
+    explanation: explanation.present ? explanation.value : this.explanation,
+    citation: citation.present ? citation.value : this.citation,
   );
   QuizQuestionRow copyWithCompanion(QuizQuestionsCompanion data) {
     return QuizQuestionRow(
@@ -4716,6 +4787,10 @@ class QuizQuestionRow extends DataClass implements Insertable<QuizQuestionRow> {
           ? data.correctAnswerIndex.value
           : this.correctAnswerIndex,
       timeLimit: data.timeLimit.present ? data.timeLimit.value : this.timeLimit,
+      explanation: data.explanation.present
+          ? data.explanation.value
+          : this.explanation,
+      citation: data.citation.present ? data.citation.value : this.citation,
     );
   }
 
@@ -4730,7 +4805,9 @@ class QuizQuestionRow extends DataClass implements Insertable<QuizQuestionRow> {
           ..write('markValue: $markValue, ')
           ..write('options: $options, ')
           ..write('correctAnswerIndex: $correctAnswerIndex, ')
-          ..write('timeLimit: $timeLimit')
+          ..write('timeLimit: $timeLimit, ')
+          ..write('explanation: $explanation, ')
+          ..write('citation: $citation')
           ..write(')'))
         .toString();
   }
@@ -4746,6 +4823,8 @@ class QuizQuestionRow extends DataClass implements Insertable<QuizQuestionRow> {
     options,
     correctAnswerIndex,
     timeLimit,
+    explanation,
+    citation,
   );
   @override
   bool operator ==(Object other) =>
@@ -4759,7 +4838,9 @@ class QuizQuestionRow extends DataClass implements Insertable<QuizQuestionRow> {
           other.markValue == this.markValue &&
           other.options == this.options &&
           other.correctAnswerIndex == this.correctAnswerIndex &&
-          other.timeLimit == this.timeLimit);
+          other.timeLimit == this.timeLimit &&
+          other.explanation == this.explanation &&
+          other.citation == this.citation);
 }
 
 class QuizQuestionsCompanion extends UpdateCompanion<QuizQuestionRow> {
@@ -4772,6 +4853,8 @@ class QuizQuestionsCompanion extends UpdateCompanion<QuizQuestionRow> {
   final Value<List<String>> options;
   final Value<int?> correctAnswerIndex;
   final Value<int?> timeLimit;
+  final Value<String?> explanation;
+  final Value<String?> citation;
   final Value<int> rowid;
   const QuizQuestionsCompanion({
     this.id = const Value.absent(),
@@ -4783,6 +4866,8 @@ class QuizQuestionsCompanion extends UpdateCompanion<QuizQuestionRow> {
     this.options = const Value.absent(),
     this.correctAnswerIndex = const Value.absent(),
     this.timeLimit = const Value.absent(),
+    this.explanation = const Value.absent(),
+    this.citation = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   QuizQuestionsCompanion.insert({
@@ -4795,6 +4880,8 @@ class QuizQuestionsCompanion extends UpdateCompanion<QuizQuestionRow> {
     required List<String> options,
     this.correctAnswerIndex = const Value.absent(),
     this.timeLimit = const Value.absent(),
+    this.explanation = const Value.absent(),
+    this.citation = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        quizId = Value(quizId),
@@ -4813,6 +4900,8 @@ class QuizQuestionsCompanion extends UpdateCompanion<QuizQuestionRow> {
     Expression<String>? options,
     Expression<int>? correctAnswerIndex,
     Expression<int>? timeLimit,
+    Expression<String>? explanation,
+    Expression<String>? citation,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -4826,6 +4915,8 @@ class QuizQuestionsCompanion extends UpdateCompanion<QuizQuestionRow> {
       if (correctAnswerIndex != null)
         'correct_answer_index': correctAnswerIndex,
       if (timeLimit != null) 'time_limit': timeLimit,
+      if (explanation != null) 'explanation': explanation,
+      if (citation != null) 'citation': citation,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -4840,6 +4931,8 @@ class QuizQuestionsCompanion extends UpdateCompanion<QuizQuestionRow> {
     Value<List<String>>? options,
     Value<int?>? correctAnswerIndex,
     Value<int?>? timeLimit,
+    Value<String?>? explanation,
+    Value<String?>? citation,
     Value<int>? rowid,
   }) {
     return QuizQuestionsCompanion(
@@ -4852,6 +4945,8 @@ class QuizQuestionsCompanion extends UpdateCompanion<QuizQuestionRow> {
       options: options ?? this.options,
       correctAnswerIndex: correctAnswerIndex ?? this.correctAnswerIndex,
       timeLimit: timeLimit ?? this.timeLimit,
+      explanation: explanation ?? this.explanation,
+      citation: citation ?? this.citation,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -4890,6 +4985,12 @@ class QuizQuestionsCompanion extends UpdateCompanion<QuizQuestionRow> {
     if (timeLimit.present) {
       map['time_limit'] = Variable<int>(timeLimit.value);
     }
+    if (explanation.present) {
+      map['explanation'] = Variable<String>(explanation.value);
+    }
+    if (citation.present) {
+      map['citation'] = Variable<String>(citation.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -4908,6 +5009,8 @@ class QuizQuestionsCompanion extends UpdateCompanion<QuizQuestionRow> {
           ..write('options: $options, ')
           ..write('correctAnswerIndex: $correctAnswerIndex, ')
           ..write('timeLimit: $timeLimit, ')
+          ..write('explanation: $explanation, ')
+          ..write('citation: $citation, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -15228,6 +15331,8 @@ typedef $$QuizQuestionsTableCreateCompanionBuilder =
       required List<String> options,
       Value<int?> correctAnswerIndex,
       Value<int?> timeLimit,
+      Value<String?> explanation,
+      Value<String?> citation,
       Value<int> rowid,
     });
 typedef $$QuizQuestionsTableUpdateCompanionBuilder =
@@ -15241,6 +15346,8 @@ typedef $$QuizQuestionsTableUpdateCompanionBuilder =
       Value<List<String>> options,
       Value<int?> correctAnswerIndex,
       Value<int?> timeLimit,
+      Value<String?> explanation,
+      Value<String?> citation,
       Value<int> rowid,
     });
 
@@ -15368,6 +15475,16 @@ class $$QuizQuestionsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get explanation => $composableBuilder(
+    column: $table.explanation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get citation => $composableBuilder(
+    column: $table.citation,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$QuizzesTableFilterComposer get quizId {
     final $$QuizzesTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -15491,6 +15608,16 @@ class $$QuizQuestionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get explanation => $composableBuilder(
+    column: $table.explanation,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get citation => $composableBuilder(
+    column: $table.citation,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$QuizzesTableOrderingComposer get quizId {
     final $$QuizzesTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -15549,6 +15676,14 @@ class $$QuizQuestionsTableAnnotationComposer
 
   GeneratedColumn<int> get timeLimit =>
       $composableBuilder(column: $table.timeLimit, builder: (column) => column);
+
+  GeneratedColumn<String> get explanation => $composableBuilder(
+    column: $table.explanation,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get citation =>
+      $composableBuilder(column: $table.citation, builder: (column) => column);
 
   $$QuizzesTableAnnotationComposer get quizId {
     final $$QuizzesTableAnnotationComposer composer = $composerBuilder(
@@ -15666,6 +15801,8 @@ class $$QuizQuestionsTableTableManager
                 Value<List<String>> options = const Value.absent(),
                 Value<int?> correctAnswerIndex = const Value.absent(),
                 Value<int?> timeLimit = const Value.absent(),
+                Value<String?> explanation = const Value.absent(),
+                Value<String?> citation = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => QuizQuestionsCompanion(
                 id: id,
@@ -15677,6 +15814,8 @@ class $$QuizQuestionsTableTableManager
                 options: options,
                 correctAnswerIndex: correctAnswerIndex,
                 timeLimit: timeLimit,
+                explanation: explanation,
+                citation: citation,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -15690,6 +15829,8 @@ class $$QuizQuestionsTableTableManager
                 required List<String> options,
                 Value<int?> correctAnswerIndex = const Value.absent(),
                 Value<int?> timeLimit = const Value.absent(),
+                Value<String?> explanation = const Value.absent(),
+                Value<String?> citation = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => QuizQuestionsCompanion.insert(
                 id: id,
@@ -15701,6 +15842,8 @@ class $$QuizQuestionsTableTableManager
                 options: options,
                 correctAnswerIndex: correctAnswerIndex,
                 timeLimit: timeLimit,
+                explanation: explanation,
+                citation: citation,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

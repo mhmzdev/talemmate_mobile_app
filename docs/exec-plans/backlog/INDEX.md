@@ -2,4 +2,4 @@
 
 | Plan | Description |
 |---|---|
-| _(none — backlog empty)_ | |
+| _(none)_ | |

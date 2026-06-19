@@ -18,6 +18,14 @@ class _SubjectSection extends StatelessWidget {
     final count = section.items.length;
     final countLabel = '$count ${count == 1 ? 'item' : 'items'}';
 
+    // Quiz generation needs a subject to ground on + at least one indexed
+    // material; the "Unsorted" bucket (subject == null) is never quizzable.
+    final indexedItems = subject == null
+        ? const <LibraryItem>[]
+        : section.items
+              .where((i) => i.processingStatus == ProcessingStatus.indexed)
+              .toList();
+
     return Padding(
       padding: Space.t.t24,
       child: Column(
@@ -55,6 +63,40 @@ class _SubjectSection extends StatelessWidget {
                   ],
                 ),
               ),
+              if (subject != null && indexedItems.isNotEmpty) ...[
+                Space.x.t08,
+                AppTouch(
+                  onTap: () => _showQuizScope(context, subject, indexedItems),
+                  hasSplash: false,
+                  child: Container(
+                    padding: Space.sym(SpaceToken.t08, SpaceToken.t04),
+                    decoration: BoxDecoration(
+                      color: AppTheme.c.accent.withValues(alpha: 0.12),
+                      borderRadius: 999.radius(),
+                      border: Border.all(
+                        color: AppTheme.c.accent.withValues(alpha: 0.4),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: .min,
+                      children: [
+                        Icon(
+                          LucideIcons.circle_question_mark,
+                          size: 13,
+                          color: AppTheme.c.accent,
+                        ),
+                        Space.x.t04,
+                        Text(
+                          'Quiz',
+                          style: AppText.l1b
+                              .cl(AppTheme.c.accent)
+                              .copyWith(letterSpacing: 0.6),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
               Space.x.t08,
               Text(countLabel, style: AppText.b2.cl(AppTheme.c.subText)),
             ],
@@ -66,6 +108,7 @@ class _SubjectSection extends StatelessWidget {
                 item: item,
                 status: _MaterialStatus(item: item),
                 trailing: AppTouch(
+                  key: ValueKey('material_more_${item.id}'),
                   onTap: () =>
                       _showMaterialActions(context, item, subject?.name),
                   hasSplash: false,

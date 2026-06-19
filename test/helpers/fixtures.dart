@@ -1,6 +1,8 @@
 import 'package:mocktail/mocktail.dart';
+import 'package:taleemmate/blocs/quiz/cubit.dart';
 import 'package:taleemmate/blocs/quotes/cubit.dart';
 import 'package:taleemmate/blocs/user/cubit.dart';
+import 'package:taleemmate/core/models/quiz/quiz.dart';
 import 'package:taleemmate/core/models/quotes/quote.dart';
 import 'package:taleemmate/core/models/schedule/study_block.dart';
 import 'package:taleemmate/core/models/user/user.dart';
@@ -81,6 +83,52 @@ class TestBlock {
   };
 }
 
+class TestQuiz {
+  static const id = 'quiz-1';
+
+  /// A `Quiz.toJson()`-shaped map (nested `questions`) — what `QuizRepo.generate`
+  /// returns and the cubit hydrates. Two single-answer MCQs: q1 cites a source,
+  /// q2 does not.
+  static Map<String, dynamic> rawJson() => {
+    'id': id,
+    'subjectId': 'subj-maths',
+    'topicId': null,
+    'currentQuestionIndex': 0,
+    'sourceLabel': 'Generated from Algebra notes',
+    'isAIGenerated': true,
+    'questions': [
+      {
+        'id': 'q1',
+        'quizId': id,
+        'index': 0,
+        'text': 'What is 2 + 2?',
+        'type': 'singleAnswer',
+        'markValue': 1,
+        'options': ['3', '4', '5', '6'],
+        'correctAnswerIndex': 1,
+        'timeLimit': null,
+        'explanation': 'Two plus two equals four.',
+        'citation': 'Algebra notes — p.1',
+      },
+      {
+        'id': 'q2',
+        'quizId': id,
+        'index': 1,
+        'text': 'What is the capital of France?',
+        'type': 'singleAnswer',
+        'markValue': 1,
+        'options': ['Berlin', 'Madrid', 'Paris', 'Rome'],
+        'correctAnswerIndex': 2,
+        'timeLimit': null,
+        'explanation': 'Paris is the capital of France.',
+        'citation': null,
+      },
+    ],
+  };
+
+  static Quiz sample() => Quiz.fromJson(rawJson());
+}
+
 /// A Firebase [User] mock with `.uid` stubbed — the only field cubits read.
 MockFirebaseUser fakeFirebaseUser({String uid = TestUser.uid}) {
   final user = MockFirebaseUser();
@@ -127,4 +175,9 @@ extension QuotesStateX on QuotesState {
   QuotesState todaySuccess([Quote? quote]) => copyWith(
     today: today.toSuccess(data: quote ?? TestQuote.sample()),
   );
+}
+
+extension QuizStateX on QuizState {
+  QuizState generateSuccess([Quiz? quiz]) =>
+      copyWith(generate: generate.toSuccess(data: quiz ?? TestQuiz.sample()));
 }

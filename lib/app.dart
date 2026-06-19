@@ -1,3 +1,4 @@
+import 'blocs/quiz/cubit.dart';
 import 'blocs/plan/cubit.dart';
 import 'blocs/chat/cubit.dart';
 import 'blocs/material/cubit.dart';
@@ -49,6 +50,7 @@ class _TaleemMateState extends State<TaleemMate> {
     return MultiProvider(
       providers: [
         // bloc-initiate-start
+        BlocProvider(create: (_) => QuizCubit()),
         BlocProvider(create: (_) => PlanCubit()),
         BlocProvider(create: (_) => ChatCubit()),
         BlocProvider(create: (_) => MaterialCubit()),

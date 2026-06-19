@@ -130,4 +130,47 @@ class AgentTools {
       ),
     },
   );
+
+  /// Structured-output schema for single-answer MCQ quiz generation (see
+  /// [quiz_sys_prompt.md]). Maps onto `Quiz` → `QuizQuestion`, omitting the
+  /// fields the app fills itself (id / quizId / index / type / markValue). Fed to
+  /// `GenerationConfig.responseSchema` so Gemini always returns parseable JSON.
+  Schema get quizSchema => Schema.object(
+    properties: {
+      'sourceLabel': Schema.string(
+        nullable: true,
+        description:
+            'Short basis label, e.g. "Generated from Lec 12" when grounded on a '
+            'material, else the subject name.',
+      ),
+      'questions': Schema.array(
+        description: 'Exactly the requested number of single-answer MCQs.',
+        items: Schema.object(
+          properties: {
+            'text': Schema.string(description: 'The question stem.'),
+            'options': Schema.array(
+              description: 'Exactly 4 answer options.',
+              items: Schema.string(),
+            ),
+            'correctAnswerIndex': Schema.integer(
+              description: 'Index (0–3) of the single correct option.',
+            ),
+            'explanation': Schema.string(
+              description:
+                  'Why the correct option is right (and others wrong), '
+                  "in the student's language.",
+            ),
+            'citation': Schema.string(
+              nullable: true,
+              description:
+                  'Source ref (material name + locator) when grounded; '
+                  'omit when not grounded.',
+            ),
+          },
+          optionalProperties: ['citation'],
+        ),
+      ),
+    },
+    optionalProperties: ['sourceLabel'],
+  );
 }

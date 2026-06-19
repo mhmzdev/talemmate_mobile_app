@@ -27,4 +27,7 @@ class SystemPrompts {
   /// Narrow "Why this plan" rewrite prompt
   /// (`assets/plan_reason_sys_prompt.md`), used after a block reschedule.
   static Future<String> reason() => _load(Assets.planReasonSysPrompt);
+
+  /// Single-answer MCQ quiz generation prompt (`assets/quiz_sys_prompt.md`).
+  static Future<String> quiz() => _load(Assets.quizSysPrompt);
 }

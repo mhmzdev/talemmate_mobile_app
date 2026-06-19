@@ -1,6 +1,6 @@
 part of '../library.dart';
 
-enum _MaterialAction { open, tutor, delete }
+enum _MaterialAction { open, tutor, quiz, delete }
 
 /// Opens the "…" overflow sheet for a material, then runs the chosen action on
 /// the (valid) screen context once the sheet has popped.
@@ -24,6 +24,14 @@ Future<void> _showMaterialActions(
       UIFlash.info(context, 'Document viewer coming soon');
     case _MaterialAction.tutor:
       UIFlash.info(context, 'Tutor coming soon');
+    case _MaterialAction.quiz:
+      AppRoutes.quiz.push(
+        context,
+        arguments: {
+          'subjectId': item.subjectId,
+          'sourceItemIds': [item.id],
+        },
+      );
     case _MaterialAction.delete:
       _confirmDeleteMaterial(context, cubit, item);
     case null:
@@ -123,6 +131,18 @@ class _MaterialActionsSheet extends StatelessWidget {
             subtitle: 'Start a grounded chat',
             onTap: () => Navigator.pop(context, _MaterialAction.tutor),
           ),
+          // Quiz generation needs extracted text + a subject to ground on, so
+          // it's only offered for indexed materials filed under a subject.
+          if (item.processingStatus == ProcessingStatus.indexed &&
+              item.subjectId != null) ...[
+            Space.y.t08,
+            _SheetAction(
+              icon: LucideIcons.circle_question_mark,
+              title: 'Generate quiz',
+              subtitle: 'AI MCQs grounded on this material',
+              onTap: () => Navigator.pop(context, _MaterialAction.quiz),
+            ),
+          ],
           Space.y.t08,
           _SheetAction(
             icon: LucideIcons.trash_2,

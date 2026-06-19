@@ -21,6 +21,8 @@ _QuizQuestion _$QuizQuestionFromJson(Map<String, dynamic> json) =>
           const [],
       correctAnswerIndex: (json['correctAnswerIndex'] as num?)?.toInt(),
       timeLimit: (json['timeLimit'] as num?)?.toInt(),
+      explanation: json['explanation'] as String?,
+      citation: json['citation'] as String?,
     );
 
 Map<String, dynamic> _$QuizQuestionToJson(_QuizQuestion instance) =>
@@ -34,6 +36,8 @@ Map<String, dynamic> _$QuizQuestionToJson(_QuizQuestion instance) =>
       'options': instance.options,
       'correctAnswerIndex': instance.correctAnswerIndex,
       'timeLimit': instance.timeLimit,
+      'explanation': instance.explanation,
+      'citation': instance.citation,
     };
 
 const _$QuestionTypeEnumMap = {

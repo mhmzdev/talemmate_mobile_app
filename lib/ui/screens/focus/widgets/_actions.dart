@@ -12,33 +12,51 @@ class _Actions extends StatelessWidget {
   Widget build(BuildContext context) {
     App.init(context);
 
-    return Row(
+    return Column(
+      crossAxisAlignment: .stretch,
       children: [
-        Expanded(
-          child: AppButton(
-            label: 'I\'m stuck',
-            icon: LucideIcons.life_buoy,
-            style: .creamy,
-            mainAxisSize: .max,
-            onTap: () {
-              ChatCubit.c(context).startConversation(block.subjectId);
-
-              ''.pop(context); // pop focus
-              AppRoutes.tutor.pushReplace(context); // push replace tutor (bottom bar)
+        AppButton(
+          label: 'Test yourself',
+          icon: LucideIcons.circle_question_mark,
+          mainAxisSize: .max,
+          onTap: () => AppRoutes.quiz.push(
+            context,
+            arguments: {
+              'subjectId': block.subjectId,
+              'topicId': block.topicId,
             },
           ),
         ),
-        Space.x.t08,
-        Expanded(
-          child: AppButton(
-            label: 'Mark block done',
-            icon: LucideIcons.check,
-            mainAxisSize: .max,
-            onTap: () {
-              PlanCubit.c(context).markBlockDone(block);
-              AppRoutes.focus.pop(context);
-            },
-          ),
+        Space.y.t08,
+        Row(
+          children: [
+            Expanded(
+              child: AppButton(
+                label: 'I\'m stuck',
+                icon: LucideIcons.life_buoy,
+                style: .creamy,
+                mainAxisSize: .max,
+                onTap: () {
+                  ChatCubit.c(context).startConversation(block.subjectId);
+
+                  ''.pop(context); // pop focus
+                  AppRoutes.tutor.pushReplace(context); // push replace tutor (bottom bar)
+                },
+              ),
+            ),
+            Space.x.t08,
+            Expanded(
+              child: AppButton(
+                label: 'Mark block done',
+                icon: LucideIcons.check,
+                mainAxisSize: .max,
+                onTap: () {
+                  PlanCubit.c(context).markBlockDone(block);
+                  AppRoutes.focus.pop(context);
+                },
+              ),
+            ),
+          ],
         ),
       ],
     );

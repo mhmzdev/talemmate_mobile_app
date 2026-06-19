@@ -1,4 +1,5 @@
 abstract class AppRoutes {
+  static const quiz = '/quiz';
   static const focus = '/focus';
   static const profile = '/profile';
   static const createAccount = '/create-account';

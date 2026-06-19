@@ -1,3 +1,4 @@
+import 'package:taleemmate/ui/screens/quiz/quiz.dart';
 import 'package:taleemmate/ui/screens/focus/focus.dart';
 import 'package:taleemmate/ui/screens/profile/profile.dart';
 import 'package:taleemmate/ui/screens/stepwise_loader/stepwise_loader.dart';
@@ -17,6 +18,7 @@ import 'routes.dart';
 final navigator = GlobalKey<NavigatorState>();
 
 final appRoutes = <String, WidgetBuilder>{
+  AppRoutes.quiz: (_) => const QuizScreen(),
   AppRoutes.profile: (_) => const ProfileScreen(),
   AppRoutes.stepwiseLoader: (_) => const StepwiseLoaderScreen(),
   AppRoutes.onboarding: (_) => const OnboardingScreen(),
