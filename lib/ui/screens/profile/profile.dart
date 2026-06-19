@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
 import 'package:taleemmate/blocs/user/cubit.dart';
@@ -9,6 +10,7 @@ import 'package:taleemmate/blocs/progress/cubit.dart';
 import 'package:taleemmate/configs/configs.dart';
 import 'package:taleemmate/providers/app.dart';
 import 'package:taleemmate/router/routes.dart';
+import 'package:taleemmate/services/flavor/flavor.dart';
 import 'package:taleemmate/ui/widgets/core/button/button.dart';
 import 'package:taleemmate/ui/widgets/core/buttons/app_icon_button.dart';
 import 'package:taleemmate/ui/widgets/core/screen/screen.dart';
@@ -207,10 +209,6 @@ class _Body extends StatelessWidget {
                     onChanged: state.toggleCloudBackup,
                   ),
                   const _SettingRow(
-                    icon: LucideIcons.download,
-                    label: 'Export my data',
-                  ),
-                  const _SettingRow(
                     icon: LucideIcons.shield,
                     label: 'Privacy policy',
                     last: true,
@@ -229,12 +227,6 @@ class _Body extends StatelessWidget {
                   _SettingRow(
                     icon: LucideIcons.star,
                     label: 'Rate TaleemMate',
-                  ),
-                  _SettingRow(
-                    icon: LucideIcons.info,
-                    label: 'About',
-                    value: 'v1.4.0 · build 218',
-                    last: true,
                   ),
                 ],
               ),
@@ -265,12 +257,27 @@ class _Body extends StatelessWidget {
                   ],
                 ),
               ),
-
               Space.y.t08,
-              Text(
-                'Made with care · Lahore + Islamabad',
-                style: AppText.b2.cl(AppTheme.c.subText).gm(),
-                textAlign: .center,
+              GestureDetector(
+                onTap: () async {
+                  await Clipboard.setData(
+                    ClipboardData(
+                      text:
+                          'Version: ${AppFlavor.version}, Build No: ${AppFlavor.buildNo}',
+                    ),
+                  );
+                  if (context.mounted) {
+                    UIFlash.info(
+                      context,
+                      'App version info copied to clipboard!',
+                    );
+                  }
+                },
+                child: Text(
+                  'v${AppFlavor.version} · ${AppFlavor.buildNo}',
+                  style: AppText.b2.cl(AppTheme.c.subText).gm(),
+                  textAlign: .center,
+                ),
               ),
             ],
           ),
