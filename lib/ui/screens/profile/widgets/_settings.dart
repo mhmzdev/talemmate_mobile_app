@@ -48,6 +48,57 @@ class _Section extends StatelessWidget {
   }
 }
 
+/// The "Account" group — reads live session data (subjects, schedule, materials,
+/// institution) from the app-level cubits rather than placeholder copy. "Material"
+/// jumps to the Library; the editor-backed rows are wired as that feature lands.
+class _AccountSection extends StatelessWidget {
+  const _AccountSection();
+
+  @override
+  Widget build(BuildContext context) {
+    App.init(context);
+    final lib = LibraryCubit.c(context, true).state;
+    final schedule = PlanCubit.c(context, true).state.schedule;
+    final institution = UserCubit.c(context, true).state.userData?.institution;
+
+    final subjects = lib.subjects.length;
+    final items = lib.load.data ?? const [];
+    final totalSize = items.fold<int>(0, (sum, it) => sum + it.fileSize);
+    final hrs = schedule?.dailyTargetHours;
+
+    return _Section(
+      title: 'Account',
+      children: [
+        _SettingRow(
+          icon: LucideIcons.book_open,
+          label: 'Subjects & confidence',
+          value: subjects == 1 ? '1 subject' : '$subjects subjects',
+        ),
+        _SettingRow(
+          icon: LucideIcons.calendar,
+          label: 'Schedule & exams',
+          value: hrs == null ? 'Not set' : '${hrs.toStringAsFixed(1)} hrs/day',
+        ),
+        _SettingRow(
+          icon: LucideIcons.library,
+          label: 'Material',
+          value:
+              '${items.length} item${items.length == 1 ? '' : 's'} · ${totalSize.readableSize}',
+          onTap: () => AppRoutes.library.pushReplace(context),
+        ),
+        _SettingRow(
+          icon: LucideIcons.flag,
+          label: 'Institution',
+          value: (institution == null || institution.isEmpty)
+              ? 'Add'
+              : institution,
+          last: true,
+        ),
+      ],
+    );
+  }
+}
+
 /// Hairline divider drawn under a row unless it is the last in its section.
 BoxDecoration? _rowDivider(bool last) => last
     ? null

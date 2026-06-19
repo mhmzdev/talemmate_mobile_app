@@ -64,32 +64,7 @@ class _Body extends StatelessWidget {
               const _GlanceCard(),
 
               // Account
-              const _Section(
-                title: 'Account',
-                children: [
-                  _SettingRow(
-                    icon: LucideIcons.book_open,
-                    label: 'Subjects & confidence',
-                    value: '5 subjects',
-                  ),
-                  _SettingRow(
-                    icon: LucideIcons.calendar,
-                    label: 'Schedule & exams',
-                    value: '3.5 hrs/day',
-                  ),
-                  _SettingRow(
-                    icon: LucideIcons.library,
-                    label: 'Material',
-                    value: '42 items · 1.2 GB',
-                  ),
-                  _SettingRow(
-                    icon: LucideIcons.flag,
-                    label: 'Institution',
-                    value: 'NUST · SEECS',
-                    last: true,
-                  ),
-                ],
-              ),
+              const _AccountSection(),
 
               // AI tutor
               _Section(
