@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:taleemmate/blocs/chat/cubit.dart';
 import 'package:taleemmate/blocs/library/cubit.dart';
 import 'package:taleemmate/blocs/plan/cubit.dart';
+import 'package:taleemmate/blocs/progress/cubit.dart';
 import 'package:taleemmate/blocs/quotes/cubit.dart';
 import 'package:taleemmate/blocs/user/cubit.dart';
 import 'package:taleemmate/providers/app.dart';
@@ -64,6 +65,7 @@ class TestApp extends StatelessWidget {
     required this.libraryCubit,
     required this.chatCubit,
     required this.planCubit,
+    this.progressCubit,
   });
 
   final String initialRoute;
@@ -74,8 +76,13 @@ class TestApp extends StatelessWidget {
   final ChatCubit chatCubit;
   final PlanCubit planCubit;
 
+  /// The Progress screen's driving cubit. Optional — bystander shells get a
+  /// default inert one (it only does work once `loadForUser` is called).
+  final ProgressCubit? progressCubit;
+
   @override
   Widget build(BuildContext context) {
+    final progress = progressCubit;
     return MultiBlocProvider(
       providers: [
         BlocProvider<UserCubit>.value(value: userCubit),
@@ -83,6 +90,10 @@ class TestApp extends StatelessWidget {
         BlocProvider<LibraryCubit>.value(value: libraryCubit),
         BlocProvider<ChatCubit>.value(value: chatCubit),
         BlocProvider<PlanCubit>.value(value: planCubit),
+        if (progress != null)
+          BlocProvider<ProgressCubit>.value(value: progress)
+        else
+          BlocProvider<ProgressCubit>(create: (_) => ProgressCubit()),
       ],
       child: ChangeNotifierProvider<AppProvider>(
         create: (_) => AppProvider(),
