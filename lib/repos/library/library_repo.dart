@@ -26,4 +26,12 @@ class LibraryRepo {
 
   // Single-primitive param — ADR-013 exception.
   Future<void> remove(String id) => _LibraryProvider.remove(id);
+
+  /// Upserts one subject. [values] is a `Subject.toJson()` map plus a `userId`
+  /// key; the Map→row mapping lives in `AppDatabase.upsertSubject` (ADR-013).
+  Future<void> upsertSubject(Map<String, dynamic> values) =>
+      _LibraryProvider.upsertSubject(values);
+
+  // Single-primitive param — ADR-013 exception. Cascade lives in AppDatabase.
+  Future<void> removeSubject(String id) => _LibraryProvider.removeSubject(id);
 }

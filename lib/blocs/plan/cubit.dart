@@ -214,9 +214,75 @@ class PlanCubit extends Cubit<PlanState> {
     }
   }
 
+  // --- schedule / exam edits (Schedule editor) ---------------------------
+
+  /// Applies a batch of Schedule-editor edits in one shot: persists the new
+  /// study windows + daily target onto the watched schedule, removes each of
+  /// [removeExamIds], upserts each of [upsertExams] (scoped to the watched uid),
+  /// then refreshes the cached `schedule`/`_exams` in-memory and emits a single
+  /// `saveSchedule` success — the signal the editor's listener acts on. A failure
+  /// aborts with a `saveSchedule` fault.
+  Future<void> commitSchedule({
+    required double dailyTargetHours,
+    required List<String> enabledWindowIds,
+    required List<Exam> upsertExams,
+    required List<String> removeExamIds,
+  }) async {
+    final schedule = state.schedule;
+    final userId = _watchingUserId;
+    if (schedule == null || userId == null) return;
+    emit(state.copyWith(saveSchedule: state.saveSchedule.toLoading()));
+    try {
+      await PlanRepo.ins.updateSchedule({
+        'id': schedule.id,
+        'dailyTargetHours': dailyTargetHours,
+        'enabledWindowIds': enabledWindowIds,
+      });
+      for (final id in removeExamIds) {
+        await PlanRepo.ins.removeExam(id);
+      }
+      for (final exam in upsertExams) {
+        await PlanRepo.ins.upsertExam({...exam.toJson(), 'userId': userId});
+      }
+      final updated = schedule.copyWith(
+        dailyTargetHours: dailyTargetHours,
+        enabledWindowIds: enabledWindowIds,
+      );
+      emit(state.copyWith(schedule: updated));
+      await _refreshExams(userId);
+      emit(
+        state.copyWith(
+          saveSchedule: state.saveSchedule.toSuccess(data: updated),
+        ),
+      );
+    } on Fault catch (e) {
+      emit(state.copyWith(saveSchedule: state.saveSchedule.toFailed(fault: e)));
+    }
+  }
+
+  /// Re-reads the user's exams into the in-memory cache and re-emits the week
+  /// so day-level exam markers reflect the change without waiting for the next
+  /// block-stream tick. Purely derived — never mutates persisted blocks.
+  Future<void> _refreshExams(String userId) async {
+    _exams = (await PlanRepo.ins.exams(userId)).map(Exam.fromJson).toList();
+    final week = state.week.data;
+    final schedule = state.schedule;
+    if (week != null && schedule != null) {
+      final blocks = week.days.expand((d) => d.blocks).toList();
+      emit(
+        state.copyWith(
+          week: state.week.toSuccess(data: _assembleWeek(schedule, blocks)),
+        ),
+      );
+    }
+  }
+
   // --- convenience getters for the UI ------------------------------------
 
   WeekPlan? get week => state.week.data;
+
+  /// The watched user's exams (read-only) — seeds the Schedule editor.
+  List<Exam> get exams => List.unmodifiable(_exams);
 
   /// Today's day plan within the watched week, if present.
   DayPlan? get today {

@@ -164,13 +164,20 @@ class UserCubit extends Cubit<UserState> {
     }
   }
 
-  Future<void> update() async {
+  /// Merge-persists [fields] onto the signed-in user's profile (e.g.
+  /// `{'institution': '…'}`), then refreshes [UserState.userData] so every
+  /// `UserCubit`-listening surface reflects the change without a manual reload.
+  Future<void> updateProfile(Map<String, dynamic> fields) async {
+    final uid = state.user?.uid ?? state.userData?.uid;
+    if (uid == null) return;
     emit(state.copyWith(update: state.update.toLoading()));
     try {
-      final raw = await UserRepo.ins.update();
+      final raw = await UserRepo.ins.update(uid, fields);
+      final data = UserData.fromJson(raw);
       emit(
         state.copyWith(
-          update: state.update.toSuccess(data: UserData.fromJson(raw)),
+          userData: data,
+          update: state.update.toSuccess(data: data),
         ),
       );
     } on Fault catch (e) {

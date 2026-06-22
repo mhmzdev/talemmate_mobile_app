@@ -3,6 +3,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:taleemmate/blocs/chat/cubit.dart';
 import 'package:taleemmate/blocs/library/cubit.dart';
 import 'package:taleemmate/blocs/plan/cubit.dart';
+import 'package:taleemmate/repos/library/library_repo.dart';
 import 'package:taleemmate/repos/plan/plan_repo.dart';
 import 'package:taleemmate/repos/progress/progress_repo.dart';
 import 'package:taleemmate/repos/quiz/quiz_repo.dart';
@@ -21,6 +22,8 @@ import 'package:taleemmate/repos/user/user_repo.dart';
 // ---------------------------------------------------------------------------
 
 class MockUserRepo extends Mock implements UserRepo {}
+
+class MockLibraryRepo extends Mock implements LibraryRepo {}
 
 class MockQuotesRepo extends Mock implements QuotesRepo {}
 

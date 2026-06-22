@@ -84,5 +84,38 @@ class LibraryCubit extends Cubit<LibraryState> {
     }
   }
 
+  /// Applies a batch of subject edits from the Subjects editor in one shot:
+  /// removes each of [removeIds] (cascade — see `AppDatabase.deleteSubjectCascade`),
+  /// upserts each of [upserts] (scoped to the session uid, ADR-014), reloads the
+  /// app-wide `subjects` list once, then emits a single `saveSubject` success —
+  /// the signal the editor's listener acts on (pop / offer-to-regenerate). Any
+  /// failure aborts the batch with a `saveSubject` fault.
+  Future<void> commitSubjects({
+    required List<Subject> upserts,
+    required List<String> removeIds,
+  }) async {
+    final uid = state.userId;
+    if (uid == null) return;
+    emit(state.copyWith(saveSubject: state.saveSubject.toLoading()));
+    try {
+      for (final id in removeIds) {
+        await _repo.removeSubject(id);
+      }
+      for (final subject in upserts) {
+        await _repo.upsertSubject({...subject.toJson(), 'userId': uid});
+      }
+      await load();
+      emit(
+        state.copyWith(
+          saveSubject: state.saveSubject.toSuccess(
+            data: upserts.isEmpty ? null : upserts.last,
+          ),
+        ),
+      );
+    } on Fault catch (e) {
+      emit(state.copyWith(saveSubject: state.saveSubject.toFailed(fault: e)));
+    }
+  }
+
   void reset() => emit(LibraryState.def());
 }

@@ -73,18 +73,23 @@ class _AccountSection extends StatelessWidget {
           icon: LucideIcons.book_open,
           label: 'Subjects & confidence',
           value: subjects == 1 ? '1 subject' : '$subjects subjects',
+          onTap: () => AppRoutes.subjectsEditor.push(context),
         ),
         _SettingRow(
           icon: LucideIcons.calendar,
           label: 'Schedule & exams',
           value: hrs == null ? 'Not set' : '${hrs.toStringAsFixed(1)} hrs/day',
+          onTap: () => AppRoutes.scheduleEditor.push(context),
         ),
         _SettingRow(
           icon: LucideIcons.library,
           label: 'Material',
           value:
               '${items.length} item${items.length == 1 ? '' : 's'} · ${totalSize.readableSize}',
-          onTap: () => AppRoutes.library.pushReplace(context),
+          onTap: () {
+            ''.pop(context);
+            AppRoutes.library.pushReplace(context);
+          },
         ),
         _SettingRow(
           icon: LucideIcons.flag,
@@ -92,6 +97,7 @@ class _AccountSection extends StatelessWidget {
           value: (institution == null || institution.isEmpty)
               ? 'Add'
               : institution,
+          onTap: () => _InstitutionSheet.show(context, institution),
           last: true,
         ),
       ],

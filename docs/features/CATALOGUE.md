@@ -42,7 +42,7 @@ Where each feature actually stands in code. Status legend:
 
 | Feature | Status | What's real | Not wired yet |
 |---|---|---|---|
-| Auth (login / register / sign-out) | ✅ | Firebase Auth, launch gate, onboarding routing, stack-clearing sign-out | Forgot-password (empty `onTap`); `forgot`/`update`/`fetch`/`deleteAccount` mocked |
+| Auth (login / register / sign-out) | ✅ | Firebase Auth, launch gate, onboarding routing, stack-clearing sign-out; `update(uid, fields)` real (Profile institution edit) | Forgot-password (empty `onTap`); `forgot`/`fetch`/`deleteAccount` mocked |
 | Onboarding (4 steps + loader) | ✅ | Full flow → local Drift persistence (subjects/schedule/exams/materials), validation gates, resume | Firestore payload sync deferred; file picker stores **local refs only** |
 | Library (materials module) | ✅ | Grouped list, in-memory search/filter, add/delete, pull-to-refresh, per-user uid | "Open document" & "Ask the tutor about this" → "coming soon" flash; no cloud storage; no rename/move/re-index |
 | Library text extraction (OCR/index) | ✅ | Live Gemini OCR pipeline → `MaterialTexts`, status badges, retry, real page counts | No backfill of pre-existing items; no vector DB/embeddings; slides/video/voice/`.docx` → `failed` |
@@ -51,7 +51,7 @@ Where each feature actually stands in code. Status legend:
 | Focus session + Reschedule/Snooze | ✅ | Timer ring, "Mark block done" → `SessionMetric`, 4 deterministic reschedule edits + narrow AI reasoning rewrite | "DND on" is a static label; pause/resume icon not keyed; "Move to tonight" fixed 20:30 (no prayer data) |
 | Quiz | 🟢 | Live Gemini (`quizModel`), grounded on materials, 8/15 questions, persists attempts (feeds Progress) | No `docs/feat-checklist/` (not driver-verified); no flag/report-question; feedback citation has no "See in source" link |
 | Progress | 🟢 | Reads **real** Drift data (streak, daily scores, session metrics, quiz attempts) + live `progressModel` AI insights | No `docs/feat-checklist/` (not driver-verified) |
-| Profile & Settings | 🟡 | Screen renders; theme + Daily-quote-card toggle persist; version-copy-to-clipboard works | Header/account stats are **hardcoded** (`5 subjects`, `86 hrs`, `68/100`, `42 items`); most toggles local-only (not persisted); Delete account / Help / Rate are no-ops |
+| Profile & Settings | 🟢 | Account rows read live data **and are editable**: Institution sheet (`updateProfile` → Firestore + Drift), Subjects editor (`commitSubjects`, cascade-delete keeping materials), Schedule editor (`commitSchedule`, ≥1-window gate), shared offer-to-regenerate; theme + Daily-quote-card persist; version-copy works | Header quick-stats (Studied/Readiness) still placeholder; AI-tutor/notification/appearance toggles local-only; Delete account / Help / Rate are no-ops; no client-side timeout on the institution write |
 | Splash | ✅ | Animated gate → `UserCubit.init()` → routes by session/onboarding state | — |
 
 ### Cross-cutting — partial / deferred
@@ -350,11 +350,13 @@ Learning analytics dashboard. **14-day rolling view.**
 
 ### Settings sections
 
-**Account**
-- Subjects & confidence (e.g. "5 subjects")
-- Schedule & exams (e.g. "3.5 hrs/day")
-- Material → Library (e.g. "42 items · 1.2 GB")
-- Institution (e.g. "NUST · SEECS")
+**Account** — reads live data; the three editor rows are now **functional**:
+- Subjects & confidence (e.g. "5 subjects") → standalone **Subjects editor** (add/edit/remove + confidence; `LibraryCubit.commitSubjects`; subject removal cascades but keeps materials)
+- Schedule & exams (e.g. "3.5 hrs/day") → standalone **Schedule editor** (windows + daily target + exams; `PlanCubit.commitSchedule`; ≥1 window required)
+- Material → Library (e.g. "42 items · 1.2 GB") _(navigates to Library)_
+- Institution (e.g. "NUST · SEECS") → edit **bottom sheet** (`UserCubit.updateProfile`; persists to `users/{uid}` + mirrors to local Drift)
+
+> The editors hold edits locally and **apply them only on rebuild**: "Save changes" always asks **"Rebuild this week's plan?"** — **Rebuild** persists the edits + regenerates behind a loader; **Later** discards them (inputs and the generated week never drift apart). See [profile-account-editors checklist](../feat-checklist/profile-account-editors.md).
 
 **AI Tutor**
 - Citations toggle ("Show citations on every reply", default **on**)

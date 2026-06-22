@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:taleemmate/configs/configs.dart';
+import 'package:taleemmate/core/db/database.dart';
 import 'package:taleemmate/services/fault/faults.dart';
 import 'package:taleemmate/services/firebase/collections.dart';
 
@@ -44,7 +45,8 @@ class UserRepo {
 
   Future<Map<String, dynamic>> fetch() => _UserProvider.fetch();
 
-  Future<Map<String, dynamic>> update() => _UserProvider.update();
+  Future<Map<String, dynamic>> update(String uid, Map<String, dynamic> fields) =>
+      _UserProvider.update(uid, fields);
 
   Future<Map<String, dynamic>> forgot() => _UserProvider.forgot();
 

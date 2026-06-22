@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
 import 'package:taleemmate/blocs/user/cubit.dart';
@@ -16,6 +17,8 @@ import 'package:taleemmate/ui/widgets/core/buttons/app_icon_button.dart';
 import 'package:taleemmate/ui/widgets/core/screen/screen.dart';
 import 'package:taleemmate/ui/widgets/design/alerts/app_alert_base.dart';
 import 'package:taleemmate/ui/widgets/design/misc/app_ai_pill.dart';
+import 'package:taleemmate/ui/widgets/design/modals/app_modal_base.dart';
+import 'package:taleemmate/ui/widgets/forms/forms.dart';
 import 'package:taleemmate/ui/widgets/design/misc/app_avatar.dart';
 import 'package:taleemmate/ui/widgets/design/progress/app_stat.dart';
 import 'package:taleemmate/ui/widgets/headless/app_touch.dart';
@@ -26,6 +29,7 @@ part '_state.dart';
 part 'widgets/_profile_header.dart';
 part 'widgets/_glance.dart';
 part 'widgets/_settings.dart';
+part 'widgets/_institution_sheet.dart';
 part 'listeners/_logout.dart';
 
 class ProfileScreen extends StatelessWidget {

@@ -1,3 +1,5 @@
+import 'package:taleemmate/ui/screens/schedule_editor/schedule_editor.dart';
+import 'package:taleemmate/ui/screens/subjects_editor/subjects_editor.dart';
 import 'package:taleemmate/ui/screens/quiz/quiz.dart';
 import 'package:taleemmate/ui/screens/focus/focus.dart';
 import 'package:taleemmate/ui/screens/profile/profile.dart';
@@ -18,6 +20,8 @@ import 'routes.dart';
 final navigator = GlobalKey<NavigatorState>();
 
 final appRoutes = <String, WidgetBuilder>{
+AppRoutes.scheduleEditor: (_) => const ScheduleEditorScreen(),
+AppRoutes.subjectsEditor: (_) => const SubjectsEditorScreen(),
   AppRoutes.quiz: (_) => const QuizScreen(),
   AppRoutes.profile: (_) => const ProfileScreen(),
   AppRoutes.stepwiseLoader: (_) => const StepwiseLoaderScreen(),

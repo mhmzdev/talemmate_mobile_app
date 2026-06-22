@@ -142,6 +142,58 @@ void main() {
     });
   });
 
+  group('updateProfile', () {
+    test('emits [loading, success] and refreshes userData', () async {
+      when(() => repo.login(any())).thenAnswer((_) async => fakeFirebaseUser());
+      when(() => repo.fetchProfile(any())).thenAnswer((_) async => TestUser.rawJson());
+      when(() => repo.update(any(), any())).thenAnswer(
+        (_) async => {...TestUser.rawJson(), 'institution': 'NUST'},
+      );
+
+      final cubit = UserCubit();
+      addTearDown(cubit.close);
+      await cubit.login({'email': 'a@b.com', 'password': 'pass1234'});
+
+      final states = <UserState>[];
+      final sub = cubit.stream.listen(states.add);
+      await cubit.updateProfile({'institution': 'NUST'});
+      await Future<void>.delayed(Duration.zero);
+      await sub.cancel();
+
+      expect(states.first.update.isLoading, isTrue);
+      expect(states.last.update.isSuccess, isTrue);
+      expect(states.last.userData?.institution, 'NUST');
+      verify(() => repo.update(TestUser.uid, {'institution': 'NUST'})).called(1);
+    });
+
+    test('emits [loading, failed] when the repo throws a Fault', () async {
+      when(() => repo.login(any())).thenAnswer((_) async => fakeFirebaseUser());
+      when(() => repo.fetchProfile(any())).thenAnswer((_) async => TestUser.rawJson());
+      when(() => repo.update(any(), any())).thenThrow(testFault('permission-denied'));
+
+      final cubit = UserCubit();
+      addTearDown(cubit.close);
+      await cubit.login({'email': 'a@b.com', 'password': 'pass1234'});
+
+      final states = <UserState>[];
+      final sub = cubit.stream.listen(states.add);
+      await cubit.updateProfile({'institution': 'NUST'});
+      await Future<void>.delayed(Duration.zero);
+      await sub.cancel();
+
+      expect(states.first.update.isLoading, isTrue);
+      expect(states.last.update.isFailed, isTrue);
+      expect(states.last.update.fault, isNotNull);
+    });
+
+    test('no-ops when there is no signed-in uid', () async {
+      final states = await record((c) => c.updateProfile({'institution': 'NUST'}));
+
+      expect(states, isEmpty);
+      verifyNever(() => repo.update(any(), any()));
+    });
+  });
+
   group('reset', () {
     test('returns to a fresh default state', () async {
       when(() => repo.login(any())).thenAnswer((_) async => fakeFirebaseUser());

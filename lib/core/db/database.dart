@@ -202,6 +202,12 @@ class AppDatabase extends _$AppDatabase {
     });
   }
 
+  /// Mirrors the user's institution into the local onboarding row so offline
+  /// surfaces stay consistent with `users/{uid}`. A targeted UPDATE — no-op when
+  /// the user has no local onboarding row yet (e.g. logged in on a fresh device).
+  Future<void> updateInstitution(String userId, String? value) =>
+      onboardingDao.updateInstitution(userId, value);
+
   /// Removes a material and its extracted text in one transaction. The
   /// `material_texts.itemId` FK means the child text row must be deleted first —
   /// once an item is indexed, deleting only the item raises a foreign-key
@@ -463,9 +469,7 @@ class AppDatabase extends _$AppDatabase {
   }) async {
     await (update(studyBlocks)..where((b) => b.id.equals(id))).write(
       StudyBlocksCompanion(
-        startTime: startTime == null
-            ? const Value.absent()
-            : Value(startTime),
+        startTime: startTime == null ? const Value.absent() : Value(startTime),
         durationMinutes: durationMinutes == null
             ? const Value.absent()
             : Value(durationMinutes),
@@ -598,7 +602,8 @@ class AppDatabase extends _$AppDatabase {
     'subjectId': r.subjectId,
     'readinessScore': r.readinessScore,
     'lastUpdatedAt': r.lastUpdatedAt.toIso8601String(),
-    'predictedScoreRange': r.predictedScoreMin == null && r.predictedScoreMax == null
+    'predictedScoreRange':
+        r.predictedScoreMin == null && r.predictedScoreMax == null
         ? null
         : {'min': r.predictedScoreMin ?? 0, 'max': r.predictedScoreMax ?? 0},
     'weeklyGain': r.weeklyGain,
@@ -696,6 +701,129 @@ class AppDatabase extends _$AppDatabase {
     'date': r.date.toIso8601String(),
     'label': r.label,
   };
+
+  // --- Profile editors (subjects / exams / schedule) ---------------------
+  // Map-only surface so `LibraryRepo` / `PlanRepo` stay model-free (ADR-013):
+  // the Map→Companion conversion lives here. The subject/exam payloads carry an
+  // extra `userId` key (the model itself is uid-less) for per-account scoping.
+
+  /// Upserts one subject from a `Subject.toJson()` map plus a `userId` key —
+  /// editing an existing row by id is an update (insertOnConflictUpdate).
+  Future<void> upsertSubject(Map<String, dynamic> json) =>
+      subjectDao.upsertSubject(
+        SubjectsCompanion(
+          id: Value(json['id'] as String),
+          userId: Value(json['userId'] as String),
+          code: Value(json['code'] as String),
+          name: Value(json['name'] as String),
+          colorHex: Value(json['colorHex'] as String),
+          confidenceLevel: Value((json['confidenceLevel'] as num).toDouble()),
+          order: Value((json['order'] as num?)?.toInt() ?? 0),
+        ),
+      );
+
+  /// Removes a subject and every row derived from it in one transaction —
+  /// study blocks, topics, exams, quizzes (+questions/attempts/feedback), tutor
+  /// conversations (+messages) and progress metrics are deleted; uploaded
+  /// materials survive but are un-assigned (subjectId → null). Children are
+  /// deleted before parents because `PRAGMA foreign_keys = ON` is enforced.
+  Future<void> deleteSubjectCascade(String subjectId) async {
+    await transaction(() async {
+      // Quizzes for the subject → feedback → attempts → questions → quizzes.
+      final quizRows = await (select(
+        quizzes,
+      )..where((q) => q.subjectId.equals(subjectId))).get();
+      final quizIds = quizRows.map((r) => r.id).toList();
+      if (quizIds.isNotEmpty) {
+        final questionRows = await (select(
+          quizQuestions,
+        )..where((q) => q.quizId.isIn(quizIds))).get();
+        final questionIds = questionRows.map((r) => r.id).toList();
+        if (questionIds.isNotEmpty) {
+          await (delete(
+            quizFeedbackItems,
+          )..where((f) => f.questionId.isIn(questionIds))).go();
+        }
+        await (delete(quizAttempts)..where((a) => a.quizId.isIn(quizIds))).go();
+        await (delete(
+          quizQuestions,
+        )..where((q) => q.quizId.isIn(quizIds))).go();
+        await (delete(quizzes)..where((q) => q.id.isIn(quizIds))).go();
+      }
+
+      // Tutor conversations for the subject → messages → conversations.
+      final convRows = await (select(
+        tutorConversations,
+      )..where((c) => c.subjectId.equals(subjectId))).get();
+      final convIds = convRows.map((r) => r.id).toList();
+      if (convIds.isNotEmpty) {
+        await (delete(
+          tutorMessages,
+        )..where((m) => m.conversationId.isIn(convIds))).go();
+        await (delete(
+          tutorConversations,
+        )..where((c) => c.id.isIn(convIds))).go();
+      }
+
+      // Subject-scoped derived rows.
+      await (delete(
+        studyBlocks,
+      )..where((b) => b.subjectId.equals(subjectId))).go();
+      await (delete(
+        progressMetrics,
+      )..where((p) => p.subjectId.equals(subjectId))).go();
+      await (delete(exams)..where((e) => e.subjectId.equals(subjectId))).go();
+
+      // Topics of the subject — null out the nullable daily-score references
+      // first, then drop the topics. Materials survive as unsorted.
+      final topicRows = await (select(
+        topics,
+      )..where((t) => t.subjectId.equals(subjectId))).get();
+      final topicIds = topicRows.map((r) => r.id).toList();
+      if (topicIds.isNotEmpty) {
+        await (update(dailyScores)..where((d) => d.topicId.isIn(topicIds)))
+            .write(const DailyScoresCompanion(topicId: Value<String?>(null)));
+      }
+      await (update(libraryItems)..where((i) => i.subjectId.equals(subjectId)))
+          .write(const LibraryItemsCompanion(subjectId: Value<String?>(null)));
+      await (delete(topics)..where((t) => t.subjectId.equals(subjectId))).go();
+
+      // Finally the subject itself.
+      await (delete(subjects)..where((s) => s.id.equals(subjectId))).go();
+    });
+  }
+
+  /// Upserts one exam from an `Exam.toJson()` map plus a `userId` key. `date`
+  /// arrives as an ISO-8601 string; editing an existing row by id is an update.
+  Future<void> upsertExam(Map<String, dynamic> json) => subjectDao.upsertExam(
+    ExamsCompanion(
+      id: Value(json['id'] as String),
+      userId: Value(json['userId'] as String),
+      subjectId: Value(json['subjectId'] as String),
+      date: Value(DateTime.parse(json['date'] as String)),
+      label: Value(json['label'] as String?),
+    ),
+  );
+
+  /// Removes a single exam by id.
+  Future<void> deleteExam(String id) => subjectDao.deleteExam(id);
+
+  /// Applies a partial schedule edit onto an existing row — only the supplied
+  /// `dailyTargetHours` / `enabledWindowIds` columns are written (a targeted
+  /// UPDATE, mirroring [updateScheduleReasoning]; never an insert).
+  Future<void> updateSchedule(Map<String, dynamic> json) async {
+    final id = json['id'] as String;
+    await (update(schedules)..where((s) => s.id.equals(id))).write(
+      SchedulesCompanion(
+        dailyTargetHours: json.containsKey('dailyTargetHours')
+            ? Value((json['dailyTargetHours'] as num).toDouble())
+            : const Value.absent(),
+        enabledWindowIds: json.containsKey('enabledWindowIds')
+            ? Value((json['enabledWindowIds'] as List).cast<String>())
+            : const Value.absent(),
+      ),
+    );
+  }
 
   // --- Quiz persistence --------------------------------------------------
   // Map-only surface so `QuizRepo` stays model-free (ADR-013): row↔Map and

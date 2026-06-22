@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:taleemmate/blocs/plan/cubit.dart';
 import 'package:taleemmate/core/models/schedule/study_block.dart';
+import 'package:taleemmate/core/models/subject/exam.dart';
 import 'package:taleemmate/repos/plan/plan_repo.dart';
 import 'package:taleemmate/repos/progress/progress_repo.dart';
 
@@ -130,6 +131,64 @@ void main() {
       // The block move still stands; the week keeps its original reasoning.
       expect(states.last.week.data?.aiReasoning, 'Original reasoning.');
       verify(() => repo.updateBlock(any())).called(1);
+    });
+  });
+
+  group('commitSchedule', () {
+    Exam exam({String id = 'exam-1'}) =>
+        Exam(id: id, subjectId: 'subj-maths', date: DateTime(2026, 7, 1));
+
+    test('persists windows + target + exam edits and refreshes caches', () async {
+      stubWatch();
+      when(() => repo.updateSchedule(any())).thenAnswer((_) async {});
+      when(() => repo.upsertExam(any())).thenAnswer((_) async {});
+      when(() => repo.removeExam(any())).thenAnswer((_) async {});
+      when(() => repo.exams(any())).thenAnswer((_) async => [exam().toJson()]);
+
+      final states = await record((c) async {
+        await c.watchForUser(TestUser.uid);
+        await c.commitSchedule(
+          dailyTargetHours: 3.5,
+          enabledWindowIds: const ['evening'],
+          upsertExams: [exam()],
+          removeExamIds: const ['old-exam'],
+        );
+      });
+
+      final sched =
+          verify(() => repo.updateSchedule(captureAny())).captured.single
+              as Map<String, dynamic>;
+      expect(sched['id'], TestBlock.scheduleId);
+      expect(sched['dailyTargetHours'], 3.5);
+      expect(sched['enabledWindowIds'], const ['evening']);
+
+      final sentExam = verify(() => repo.upsertExam(captureAny())).captured.last
+          as Map<String, dynamic>;
+      expect(sentExam['userId'], TestUser.uid);
+      expect(sentExam['subjectId'], 'subj-maths');
+      verify(() => repo.removeExam('old-exam')).called(1);
+
+      expect(states.last.saveSchedule.isSuccess, isTrue);
+      expect(states.last.schedule?.dailyTargetHours, 3.5);
+      expect(states.last.schedule?.enabledWindowIds, const ['evening']);
+    });
+
+    test('emits failed and keeps the prior schedule on a Fault', () async {
+      stubWatch();
+      when(() => repo.updateSchedule(any())).thenThrow(testFault('locked'));
+
+      final states = await record((c) async {
+        await c.watchForUser(TestUser.uid);
+        await c.commitSchedule(
+          dailyTargetHours: 3.5,
+          enabledWindowIds: const ['evening'],
+          upsertExams: const [],
+          removeExamIds: const [],
+        );
+      });
+
+      expect(states.last.saveSchedule.isFailed, isTrue);
+      expect(states.last.schedule?.dailyTargetHours, 2.0);
     });
   });
 

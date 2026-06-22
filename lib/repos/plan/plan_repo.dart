@@ -65,4 +65,16 @@ class PlanRepo {
   /// failure (the caller keeps the prior reasoning).
   Future<String> updateReasoning(String userId) =>
       _PlanProvider.updateReasoning(userId);
+
+  /// Applies a partial schedule edit. [values] carries `id` plus any of
+  /// `dailyTargetHours` (num), `enabledWindowIds` (`List<String>`).
+  Future<void> updateSchedule(Map<String, dynamic> values) =>
+      _PlanProvider.updateSchedule(values);
+
+  /// Upserts one exam. [values] is an `Exam.toJson()` map plus a `userId` key.
+  Future<void> upsertExam(Map<String, dynamic> values) =>
+      _PlanProvider.upsertExam(values);
+
+  // Single-primitive param — ADR-013 exception.
+  Future<void> removeExam(String id) => _PlanProvider.removeExam(id);
 }

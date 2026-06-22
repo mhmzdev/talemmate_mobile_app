@@ -103,9 +103,28 @@ class _UserProvider {
     }
   }
 
-  static Future<Map<String, dynamic>> update() async {
+  /// Merge-writes [fields] onto `users/{uid}` and returns the fresh profile map.
+  /// Used by the Profile editors (e.g. institution) to persist a partial update.
+  static Future<Map<String, dynamic>> update(
+    String uid,
+    Map<String, dynamic> fields,
+  ) async {
     try {
-      return await _UserMocks.update();
+      await _firestore
+          .collection(FireCollections.users)
+          .doc(uid)
+          .set(fields, SetOptions(merge: true));
+      // Mirror the institution into the local onboarding row so offline
+      // surfaces stay consistent with `users/{uid}` (no-op if no local row).
+      if (fields.containsKey('institution')) {
+        await AppDatabase.ins.updateInstitution(
+          uid,
+          fields['institution'] as String?,
+        );
+      }
+      return await fetchProfile(uid);
+    } on FirebaseException catch (e, s) {
+      throw FirebaseFault.fromFirebase(e, s);
     } catch (e, st) {
       if (e is Fault) rethrow;
       throw UnknownFault('Something went wrong!', st);

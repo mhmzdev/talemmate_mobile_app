@@ -1,4 +1,6 @@
 abstract class AppRoutes {
+static const scheduleEditor = '/schedule-editor';
+static const subjectsEditor = '/subjects-editor';
   static const quiz = '/quiz';
   static const focus = '/focus';
   static const profile = '/profile';

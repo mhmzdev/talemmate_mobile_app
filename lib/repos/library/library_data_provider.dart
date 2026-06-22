@@ -43,6 +43,26 @@ class _LibraryProvider {
       throw UnknownFault('Could not remove the material.', st);
     }
   }
+
+  /// Upserts one subject; the Map→row mapping lives in `AppDatabase`.
+  static Future<void> upsertSubject(Map<String, dynamic> values) async {
+    try {
+      await AppDatabase.ins.upsertSubject(values);
+    } catch (e, st) {
+      if (e is Fault) rethrow;
+      throw UnknownFault('Could not save the subject.', st);
+    }
+  }
+
+  /// Removes a subject and its derived rows (cascade lives in `AppDatabase`).
+  static Future<void> removeSubject(String id) async {
+    try {
+      await AppDatabase.ins.deleteSubjectCascade(id);
+    } catch (e, st) {
+      if (e is Fault) rethrow;
+      throw UnknownFault('Could not remove the subject.', st);
+    }
+  }
 }
 
 /// Maps a Drift [LibraryItemRow] to a `LibraryItem.fromJson`-compatible map.

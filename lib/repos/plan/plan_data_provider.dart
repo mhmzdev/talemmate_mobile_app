@@ -61,6 +61,39 @@ class _PlanProvider {
     }
   }
 
+  /// See [PlanRepo.updateSchedule].
+  static Future<void> updateSchedule(Map<String, dynamic> values) async {
+    try {
+      await AppDatabase.ins.updateSchedule(values);
+    } on Fault {
+      rethrow;
+    } catch (e, st) {
+      throw UnknownFault('Couldn\'t update your schedule.', st);
+    }
+  }
+
+  /// See [PlanRepo.upsertExam].
+  static Future<void> upsertExam(Map<String, dynamic> values) async {
+    try {
+      await AppDatabase.ins.upsertExam(values);
+    } on Fault {
+      rethrow;
+    } catch (e, st) {
+      throw UnknownFault('Couldn\'t save the exam.', st);
+    }
+  }
+
+  /// See [PlanRepo.removeExam].
+  static Future<void> removeExam(String id) async {
+    try {
+      await AppDatabase.ins.deleteExam(id);
+    } on Fault {
+      rethrow;
+    } catch (e, st) {
+      throw UnknownFault('Couldn\'t remove the exam.', st);
+    }
+  }
+
   /// See [PlanRepo.updateReasoning]. Loads the current plan context, asks the
   /// narrow reasoning model for a fresh paragraph, persists it, and returns it.
   static Future<String> updateReasoning(String userId) async {

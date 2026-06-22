@@ -7,6 +7,10 @@ class PlanState extends Equatable {
   final BlocState<WeekPlan> week;
   final BlocState<String> reasoning;
 
+  /// Commit of a batch of Schedule-editor edits (windows + target + exams) —
+  /// the signal the editor listens on (pop / offer-to-regenerate).
+  final BlocState<Schedule> saveSchedule;
+
   // --- state data --- //
   final Schedule? schedule;
 
@@ -14,6 +18,7 @@ class PlanState extends Equatable {
     required this.generate,
     required this.week,
     required this.reasoning,
+    required this.saveSchedule,
     this.schedule,
   });
 
@@ -22,18 +27,21 @@ class PlanState extends Equatable {
       generate = BlocState(),
       week = BlocState(),
       reasoning = BlocState(),
+      saveSchedule = BlocState(),
       schedule = null;
 
   PlanState copyWith({
     BlocState<WeekPlan>? generate,
     BlocState<WeekPlan>? week,
     BlocState<String>? reasoning,
+    BlocState<Schedule>? saveSchedule,
     Schedule? schedule,
   }) {
     return PlanState(
       generate: generate ?? this.generate,
       week: week ?? this.week,
       reasoning: reasoning ?? this.reasoning,
+      saveSchedule: saveSchedule ?? this.saveSchedule,
       schedule: schedule ?? this.schedule,
     );
   }
@@ -44,6 +52,7 @@ class PlanState extends Equatable {
     generate,
     week,
     reasoning,
+    saveSchedule,
     schedule,
   ];
 }

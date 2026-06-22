@@ -38,7 +38,7 @@ class UIFlash {
       Overlay.of(context),
       CustomSnackBar.success(
         message: message,
-        textStyle: AppText.h3 + Colors.white,
+        textStyle: AppText.b1 + Colors.white,
         backgroundColor: AppTheme.c.success, //
 
         iconPositionLeft: iconLeftSmall,
