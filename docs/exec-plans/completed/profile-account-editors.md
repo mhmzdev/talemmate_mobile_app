@@ -1,10 +1,18 @@
 ---
 title: "Profile → Account section editors (Institution, Subjects, Schedule & exams)"
-status: active
+status: completed
 created: 2026-06-20
+completed: 2026-06-22
 ---
 
-🚧 ACTIVE — Implementation in progress
+✅ COMPLETED — Merged + driver-verified
+
+> **Implemented as apply-on-rebuild** (refined from the original "offer-to-regenerate"
+> design): the editors hold edits locally and only persist on **Rebuild** — "Save
+> changes" always prompts, **Rebuild** persists + regenerates, **Later** discards.
+> So plan inputs and the generated week never drift apart. The Institution sheet
+> owns its own success listener (a slow Firestore write can't pop an unrelated
+> route). See [docs/feat-checklist/profile-account-editors.md](../../feat-checklist/profile-account-editors.md).
 
 # Profile → Account Editors — Implementation Plan
 
