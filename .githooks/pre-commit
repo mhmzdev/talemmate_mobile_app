@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # File-length guard — enforces the file ≤300 lines convention (.claude/rules/dart.md).
 #
-# DCM (dcm.dev) covers function length; it has no per-file metric, so this hook
-# covers files. Checks the STAGED content of each added/modified Dart file and
+# Checks the STAGED content of each added/modified Dart file and
 # aborts the commit if any exceeds the limit. Skipped: generated files
 # (*.g.dart / *.freezed.dart) and the lib/blocs/, lib/repos/, lib/core/db/ dirs.
 #
