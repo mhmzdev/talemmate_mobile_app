@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# File-length guard — enforces the file ≤300 lines convention (.claude/rules/dart.md).
+#
+# DCM (dcm.dev) covers function length; it has no per-file metric, so this hook
+# covers files. Checks the STAGED content of each added/modified Dart file and
+# aborts the commit if any exceeds the limit. Skipped: generated files
+# (*.g.dart / *.freezed.dart) and the lib/blocs/, lib/repos/, lib/core/db/ dirs.
+#
+# Bypass for a one-off commit with:  git commit --no-verify
+# To audit the whole tree manually:
+#   find lib test -name '*.dart' ! -name '*.g.dart' ! -name '*.freezed.dart' \
+#     -exec sh -c 'n=$(wc -l < "$1"); [ "$n" -gt 300 ] && echo "$n  $1"' _ {} \;
+
+set -uo pipefail
+
+LIMIT=300
+
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+cd "$repo_root" || exit 0
+
+# Staged, added/copied/modified Dart files — excluding generated output.
+# (while-read + process substitution: portable to macOS's bash 3.2, no mapfile.)
+violations=""
+while IFS= read -r f; do
+  [ -z "$f" ] && continue
+  # Count lines of the staged blob (not the working tree) for accuracy.
+  n=$(git show ":$f" 2>/dev/null | wc -l | tr -d ' ')
+  if [ "${n:-0}" -gt "$LIMIT" ]; then
+    violations+="  ${f}"$'\n'"      ${n} lines (>${LIMIT}) — split by responsibility"$'\n'
+  fi
+done < <(
+  git diff --cached --name-only --diff-filter=ACM -- '*.dart' \
+    | grep -vE '\.(g|freezed)\.dart$' \
+    | grep -vE '^lib/(blocs|repos|core/db)/'
+)
+
+if [ -n "$violations" ]; then
+  cat >&2 <<EOF
+✖ File-length limit exceeded (>${LIMIT} lines):
+
+${violations}
+A file over ${LIMIT} lines should be split by responsibility (e.g. the
+spec-driven part layout for widgets, or extracting helpers/sections).
+
+Commit aborted. Bypass once with: git commit --no-verify
+EOF
+  exit 1
+fi
+
+exit 0

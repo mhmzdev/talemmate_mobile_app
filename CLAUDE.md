@@ -4,22 +4,26 @@ Flutter-based AI tutoring app (iOS + Android). Urdu/English. Firebase-only backe
 
 ## Non-Negotiable Rules
 
-These apply to every task. Violating them breaks the architecture:
+These apply to **every** task, regardless of which files you touch. Violating them breaks the architecture:
 
-1. **`App.init(context)` first** — call it at the top of every `build()`. Skipping it breaks theme, spacing, and typography.
-2. **Layer boundary** — UI (`_state.dart`) never calls Firebase or HTTP. Cubits never import from `lib/ui/`.
-3. **State accessors** — never `context.read<X>()` / `context.watch<X>()`. Always `XCubit.c(context)` / `_ScreenState.s(context)`.
-4. **Generators for all boilerplate** — never hand-create screen, cubit, or provider files. Always use `hygen`. See [docs/tooling/HYGEN.md](docs/tooling/HYGEN.md) for all generators.
-5. **Error model** — always catch Firebase/HTTP exceptions and convert to typed `Fault` subtypes before emitting cubit state.
-6. **Repo layer purity** — `lib/repos/**/*_repo.dart` public methods accept and return `Map<String, dynamic>` / `List<Map<String, dynamic>>` / primitives only. Never return Dart model classes (e.g. `UserData`). Exception: a single-purpose function with 1–2 primitive params (e.g. `Future<bool> exists(String id)`). Cubits do the `Model.fromJson(raw)` conversion. See [ADR-013](docs/architecture/DECISIONS.md).
-7. **Widget extraction threshold** — Only extract a private widget when the child contains **≥5 child widgets OR ≥30 lines**. A single `Row`, single `Container`, or one-line wrapper does NOT earn its own class. Inline it.
-8. **Spacing tokens are 4-multiples only** — `t04, t08, t12, t16, t24, t32, t48, t64`. Snap any design value to the nearest token (10→8, 17→16, 19→20, 22→24). Never use `Spacer()` — use `Space.x.t*` / `Space.y.t*` with the explicit token.
-9. **FocusNodes are opt-in** — Forms do NOT use `FocusNode` by default. The keyboard's "next" action moves focus on its own. Only add a FocusNode when there is a concrete need: jumping to a non-text field, programmatic focus on mount, or focusing after a non-tap event.
-10. **Read the conventions before generating code** — When touching UI, forms, state, or repos, the relevant `docs/conventions/*.md` file is authoritative. If you are unsure, read it first rather than inferring from siblings.
-11. **No `for` loops in the widget tree** — never iterate UI with `for (...) ...[]`. Always use `.map()` (and `.asMap().entries.expand(...)` when you need the index or separators). Applies to every widget-list build, including fixed-count ones.
-12. **Never delete `*_mocks.dart` / `*_parser.dart` from `lib/repos/`** — they are part of the repo scaffold and kept for future/test wiring even when a real provider is live. Keep them as `part of` with `// ignore_for_file: unused_element`. Same for the cubit/repo method surface (`forgot`, `update`, `fetch`, `deleteAccount`, …): don't prune methods just because nothing calls them yet.
-13. **Use the dedicated `Space` token for the shape you need** — `Space.a.t*` (all), `Space.h.t*` / `Space.v.t*` (one axis), `Space.t/b/l/r.t*` (one side). Reserve `Space.sym(h, v)` for genuinely asymmetric padding only — don't reach for it when a single-token form fits.
-14. **Always pass `routeName` to dialogs/sheets** — `showAppAlert`/`showDialog`/`showModalBottomSheet` must set `RouteSettings(name: ...)` so navigation logs are investigable (no `unknown` routes).
+1. **Layer boundary** — UI (`_state.dart`) never calls Firebase or HTTP. Cubits never import from `lib/ui/`. The dependency points one way only: UI → cubit → repo.
+2. **Generators for all boilerplate** — never hand-create screen, cubit, provider, or repo files. Always use `hygen`. See [docs/tooling/HYGEN.md](docs/tooling/HYGEN.md) for all generators.
+3. **Error model** — always catch Firebase/HTTP exceptions and convert to typed `Fault` subtypes before emitting cubit state.
+
+### Layer-specific rules load automatically
+
+The detailed, file-type-specific rules live in `.claude/rules/` and are **auto-injected into context the moment you open a matching file** — they are equally non-negotiable. You do not need to remember to read them; they appear when relevant.
+
+| When you edit… | Auto-loaded rules | Authoritative doc |
+|---|---|---|
+| `lib/**` · `test/**` | Enums over strings (+ where enums live), class-based widgets not functional, function ≤30 / file ≤300 lines | [DART.md](docs/conventions/DART.md) |
+| `lib/ui/**` | `App.init` first, state accessors, spacing tokens, widget extraction, `.map()` not `for`, dialog `routeName`, FocusNodes | [CONFIGS.md](docs/conventions/CONFIGS.md) · [DART.md](docs/conventions/DART.md) |
+| `lib/ui/widgets/**` | Spec-driven atomic widget architecture (`_enums`/`_model`/`_data` `part` layout, enum-keyed variant maps) | — |
+| `lib/repos/**` | Repo purity (raw `Map`/primitives), keep `*_mocks`/`*_parser`, don't prune method surface | [ADR-013](docs/architecture/DECISIONS.md) |
+| `lib/blocs/**` | `Fault` conversion, model `fromJson` here, `BlocListener` for nav/side-effects | [STATE_MANAGEMENT.md](docs/conventions/STATE_MANAGEMENT.md) |
+| `test/**` | Ship tests with features, mocktail-only, `.ins` seam | [TESTING.md](docs/TESTING.md) |
+
+If you are planning work that does NOT open these files, open the relevant doc above before generating layer-specific code.
 
 ## Tech Stack
 
